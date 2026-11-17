@@ -3,6 +3,8 @@ import { html, useState } from '../../vendor/preact-htm.js';
 import { FACE } from './rules.js';
 
 const cls = (...a) => a.filter(Boolean).join(' ');
+/* charts are drawn at roughly the width they will show at, so text keeps its size on phones */
+const fitW = () => { try { return Math.max(300, Math.min(560, window.innerWidth - 64)); } catch (e) { return 560; } };
 const nice = (lo, hi, n = 4) => {
   const span = hi - lo || 1; const step0 = span / n; const mag = Math.pow(10, Math.floor(Math.log10(step0)));
   const step = [1, 2, 2.5, 5, 10].map(k => k * mag).find(k => k >= step0) || mag * 10;
@@ -29,7 +31,7 @@ export function Bars({ rows, fmt = v => v, max, min = 0, unit = '', note }) {
 }
 
 /* vertical columns over a category axis */
-export function Columns({ data, fmt = v => v, height = 180, color = 'var(--gold)', yMin, yMax, xLabel, yLabel, tip, width = 560 }) {
+export function Columns({ data, fmt = v => v, height = 180, color = 'var(--gold)', yMin, yMax, xLabel, yLabel, tip, width = fitW() }) {
   const [h, setH] = useState(null);
   const W = width, H = height, L = 40, B = 30, T = 14, R = 8;
   const vals = data.map(d => d.y).filter(v => v != null);
@@ -59,7 +61,7 @@ export function Columns({ data, fmt = v => v, height = 180, color = 'var(--gold)
 }
 
 /* lines over an ordered axis; one series can be brought forward, the rest step back */
-export function Lines({ series, xs, fmt = v => v, yMin, yMax, height = 220, xLabel, focus, xFmt = v => v, width = 560 }) {
+export function Lines({ series, xs, fmt = v => v, yMin, yMax, height = 220, xLabel, focus, xFmt = v => v, width = fitW() }) {
   const [h, setH] = useState(null);
   const W = width, H = height, L = 40, B = 30, T = 14, R = 44;
   const vals = series.flatMap(s => s.pts.map(p => p.y)).filter(v => v != null);
@@ -91,7 +93,7 @@ export function Lines({ series, xs, fmt = v => v, yMin, yMax, height = 220, xLab
 /* points on two numeric axes, each labelled */
 export function Scatter({ pts, xLabel, yLabel, xFmt = v => v, yFmt = v => v, height = 260 }) {
   const [h, setH] = useState(null);
-  const W = 560, H = height, L = 46, B = 34, T = 14, R = 16;
+  const W = fitW(), H = height, L = 46, B = 34, T = 14, R = 16;
   const xt = nice(Math.min(...pts.map(p => p.x)), Math.max(...pts.map(p => p.x))), yt = nice(Math.min(...pts.map(p => p.y)), Math.max(...pts.map(p => p.y)));
   const sx = v => L + (W - L - R) * (v - xt[0]) / (xt[xt.length - 1] - xt[0] || 1), sy = v => T + (H - T - B) * (1 - (v - yt[0]) / (yt[yt.length - 1] - yt[0] || 1));
   return html`<div class="chart" onMouseLeave=${() => setH(null)}>

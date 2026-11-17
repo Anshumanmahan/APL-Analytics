@@ -17,8 +17,8 @@ export function Table({ cols, rows, sort: s0, dir: d0 = -1, limit, empty = 'Not 
   const cmp = (x, y) => (typeof x === 'string' ? x.localeCompare(y) : x - y);
   const list = sort ? rows.slice().sort((a, b) => { const x = val(a), y = val(b); if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1; return dir === -1 ? cmp(y, x) : cmp(x, y); }) : rows;
   const shown = limit && !all ? list.slice(0, limit) : list;
-  return html`<div class="tbl"><table><thead><tr>${cols.map(([k, l, , o]) => html`<th class=${cls(o && o.num && 'n', sort === k && 'on')}><button class="th" onClick=${() => { if (sort === k) setDir(-dir); else { setSort(k); setDir(-1); } }}>${l}${sort === k ? (dir === -1 ? ' ▾' : ' ▴') : ''}</button></th>`)}</tr></thead>
-    <tbody>${shown.map((r, i) => html`<tr>${cols.map(([k, , f, o]) => html`<td class=${o && o.num ? 'n' : ''}>${f ? f(r, i) : r[k] == null ? '–' : r[k]}</td>`)}</tr>`)}</tbody></table>
+  return html`<div class="tbl"><table><thead><tr>${cols.map(([k, l, , o]) => html`<th class=${cls(o && o.num && 'n', sort === k && 'on', o && o.sm === 0 && 'hs')}><button class="th" onClick=${() => { if (sort === k) setDir(-dir); else { setSort(k); setDir(-1); } }}>${l}${sort === k ? (dir === -1 ? ' ▾' : ' ▴') : ''}</button></th>`)}</tr></thead>
+    <tbody>${shown.map((r, i) => html`<tr>${cols.map(([k, , f, o]) => html`<td class=${cls(o && o.num && 'n', o && o.sm === 0 && 'hs')}>${f ? f(r, i) : r[k] == null ? '–' : r[k]}</td>`)}</tr>`)}</tbody></table>
     ${limit && list.length > limit ? html`<button class="lnk more" onClick=${() => setAll(!all)}>${all ? 'Show fewer' : `Show all ${list.length}`}</button>` : ''}</div>`;
 }
 

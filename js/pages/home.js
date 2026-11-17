@@ -35,9 +35,9 @@ export function Home() {
 
     <div class="grid2 home-g">
       <section class="panel"><h2>Points table</h2><p class="muted">League stage. 2 points a win; ties split on head-to-head, then set-point difference.</p>
-        <div class="tbl"><table class="standings"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">L</th><th class="n">Sets ±</th><th class="n">Pts</th><th>Form</th></tr></thead>
+        <div class="tbl"><table class="standings"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">L</th><th class="n">Sets ±</th><th class="n">Pts</th><th class="hs">Form</th></tr></thead>
         <tbody>${st.map((o, i) => html`<tr class=${i < 4 ? 'q' : ''}><td>${i + 1}</td><td><a class="tm" href=${'#/team/' + o.t}><i style=${`background:${tc(o.t)}`}></i>${S.T(o.t).name}</a></td>
-          <td class="n">${o.P}</td><td class="n">${o.W}</td><td class="n">${o.L}</td><td class="n">${o.SF - o.SA > 0 ? '+' : ''}${o.SF - o.SA}</td><td class="n"><b>${o.Pts}</b></td><td><${Form} list=${o.form.slice(-5)} /></td></tr>`)}</tbody></table></div>
+          <td class="n">${o.P}</td><td class="n">${o.W}</td><td class="n">${o.L}</td><td class="n">${o.SF - o.SA > 0 ? '+' : ''}${o.SF - o.SA}</td><td class="n"><b>${o.Pts}</b></td><td class="hs"><${Form} list=${o.form.slice(-5)} /></td></tr>`)}</tbody></table></div>
         ${playoffs.length ? html`<h3 class="sub">Playoffs</h3>${playoffs.map(m => html`<div class="po-row"><small class="muted">${m.stage}</small><${Result} m=${m} small /></div>`)}` : ''}
       </section>
       <div>

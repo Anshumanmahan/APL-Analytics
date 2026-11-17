@@ -47,9 +47,9 @@ function Leaderboard({ S, rctx, bow }) {
         <${Sel} label="Min arrows" value=${min} onChange=${setMin} options=${[['1', '1'], ['8', '8'], ['16', '16'], ['32', '32']]} />
       </div>
       <${Table} sort="avg" rows=${rows} cols=${[
-        ['rank', '#', (r, i) => i + 1], ['name', 'Archer', r => html`<${Arch} id=${r.id} />`, { sort: r => r.ar.name }], ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat }],
-        ['n', 'Arrows', null, { num: 1 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1 }], ['x', 'X', null, { num: 1 }],
-        ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1 }], ['agi', 'AGI', r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }], ['group', 'Group cm', r => (r.group != null ? r.group.toFixed(1) : '–'), { num: 1 }]]} />
+        ['rank', '#', (r, i) => i + 1], ['name', 'Archer', r => html`<${Arch} id=${r.id} />`, { sort: r => r.ar.name }], ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat, sm: 0 }],
+        ['n', 'Arrows', null, { num: 1, sm: 0 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['x', 'X', null, { num: 1, sm: 0 }],
+        ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1, sm: 0 }], ['agi', 'AGI', r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }], ['group', 'Group cm', r => (r.group != null ? r.group.toFixed(1) : '–'), { num: 1, sm: 0 }]]} />
     </${Panel}>`;
 }
 
@@ -94,7 +94,7 @@ function Time({ S, ctx, rctx, bow }) {
     <${Panel} title="Who manages time best" sub=${`Per team, ${bow.toLowerCase()} arrows only: average seconds per arrow, time-outs, and scoring with ${I.CRUNCH} s or less left on the clock.`}>
       <${Table} sort="at" dir=${1} rows=${tt} cols=${[
         ['t', 'Team', r => html`<${Team} code=${r.t} full />`], ['at', 'Avg time', r => f1(r.at) + ' s', { num: 1 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }],
-        ['crunchN', 'Crunch arrows', null, { num: 1 }], ['crunchAvg', 'Crunch avg', r => f2(r.crunchAvg), { num: 1 }], ['to', 'Time-outs', null, { num: 1 }]]} />
+        ['crunchN', 'Crunch arrows', null, { num: 1, sm: 0 }], ['crunchAvg', 'Crunch avg', r => f2(r.crunchAvg), { num: 1 }], ['to', 'Time-outs', null, { num: 1, sm: 0 }]]} />
     </${Panel}>
     <div class="grid2">
       <${Panel} title="Most efficient: less time, more score" sub="Points per second of clock used. At least 16 timed arrows.">
