@@ -1,8 +1,9 @@
 /* Home: team logos, the points table, how much of the season is recorded, and a few headline numbers. */
-import { html, useState } from '../../vendor/preact-htm.js';
-import { TEAMS, standings, archers, pool, summarize } from '../lib/season.js';
+import { html } from '../../vendor/preact-htm.js';
+import { TEAMS, standings, finalStandings, archers, pool, summarize } from '../lib/season.js';
 import { app, cls, f2, pct, tc, Result, matchTitle } from '../lib/ui.js';
-import { Crest, LEAGUE_LOGO } from '../lib/media.js';
+import { Crest } from '../lib/media.js';
+import { AnimatedLogo } from '../lib/logo.js';
 import { Form } from '../lib/charts.js';
 import { Arch } from './common.js';
 import { TAGLINE } from './about.js';
@@ -11,7 +12,7 @@ import { context, isCrucial, groupBy, bowOf, ofBow, BOWS } from '../lib/insights
 const ord = n => n + (['st', 'nd', 'rd'][n - 1] || 'th');
 
 export function Home() {
-  const S = app.S; const [logoOk, setLogoOk] = useState(true);
+  const S = app.S;
   const st = standings(S); const pos = Object.fromEntries(st.map((o, i) => [o.t, i + 1]));
   const rec = S.matches.filter(m => m.src === 'recorded'), tv = S.matches.filter(m => m.src === 'broadcast');
   const ctx = context(S);
@@ -23,17 +24,28 @@ export function Home() {
   const allN = summarize(pool(S)).n;
   const playoffs = S.matches.filter(m => m.stage !== 'League');
   const latest = rec.slice().sort((a, b) => b.no - a.no).slice(0, 4);
+  const fs = finalStandings(S); const champ = fs[0] && fs[0].tier === 0 ? fs[0] : null;
   return html`<div class="page home">
-    <section class="hhero">
-      ${LEAGUE_LOGO && logoOk && html`<img class="hlogo" src=${LEAGUE_LOGO} alt="Archery Premier League" referrerpolicy="no-referrer" onError=${() => setLogoOk(false)} />`}
-      <div><p class="kicker">Archery Premier League · Season 2</p><h1>APL Analytics</h1>
+    <section class="hero2">
+      <div class="h2-text"><p class="kicker">Archery Premier League · Season 2</p><h1>APL Analytics</h1>
         <p class="cr-only hh-only"><i></i>${TAGLINE}</p>
-        <p class="lead">Every arrow of the season: who shoots best, when, under what pressure, and how teams plan their sets.</p></div>
+        <p class="lead">Every arrow of the season: who shoots best, when, under what pressure, and how teams plan their sets.</p>
+        <div class="h2-cta"><a class="btn pri" href="#/analytics">Explore the analytics</a><a class="btn" href="#/players">Find a player</a></div></div>
+      <div class="h2-logo"><span class="h2-halo"></span><${AnimatedLogo} size=${280} /></div>
     </section>
 
-    <div class="crests">${TEAMS.slice().sort((a, b) => pos[a] - pos[b]).map(code => { const t = S.T(code);
-      return html`<a class="crestbtn" href=${'#/team/' + code} style=${`--tc:${tc(code)}`}><span class="cb-glow"></span>
-        <${Crest} code=${code} size=${88} /><b>${t.name}</b><small>${t.state || ''}</small><span class="cb-rec">${ord(pos[code])} in the league</span></a>`; })}</div>
+    <div class="h2-stats">
+      <div><b>${allN.toLocaleString('en-IN')}</b><span>arrows analysed</span></div>
+      <div><b>${rec.length}<i>/${S.matches.length}</i></b><span>matches arrow by arrow</span></div>
+      ${byBow.map(x => html`<div><b>${f2(x.all.avg)}</b><span>${x.b.toLowerCase()} arrow average</span></div>`)}
+    </div>
+
+    ${champ ? html`<a class="champ-strip" href=${'#/team/' + champ.t} style=${`--tc:${tc(champ.t)}`}><${Crest} code=${champ.t} size=${46} /><span><small>Season 2 champions</small><b>${S.T(champ.t).name}</b></span><em>🏆</em></a>` : ''}
+
+    <section class="hteams"><div class="ph"><h2>APL Teams</h2><a class="more" href="#/teams">All teams →</a></div>
+      <div class="hteam-grid">${TEAMS.slice().sort((a, b) => S.T(a).name.localeCompare(S.T(b).name)).map(code => html`<a class="hteam" href=${'#/team/' + code} style=${`--tc:${tc(code)}`}>
+        <${Crest} code=${code} size=${72} /><b>${S.T(code).name}</b></a>`)}</div>
+    </section>
 
     <div class="grid2 home-g">
       <section class="panel"><h2>Points table</h2><p class="muted">League stage. 2 points a win; ties split on head-to-head, then set-point difference.</p>
@@ -43,11 +55,6 @@ export function Home() {
         ${playoffs.length ? html`<h3 class="sub">Playoffs</h3>${playoffs.map(m => html`<div class="po-row"><small class="muted">${m.stage}</small><${Result} m=${m} small /></div>`)}` : ''}
       </section>
       <div>
-        <section class="panel"><h2>Data so far</h2>
-          <div class="cov"><span class="cov-r" style=${`flex:${rec.length}`}>${rec.length} recorded</span><span class="cov-t" style=${`flex:${tv.length}`}>${tv.length} TV read</span>${S.matches.length - rec.length - tv.length ? html`<span class="cov-n" style=${`flex:${S.matches.length - rec.length - tv.length}`}>${S.matches.length - rec.length - tv.length}</span>` : ''}</div>
-          <p class="muted small">Recorded matches have the archer, spot and clock for every arrow, so player numbers come only from them. Team numbers also use the TV scoreboard read. Everything here updates as you record more matches.</p>
-          <div class="facts"><span><b>${allN.toLocaleString('en-IN')}</b> arrows</span>${byBow.map(x => html`<span><b>${f2(x.all.avg)}</b> ${x.b.toLowerCase()} average · <b>${pct(x.all.tenRate)}</b> 10s</span>`)}</div>
-        </section>
         <section class="panel"><h2>Leaders so far</h2>
           ${byBow.map(x => html`<h3 class="bowh">${x.b}</h3><div class="leaders">
             <div><h3 class="sub">Arrow average</h3>${x.topAvg.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${f2(a.avg)}</b></div>`)}</div>
