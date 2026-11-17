@@ -80,7 +80,7 @@ th.on button.th { color: var(--tx); }
 /* ---------- phones and small tablets ---------- */
 @media (max-width: 640px) {
   .top { gap: 6px; padding: 0 8px; }
-  .tabs a { padding: 6px 6px; font-size: 12.5px; }
+  .tabs a { padding: 6px 5px; font-size: 12px; }
   .ticker { top: 52px; height: 30px; }
   .tk-i { font-size: 12.5px; padding: 0 14px; }
   .tbl th.hs, .tbl td.hs, th.hs, td.hs { display: none; }
@@ -130,11 +130,13 @@ th.on button.th { color: var(--tx); }
 :root[data-theme="light"] .crestbtn b, :root[data-theme="light"] .crestbtn small { text-shadow: none; }
 :root[data-theme="light"] .note { background: rgba(196, 106, 0, .08); border-color: rgba(196, 106, 0, .3); }
 :root[data-theme="light"] .ord i { background: var(--raise2); }
-/* theme switch: a small target with an arrow; the arrow flies in on each switch */
-.themebtn { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; background: var(--raise); border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px 4px 5px; color: var(--tx); font-size: 12.5px; font-weight: 600; }
-.themebtn:hover { border-color: var(--gold); }
-.themebtn svg { width: 24px; height: 24px; overflow: visible; }
-.themebtn .arw { transform-origin: 0 0; animation: arw .45s cubic-bezier(.2, .8, .3, 1.2); }
-@keyframes arw { from { transform: translate(14px, -14px); opacity: 0; } to { transform: none; opacity: 1; } }
-@media (max-width: 640px) { .themebtn span { display: none; } .themebtn { padding: 4px; } }
-@media (prefers-reduced-motion: reduce) { .themebtn .arw { animation: none; } }
+/* theme switch: light half, dark half, the arrow points at the theme in use (right = dark, left = light) */
+.themebtn { margin-left: auto; flex: none; background: none; border: 0; padding: 2px; border-radius: 999px; line-height: 0; }
+.themebtn svg { width: 72px; height: 28px; display: block; }
+.themebtn:hover svg rect:last-of-type { stroke: var(--gold); }
+.themebtn .arw2 { transform-box: view-box; transform-origin: 36px 14px; transition: transform .35s cubic-bezier(.3, .7, .3, 1.3); }
+.themebtn.light .arw2 { transform: scaleX(-1); }
+.themebtn .sun, .themebtn .moon { transition: opacity .3s; }
+@media (max-width: 640px) { .themebtn svg { width: 50px; height: 20px; } .top { gap: 4px; } }
+@media (prefers-reduced-motion: reduce) { .themebtn .arw2 { transition: none; } }
+.brand img { width: 26px; height: 26px; display: block; }

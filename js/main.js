@@ -46,25 +46,31 @@ async function open(p) {
 function Gate() {
   const [v, setV] = useState('');
   return html`<div class="gate"><form onSubmit=${e => { e.preventDefault(); if (v) open(v); }}>
-    <svg class="gate-t" viewBox="-1 -1 2 2" aria-hidden="true"><circle r="1" fill="#f4f4ef"/><circle r=".8" fill="#2a2a2a"/><circle r=".6" fill="#3b8fd9"/><circle r=".4" fill="#e5484d"/><circle r=".2" fill="#f5c518"/></svg>
+    <img class="gate-t" src="/logo.svg" alt="" />
     <h1>APL Analytics</h1><p>Enter the scorebook passcode to see the season.</p>
     <input type="password" autocomplete="off" maxlength="24" value=${v} placeholder="••••" aria-label="Passcode" autofocus onInput=${e => setV(e.target.value.trim())} />
     ${state.msg && html`<p class="err" role="alert">${state.msg}</p>`}
     <button class="btn pri" disabled=${!v}>Open</button></form></div>`;
 }
 
-/* light / dark switch, styled as a target with an arrow in it */
+/* light / dark switch: light half on the left, dark half on the right, an arrow in the middle pointing at the theme in use */
 function ThemeBtn() {
   const [t, setT] = useState(document.documentElement.getAttribute('data-theme') || 'dark');
   const flip = () => { const n = t === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('apl-theme', n); } catch (e) { } setT(n); };
   const dark = t === 'dark';
-  return html`<button class="themebtn" onClick=${flip} aria-label=${dark ? 'Switch to light theme' : 'Switch to dark theme'} title=${dark ? 'Light theme' : 'Dark theme'}>
-    <svg viewBox="-12 -12 24 24" aria-hidden="true">
-      <circle r="11" fill=${dark ? '#2a2a2a' : '#f4f4ef'} stroke=${dark ? '#55627a' : '#c9cfd9'} stroke-width="1" />
-      <circle r="8" fill="#3b8fd9" /><circle r="5.5" fill="#e5484d" /><circle r="3" fill="#f5c518" />
-      <g class="arw" key=${t}><line x1="0" y1="0" x2="10" y2="-10" stroke=${dark ? '#e8ecf2' : '#162033'} stroke-width="1.6" stroke-linecap="round" />
-        <path d="M8 -12 L12 -12 L12 -8 M6.5 -10.5 L10.5 -6.5" stroke=${dark ? '#e8ecf2' : '#162033'} stroke-width="1.3" fill="none" stroke-linecap="round" /></g>
-    </svg><span>${dark ? 'Dark' : 'Light'}</span></button>`;
+  return html`<button class=${'themebtn ' + t} onClick=${flip} role="switch" aria-checked=${dark} aria-label="Dark theme" title=${dark ? 'Switch to light' : 'Switch to dark'}>
+    <svg viewBox="0 0 72 28" aria-hidden="true">
+      <rect x="0.5" y="0.5" width="35.5" height="27" rx="13.5" fill="#f4f4ef" />
+      <rect x="36" y="0.5" width="35.5" height="27" rx="13.5" fill="#161c27" />
+      <rect x="22" y="0.5" width="28" height="27" fill="url(#tg)" />
+      <defs><linearGradient id="tg" x1="0" x2="1"><stop offset="0" stop-color="#f4f4ef" /><stop offset="1" stop-color="#161c27" /></linearGradient></defs>
+      <rect x="0.5" y="0.5" width="71" height="27" rx="13.5" fill="none" stroke="var(--line)" />
+      <g class="sun" opacity=${dark ? 0.45 : 1}><circle cx="11" cy="14" r="4" fill="#f5c518" />${[0, 45, 90, 135, 180, 225, 270, 315].map(a => html`<line x1="11" y1="7.2" x2="11" y2="8.6" stroke="#c99a00" stroke-width="1.4" stroke-linecap="round" transform=${`rotate(${a} 11 14)`} />`)}</g>
+      <g class="moon" opacity=${dark ? 1 : 0.45}><path d="M63.5 9.2a5.2 5.2 0 1 0 0 9.6a4.2 4.2 0 0 1 0-9.6z" fill="#e8ecf2" /></g>
+      <g class="arw2"><line x1="22" y1="14" x2="50" y2="14" stroke="#e5484d" stroke-width="2" stroke-linecap="round" />
+        <path d="M50 14 l-5 -3.6 M50 14 l-5 3.6" stroke="#e5484d" stroke-width="2" stroke-linecap="round" fill="none" />
+        <path d="M22 14 l-3 -3 M25 14 l-3 -3 M22 14 l-3 3 M25 14 l-3 3" stroke="#3b8fd9" stroke-width="1.6" stroke-linecap="round" /></g>
+    </svg></button>`;
 }
 
 const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['ideas', 'Ideas', '#/ideas']];
@@ -73,7 +79,7 @@ function App() {
   if (!app.S) return html`<div class="loading"><span class="spin"></span>Loading the season…</div>`;
   const r = route(); const S = app.S; const rec = S.matches.filter(m => m.src === 'recorded').length;
   return html`<div class="shell">
-    <header class="top"><a class="brand" href="#/"><svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r="1" fill="#3b8fd9"/><circle r=".8" fill="#e5484d"/><circle r=".6" fill="#f5c518"/><circle r=".3" fill="#161c27"/><circle r=".12" fill="#f5c518"/></svg><span>APL <b>Analytics</b></span></a>
+    <header class="top"><a class="brand" href="#/"><img src="/logo.svg" alt="" width="26" height="26" /><span>APL <b>Analytics</b></span></a>
       <nav class="tabs">${TABS.map(([k, l, h]) => html`<a class=${cls(r.tab === k && 'on')} href=${h} aria-current=${r.tab === k ? 'page' : null}>${l}</a>`)}</nav><${ThemeBtn} /></header>
     <${Ticker} S=${S} />
     <main>${r.el}</main>
