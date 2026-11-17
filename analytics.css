@@ -146,3 +146,15 @@ th.on button.th { color: var(--tx); }
 .brand .wm b { font-size: 19px; font-weight: 800; font-stretch: 75%; letter-spacing: .03em; color: var(--tx); }
 .brand .wm small { font-size: 8.5px; font-weight: 700; letter-spacing: .38em; color: var(--goldtx); }
 .gate-t { width: 96px; height: 96px; }
+/* about / contact */
+.me { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin: 8px 0 18px; }
+.me-photo { border-radius: 50%; object-fit: cover; box-shadow: 0 0 0 4px var(--gold), 0 10px 30px rgba(0, 0, 0, .3); flex: none; }
+.me-ini { display: grid; place-items: center; background: linear-gradient(135deg, #3b8fd9, #e5484d); color: #fff; font-size: 44px; font-weight: 800; }
+.me .pt { margin: 0; } .me .btn { display: inline-block; margin-top: 12px; text-decoration: none; }
+.me-role { margin: 2px 0 0; font-weight: 700; color: var(--goldtx); }
+.about .panel p { max-width: 70ch; }
+.contacts { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.contact { display: grid; gap: 2px; background: var(--raise); border-radius: var(--r1); padding: 10px 12px; text-decoration: none; }
+.contact:hover { background: var(--raise2); } .contact small { color: var(--mut); } .contact b { word-break: break-all; }
+.footnav { display: flex; gap: 16px; margin-top: 6px; } .footnav a { color: var(--mut); }
+@media (max-width: 640px) { .me { gap: 14px; } .me-photo { width: 88px !important; height: 88px !important; } .me-ini { font-size: 30px; } }

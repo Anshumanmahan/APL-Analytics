@@ -10,6 +10,7 @@ import { Matches, MatchPage } from './pages/matches.js';
 import { Analytics } from './pages/analytics.js';
 import { Ideas } from './pages/ideas.js';
 import { Ticker } from './pages/ticker.js';
+import { About, Contact } from './pages/about.js';
 
 const state = { status: 'loading', msg: '', loadedAt: null, open: false };
 const rerender = () => render(html`<${App} />`, document.getElementById('root'));
@@ -25,6 +26,8 @@ function route() {
   if (p === 'players') return { tab: 'players', el: html`<${Players} />` };
   if (p === 'matches') return { tab: 'matches', el: html`<${Matches} />` };
   if (p === 'analytics') return { tab: 'analytics', el: html`<${Analytics} sec=${h[1] || 'leaderboard'} bow=${h[2] || 'R'} key=${'a' + (h[1] || '') + (h[2] || '')} />` };
+  if (p === 'about') return { tab: 'about', el: html`<${About} />` };
+  if (p === 'contact') return { tab: 'contact', el: html`<${Contact} />` };
   if (p === 'ideas') return { tab: 'ideas', el: html`<${Ideas} />` };
   return { tab: 'home', el: html`<${Home} />` };
 }
@@ -86,6 +89,7 @@ function App() {
     <footer class="foot"><p><b>${rec} of ${S.matches.length}</b> matches recorded arrow by arrow so far; the rest come from the TV scoreboard read and the official results, and fill in as more are recorded.
       ${state.loadedAt ? ` Data loaded ${state.loadedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.` : ''}
       <button class="lnk" onClick=${() => open()}>${state.refreshing ? 'Refreshing…' : 'Refresh'}</button></p>
+      <p class="footnav"><a href="#/about">About us</a><a href="#/contact">Contact us</a><a href="#/ideas">Ideas board</a></p>
       ${state.msg && html`<p class="err">${state.msg}</p>`}</footer>
   </div>`;
 }
