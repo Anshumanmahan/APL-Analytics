@@ -1,14 +1,21 @@
 /* Read-only access to the scorebook's data (Supabase table public.docs).
    1) /api/data: a GET-only proxy on this site. It works once the APL_KEY environment variable is set
       on the Vercel project, and then the site needs no passcode.
-   2) Otherwise the visitor types the scorebook passcode, kept only for this tab.
+   2) Otherwise the visitor types the scorebook passcode, remembered on that device for one day.
    Nothing here ever writes. */
 const API = 'https://upbndoknwrzeohsdwkbi.supabase.co/rest/v1/docs';
 const KEY = 'sb_publishable_3fFIIVzx3HmdGz2yuo_IgQ_VZdt3Rdb';
 const PASS = 'apl-analytics-pass';
-let pass = (() => { try { return sessionStorage.getItem(PASS) || ''; } catch (e) { return ''; } })();
+const DAY = 24 * 60 * 60 * 1000; // the passcode is remembered on this device for one day
+function readPass() {
+  try { const o = JSON.parse(localStorage.getItem(PASS) || 'null');
+    if (o && o.k && o.exp > Date.now()) return o.k;
+    localStorage.removeItem(PASS); } catch (e) { }
+  try { return sessionStorage.getItem(PASS) || ''; } catch (e) { return ''; }
+}
+let pass = readPass();
 export const hasPass = () => !!pass;
-export function forget() { pass = ''; try { sessionStorage.removeItem(PASS); } catch (e) { } }
+export function forget() { pass = ''; try { localStorage.removeItem(PASS); } catch (e) { } try { sessionStorage.removeItem(PASS); } catch (e) { } }
 
 /* rows from the site's own proxy, or null when it isn't set up */
 export async function loadOpen() {
@@ -31,6 +38,6 @@ export async function load(p) {
   const rows = await res.json();
   // a wrong passcode doesn't fail; it just sees nothing
   if (!rows.some(r => r.col === 'imports' || r.col === 'matches')) return { status: 'wrong' };
-  pass = key; try { sessionStorage.setItem(PASS, key); } catch (e) { }
+  if (p) { pass = key; try { localStorage.setItem(PASS, JSON.stringify({ k: key, exp: Date.now() + DAY })); } catch (e) { } } // a typed passcode lasts one day from entry
   return { status: 'ok', rows };
 }
