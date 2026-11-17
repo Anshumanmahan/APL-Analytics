@@ -7,6 +7,35 @@ import { Columns, Bars, Scatter } from '../lib/charts.js';
 import { Arch, Table, Sel, CAT_OPTS, catOk, Panel } from './common.js';
 import * as I from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
+import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
+import { WindArrow } from './matches.js';
+
+/* average wind over a day's match start times */
+function dayWind(ms) {
+  loadWeather();
+  const w = ms.map(wxAt).filter(Boolean); if (!w.length) return html`<span class="muted">${wxStatus() === 'failed' ? 'unavailable' : '…'}</span>`;
+  const sp = w.reduce((x, o) => x + o.wind, 0) / w.length;
+  // average direction as a vector, so 350° and 10° average to north
+  const vx = w.reduce((x, o) => x + Math.sin(o.dir * Math.PI / 180), 0), vy = w.reduce((x, o) => x + Math.cos(o.dir * Math.PI / 180), 0);
+  const dir = (Math.atan2(vx, vy) * 180 / Math.PI + 360) % 360;
+  return html`<span class="wx-chip"><${WindArrow} dir=${dir} size=${13} />${Math.round(sp)} km/h ${compass(dir)}</span>`;
+}
+
+/* arrow average in calmer and windier matches, recurve and compound apart */
+function WindScores({ ctx, S }) {
+  loadWeather();
+  const ms = S.matches.filter(m => m.arrows.length && wxAt(m)); if (ms.length < 6) return '';
+  const ws = ms.map(m => wxAt(m).wind).sort((a, b) => a - b);
+  const q1 = ws[Math.floor(ws.length / 3)], q2 = ws[Math.floor(2 * ws.length / 3)];
+  const band = m => { const v = wxAt(m).wind; return v < q1 ? 0 : v < q2 ? 1 : 2; };
+  const names = [`Calmer (under ${Math.round(q1)} km/h)`, `Middle (${Math.round(q1)}–${Math.round(q2)} km/h)`, `Windier (${Math.round(q2)}+ km/h)`];
+  return html`<${Panel} title="Wind and scores" sub="Matches split into three equal groups by the modelled wind at their start time. Recurve and compound are kept apart. A few matches per group, so treat it as a first look, not proof.">
+    ${I.BOWS.map(([b]) => { const c = I.ofBow(ctx, b).filter(o => wxAt(o.m));
+      return html`<h3 class="bowh">${b}</h3><div class="tbl"><table><thead><tr><th>Wind at start</th><th class="n">Matches</th><th class="n">Arrows</th><th class="n">Avg</th><th class="n">10s</th></tr></thead><tbody>
+      ${[0, 1, 2].map(i => { const l = c.filter(o => band(o.m) === i), z = summarize(l), nm = new Set(l.map(o => o.m.key)).size;
+        return html`<tr><td>${names[i]}</td><td class="n">${nm}</td><td class="n">${z.n}</td><td class="n"><b>${z.n ? f2(z.avg) : '–'}</b></td><td class="n">${z.n ? pct(z.tenRate) : '–'}</td></tr>`; })}</tbody></table></div>`; })}
+  </${Panel}>`;
+}
 
 export const SECTIONS = [
   ['leaderboard', 'Leaderboard'], ['positions', 'Positions 1–8'], ['time', 'Time'], ['pressure', 'Pressure & clutch'],
@@ -175,11 +204,12 @@ function Events({ S, ctx }) {
   const days = I.byDay(S, ctx);
   const stage = I.groupBy(ctx, o => (o.m.stage === 'League' ? 'League' : 'Playoffs'), 1);
   return html`
-    <${Panel} title="Day by day" sub="Arrow average per match day, and how much of each day is recorded. Wind is not in the data yet: add it per day and it can go here.">
+    <${Panel} title="Day by day" sub="Arrow average per match day, how much of each day is recorded, and the average wind at match start times (modelled for the venue).">
       <${Columns} data=${days.map(d => ({ x: 'D' + d.d, y: d.n ? d.avg : null, n: d.n }))} yMin=${8} yMax=${10} fmt=${f2} xLabel="Match day" tip=${d => html`<b>${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />
       <div class="tbl"><table><thead><tr><th>Day</th><th>Date</th><th class="n">Matches</th><th class="n">Recorded</th><th class="n">Arrows</th><th class="n">Avg</th><th class="n">Avg time</th><th>Wind</th></tr></thead><tbody>
-      ${days.map(d => html`<tr><td>${d.d}</td><td>${dayName(d.d)}</td><td class="n">${d.matches.length}</td><td class="n">${d.rec}</td><td class="n">${d.n}</td><td class="n">${f2(d.avg)}</td><td class="n">${d.at ? f1(d.at) + ' s' : '–'}</td><td class="muted">not recorded</td></tr>`)}</tbody></table></div>
+      ${days.map(d => html`<tr><td>${d.d}</td><td>${dayName(d.d)}</td><td class="n">${d.matches.length}</td><td class="n">${d.rec}</td><td class="n">${d.n}</td><td class="n">${f2(d.avg)}</td><td class="n">${d.at ? f1(d.at) + ' s' : '–'}</td><td>${dayWind(d.matches)}</td></tr>`)}</tbody></table></div>
     </${Panel}>
+    <${WindScores} ctx=${ctx} S=${S} />
     <${Panel} title="League vs playoffs">
       <div class="kv">${stage.map(s => html`<span>${s.k}</span><b>${f2(s.avg)} <small class="muted">${s.n} arrows · ${pct(s.tenRate)} 10s</small></b>`)}</div>
     </${Panel}>`;

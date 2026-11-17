@@ -4,7 +4,7 @@ import { html } from '../../vendor/preact-htm.js';
 const D = 'done', R = 'rough', W = 'needs data';
 export const IDEAS = [
   ['Home: team logos and points table', '#/', D],
-  ['Wind for each day and match timings', '#/matches', R, 'Match timings come from the broadcast. Wind is not recorded anywhere yet.'],
+  ['Wind for each day and match timings', '#/matches', D, 'Official start times, with modelled wind and weather for the venue on every match page.'],
   ['Team strategy: who shot when', '#/teams', R, 'Shooting-order grid and set orders on each team page.'],
   ['Leaderboard based on filters', '#/analytics/leaderboard', D],
   ['Best archer at each position 1–8', '#/analytics/positions', D],
