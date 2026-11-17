@@ -23,7 +23,7 @@ function route() {
   if (p === 'teams') return { tab: 'teams', el: html`<${Teams} />` };
   if (p === 'players') return { tab: 'players', el: html`<${Players} />` };
   if (p === 'matches') return { tab: 'matches', el: html`<${Matches} />` };
-  if (p === 'analytics') return { tab: 'analytics', el: html`<${Analytics} sec=${h[1] || 'leaderboard'} key=${'a' + (h[1] || '')} />` };
+  if (p === 'analytics') return { tab: 'analytics', el: html`<${Analytics} sec=${h[1] || 'leaderboard'} bow=${h[2] || 'R'} key=${'a' + (h[1] || '') + (h[2] || '')} />` };
   if (p === 'ideas') return { tab: 'ideas', el: html`<${Ideas} />` };
   return { tab: 'home', el: html`<${Home} />` };
 }

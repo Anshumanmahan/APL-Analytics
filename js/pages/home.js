@@ -5,7 +5,7 @@ import { app, cls, f2, pct, tc, Result, matchTitle } from '../lib/ui.js';
 import { Crest, LEAGUE_LOGO } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
 import { Arch } from './common.js';
-import { context, isCrucial, groupBy } from '../lib/insights.js';
+import { context, isCrucial, groupBy, bowOf, ofBow, BOWS } from '../lib/insights.js';
 
 const ord = n => n + (['st', 'nd', 'rd'][n - 1] || 'th');
 
@@ -13,12 +13,13 @@ export function Home() {
   const S = app.S; const [logoOk, setLogoOk] = useState(true);
   const st = standings(S); const pos = Object.fromEntries(st.map((o, i) => [o.t, i + 1]));
   const rec = S.matches.filter(m => m.src === 'recorded'), tv = S.matches.filter(m => m.src === 'broadcast');
-  const all = summarize(pool(S));
-  const ar = archers(S).filter(a => a.n >= 16);
-  const topAvg = ar.slice().sort((a, b) => b.avg - a.avg).slice(0, 3);
-  const topAgi = ar.filter(a => a.agi != null).sort((a, b) => b.agi - a.agi).slice(0, 3);
   const ctx = context(S);
-  const clutch = groupBy(ctx.filter(isCrucial), o => o.code, 4).sort((a, b) => b.avg - a.avg)[0];
+  const ar = archers(S).filter(a => a.n >= 16);
+  // recurve and compound are always shown apart
+  const byBow = BOWS.map(([b]) => { const l = ar.filter(a => bowOf(a.ar.cat) === b); const c = ofBow(ctx, b);
+    return { b, all: summarize(c), topAvg: l.slice().sort((x, y) => y.avg - x.avg).slice(0, 3), topAgi: l.filter(a => a.agi != null).sort((x, y) => y.agi - x.agi).slice(0, 3),
+      clutch: groupBy(c.filter(isCrucial), o => o.code, 4).sort((x, y) => y.avg - x.avg)[0] }; });
+  const allN = summarize(pool(S)).n;
   const playoffs = S.matches.filter(m => m.stage !== 'League');
   const latest = rec.slice().sort((a, b) => b.no - a.no).slice(0, 4);
   return html`<div class="page home">
@@ -43,14 +44,14 @@ export function Home() {
         <section class="panel"><h2>Data so far</h2>
           <div class="cov"><span class="cov-r" style=${`flex:${rec.length}`}>${rec.length} recorded</span><span class="cov-t" style=${`flex:${tv.length}`}>${tv.length} TV read</span>${S.matches.length - rec.length - tv.length ? html`<span class="cov-n" style=${`flex:${S.matches.length - rec.length - tv.length}`}>${S.matches.length - rec.length - tv.length}</span>` : ''}</div>
           <p class="muted small">Recorded matches have the archer, spot and clock for every arrow, so player numbers come only from them. Team numbers also use the TV scoreboard read. Everything here updates as you record more matches.</p>
-          <div class="facts"><span><b>${all.n.toLocaleString('en-IN')}</b> arrows</span><span><b>${f2(all.avg)}</b> average</span><span><b>${pct(all.tenRate)}</b> 10s</span><span><b>${ar.length}</b> archers with 16+ arrows</span></div>
+          <div class="facts"><span><b>${allN.toLocaleString('en-IN')}</b> arrows</span>${byBow.map(x => html`<span><b>${f2(x.all.avg)}</b> ${x.b.toLowerCase()} average · <b>${pct(x.all.tenRate)}</b> 10s</span>`)}</div>
         </section>
         <section class="panel"><h2>Leaders so far</h2>
-          <div class="leaders">
-            <div><h3 class="sub">Arrow average</h3>${topAvg.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${f2(a.avg)}</b></div>`)}</div>
-            <div><h3 class="sub">Tightest group (AGI)</h3>${topAgi.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${a.agi.toFixed(1)}</b></div>`)}</div>
+          ${byBow.map(x => html`<h3 class="bowh">${x.b}</h3><div class="leaders">
+            <div><h3 class="sub">Arrow average</h3>${x.topAvg.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${f2(a.avg)}</b></div>`)}</div>
+            <div><h3 class="sub">Tightest group (AGI)</h3>${x.topAgi.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${a.agi.toFixed(1)}</b></div>`)}</div>
           </div>
-          ${clutch && html`<p class="small">Best on crucial arrows (last two of a set within 3 points): <b><a href=${'#/team/' + clutch.k}>${S.T(clutch.k).name}</a></b>, ${f2(clutch.avg)} from ${clutch.n} arrows.</p>`}
+          ${x.clutch && html`<p class="small">Best team on crucial ${x.b.toLowerCase()} arrows (last two of a set within 3 points): <b><a href=${'#/team/' + x.clutch.k}>${S.T(x.clutch.k).name}</a></b>, ${f2(x.clutch.avg)} from ${x.clutch.n}.</p>`}`)}
           <a class="lnk" href="#/analytics">All analytics →</a>
         </section>
       </div>

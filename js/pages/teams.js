@@ -5,7 +5,7 @@ import { app, cls, f1, f2, pct, tc, Result, Tiles, matchTitle } from '../lib/ui.
 import { Crest, Avatar } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
 import { Arch, Table, Panel } from './common.js';
-import { context, halves, shootingOrder, mean, CRUNCH } from '../lib/insights.js';
+import { context, halves, shootingOrder, mean, CRUNCH, BOWS, ofBow } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 
 const mpos = g => g.reduce((x, v, i) => x + v * i, 0) / Math.max(1, g.reduce((x, v) => x + v, 0));
@@ -29,13 +29,14 @@ export function TeamPage({ code }) {
   const squad = archers(S, it => it.code === code);
   const sq = t.archers.map(a => Object.assign({ ar: S.A(a.id) }, squad.find(x => x.id === a.id) || { n: 0 }));
   const ord = shootingOrder(S, code);
-  const hv = halves(ctx, () => code, 1)[0];
-  const cr = ctx.filter(o => o.clBefore != null && o.clBefore <= CRUNCH);
+  // recurve and compound kept apart
+  const bw = BOWS.map(([b]) => { const c = ofBow(ctx, b); const cr = c.filter(o => o.clBefore != null && o.clBefore <= CRUNCH); return { b, s: summarize(c), cr, hv: halves(c, () => code, 1)[0] }; });
   const ms = S.matches.filter(m => sideOf(m, code));
   return html`<div class="page">
     <p class="kicker"><a href="#/teams">Teams</a> · ${t.state || ''}</p>
     <section class="thero2" style=${`--tc:${tc(code)}`}><${Crest} code=${code} size=${96} /><div><h1>${t.name}</h1><p class="lead">${rank}${['st', 'nd', 'rd'][rank - 1] || 'th'} in the league · ${me.W} won, ${me.L} lost · ${me.Pts} points</p><${Form} list=${me.form} /></div></section>
-    <${Tiles} items=${[[f1(mean(sets.map(x => x.tot))), 'Average set', `${sets.length} sets`], [f2(all.avg), 'Arrow average', `${all.n} arrows`], [pct(all.tenRate), '10s'], [all.at ? f1(all.at) + ' s' : '–', 'Average time per arrow', `${all.tn} timed arrows`], [cr.length ? f2(mean(cr.map(o => o.a.s))) : '–', 'Average in a time crunch', `${cr.length} arrows with ≤${CRUNCH} s left`]]} />
+    <${Tiles} items=${[[f1(mean(sets.map(x => x.tot))), 'Average set', `${sets.length} sets, both bows`]]} />
+    ${bw.map(x => html`<h3 class="bowh">${x.b}</h3><${Tiles} items=${[[f2(x.s.avg), 'Arrow average', `${x.s.n} recorded arrows`], [pct(x.s.tenRate), '10s'], [x.s.at ? f1(x.s.at) + ' s' : '–', 'Average time per arrow', `${x.s.tn} timed`], [x.cr.length ? f2(mean(x.cr.map(o => o.a.s))) : '–', 'Average in a time crunch', `${x.cr.length} arrows with ≤${CRUNCH} s left`]]} />`)}
 
     <${Panel} title="Squad" sub="Recorded matches only. Average time is the seconds each archer took per arrow (average time by each teammate).">
       <${Table} sort="n" rows=${sq} cols=${[
@@ -51,7 +52,7 @@ export function TeamPage({ code }) {
             return html`<tr><td><${Arch} id=${id} team=${false} /></td>${[1, 2, 3, 4, 5, 6, 7, 8].map(p => html`<td class="n hc" style=${`--h:${g[p] / Math.max(1, mx)};--tc:${tc(code)}`}>${g[p] || ''}</td>`)}</tr>`; })}</tbody></table></div>` : html`<p class="empty">No recorded matches for this team yet.</p>`}
       </${Panel}>
       <${Panel} title="First 4 vs last 4 arrows" sub="Average score of the first half of each set against the second half.">
-        ${hv ? html`<div class="kv"><span>Arrows 1–4</span><b>${f2(hv.first.avg)}</b><span>Arrows 5–8</span><b>${f2(hv.last.avg)}</b><span>Difference</span><b class=${hv.delta >= 0 ? 'pos' : 'neg'}>${hv.delta >= 0 ? '+' : ''}${f2(hv.delta)}</b></div>` : html`<p class="empty">Not enough data yet.</p>`}
+        ${bw.map(({ b, hv }) => html`<h3 class="sub">${b}</h3>${hv ? html`<div class="kv"><span>Arrows 1–4</span><b>${f2(hv.first.avg)}</b><span>Arrows 5–8</span><b>${f2(hv.last.avg)}</b><span>Difference</span><b class=${hv.delta >= 0 ? 'pos' : 'neg'}>${hv.delta >= 0 ? '+' : ''}${f2(hv.delta)}</b></div>` : html`<p class="empty">Not enough data yet.</p>`}`)}
         <h3 class="sub">Set orders (team strategy)</h3>
         ${ord.sets.length ? html`<div class="orders">${ord.sets.slice(0, 16).map(x => html`<div class="ord"><a class="muted small" href=${'#/match/' + x.m.key}>D${x.m.d} v ${opp(x.m, code)} · S${x.n}</a><span>${x.order.map(id => html`<i title=${id ? S.A(id).name : ''}>${id ? S.A(id).name.split(' ').map(w => w[0]).join('').slice(0, 2) : '·'}</i>`)}</span></div>`)}</div>` : html`<p class="empty">No recorded matches yet.</p>`}
       </${Panel}>

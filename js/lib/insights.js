@@ -8,6 +8,9 @@ export const mean = l => (l.length ? l.reduce((x, v) => x + v, 0) / l.length : n
 export const sd = l => { const m = mean(l); return l.length > 1 ? Math.sqrt(l.reduce((x, v) => x + (v - m) ** 2, 0) / (l.length - 1)) : null; };
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const bowOf = cat => (cat && cat[0] === 'C' ? 'Compound' : cat && cat[0] === 'R' ? 'Recurve' : '');
+/* recurve and compound are never averaged or ranked together */
+export const BOWS = [['Recurve', 'Recurve'], ['Compound', 'Compound']];
+export const ofBow = (ctx, b) => ctx.filter(o => o.bow === b);
 export const radius = p => (p ? Math.hypot(p[0], p[1]) : null);
 /* a 9 that only just missed the 10 line (the 10 ring ends at 0.1 of the face radius) */
 export const CLOSE9 = 0.115;
@@ -36,7 +39,7 @@ export function context(S, { recordedOnly = false } = {}) {
       const tp = clBefore == null ? 0.3 : clamp((20 - clBefore / left) / 15, 0, 1);
       const cp = clamp(1 - Math.abs(diff) / 10, 0, 1) * (0.4 + 0.6 * (p - 1) / 7);
       const mp = clamp(Math.max(sp[a.t], sp[o]) / 4, 0.15, 1);
-      const it = { a, m, code: m.teams[a.t], opp: m.teams[o], side: a.t, pos: p, clBefore, diff, pf: sp[a.t], pa: sp[o], pi: Math.round(100 * (0.35 * tp + 0.4 * cp + 0.25 * mp)) };
+      const it = { a, m, bow: a.a ? bowOf(S.A(a.a).cat) : null, code: m.teams[a.t], opp: m.teams[o], side: a.t, pos: p, clBefore, diff, pf: sp[a.t], pa: sp[o], pi: Math.round(100 * (0.35 * tp + 0.4 * cp + 0.25 * mp)) };
       if (scored(a)) out.push(it);
       if (a.s != null && !a.to) run[k] += a.s;
       if (a.cl != null) lastCl[k] = a.cl;
@@ -118,7 +121,7 @@ export function halves(ctx, key, min = 4) {
 export function lastTwo(ctx) {
   const by = {};
   ctx.forEach(o => { if (o.pos < 7) return; const k = o.m.key + o.a.set + o.side; (by[k] = by[k] || []).push(o); });
-  const rows = Object.values(by).filter(l => l.length === 2).map(l => { const first = l.find(o => o.pos === 7); return { left: first.clBefore, sum: l[0].a.s + l[1].a.s, code: first.code }; }).filter(r => r.left != null);
+  const rows = Object.values(by).filter(l => l.length === 2 && l[0].bow && l[0].bow === l[1].bow).map(l => { const first = l.find(o => o.pos === 7); return { left: first.clBefore, sum: l[0].a.s + l[1].a.s, code: first.code }; }).filter(r => r.left != null);
   const B = [[0, 15, 'under 15 s'], [15, 25, '15–25 s'], [25, 35, '25–35 s'], [35, 50, '35–50 s'], [50, 999, '50 s +']];
   return B.map(([a, b, label]) => { const l = rows.filter(r => r.left >= a && r.left < b); return { label, n: l.length, avg: mean(l.map(r => r.sum)) }; });
 }

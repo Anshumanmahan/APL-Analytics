@@ -62,3 +62,8 @@ th.on button.th { color: var(--tx); }
   .crests { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 .home .crests { margin-bottom: 16px; }
+.bowh { margin: 14px 0 8px; font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--gold); }
+.bowbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 4px 0 8px; }
+.bowbar .seg a { text-decoration: none; }
+.seg a { padding: 4px 12px; border-radius: 4px; color: var(--mut); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.seg a.on { background: var(--gold); color: #1d1600; }
