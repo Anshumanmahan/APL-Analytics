@@ -207,7 +207,7 @@ button.th { text-transform: inherit; letter-spacing: inherit; font-family: inher
 .cr-gal figure { margin: 0; position: relative; border-radius: var(--r1); overflow: hidden; border: 1px solid var(--line); height: 420px; }
 .cr-gal figure.wide { grid-column: span 2; }
 .cr-gal figure.full { grid-column: 1 / -1; height: auto; aspect-ratio: 2.4 / 1; }
-.cr-gal img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+.cr-gal img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; display: block; transition: transform .4s ease; }
 .cr-gal figure:hover img { transform: scale(1.03); }
 .cr-gal figcaption, .ct-banner figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 28px 14px 12px; font-size: 12.5px; color: #fff; background: linear-gradient(transparent, rgba(0, 0, 0, .75)); }
 .cr-note { margin: 4px 0 0; max-width: 80ch; }

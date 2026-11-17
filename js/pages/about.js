@@ -20,7 +20,8 @@ export const PROFILE = {
   gallery: [                 // [src, caption, wide?]
     ['/img/creator-recording.webp', 'Recording data at a competition on an app I built myself'],
     ['/img/creator-kim-hyung-tak.webp', 'With Coach Kim at the Kim Hyung Tak Archery Training Center', 'wide'],
-    ['/img/creator-korea-camp.webp', 'Korea training camp with the archers and Coach Kim', 'full']
+    ['/img/creator-korea-camp.webp', 'Korea training camp with the archers and Coach Kim', 'wide'],
+    ['/img/creator-vbf-range.webp', "Strolling around VBF's archery range"]
   ],
   // only what you choose to show publicly: [label, value, href]
   contacts: []
