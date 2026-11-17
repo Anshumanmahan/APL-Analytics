@@ -13,10 +13,22 @@ const mpos = g => g.reduce((x, v, i) => x + v * i, 0) / Math.max(1, g.reduce((x,
 export function Teams() {
   const S = app.S; const st = standings(S);
   return html`<div class="page"><h1 class="pt">Teams</h1>
-    <div class="tcards">${st.map((o, i) => { const sets = teamSets(S, o.t);
-      return html`<a class="tcard" href=${'#/team/' + o.t} style=${`--tc:${tc(o.t)}`}>
-        <span><small class="muted">${i + 1}${['st', 'nd', 'rd'][i] || 'th'} · ${o.W}–${o.L}</small><b class="tc-n">${S.T(o.t).name}</b><small class="muted">${S.T(o.t).state || ''} · average set ${f1(mean(sets.map(x => x.tot)))}</small></span>
-        <${Crest} code=${o.t} size=${54} /><${Form} list=${o.form} /></a>`; })}</div></div>`;
+    <div class="tblocks">${st.map((o, i) => { const sets = teamSets(S, o.t); const t = S.T(o.t); const sd = o.SF - o.SA;
+      return html`<a class="tblock" href=${'#/team/' + o.t} style=${`--tc:${tc(o.t)}`}>
+        <span class="tb-glow"></span><span class="tb-rank">${String(i + 1).padStart(2, '0')}</span>
+        <div class="tb-crest"><${Crest} code=${o.t} size=${132} /></div>
+        <div class="tb-body">
+          <small class="tb-pos">${i + 1}${['st', 'nd', 'rd'][i] || 'th'} in the league${t.state ? ' · ' + t.state : ''}</small>
+          <b class="tb-name">${t.name}</b>
+          <div class="tb-stats">
+            <span><b>${o.W}–${o.L}</b><small>won–lost</small></span>
+            <span><b>${o.Pts}</b><small>points</small></span>
+            <span><b>${sd > 0 ? '+' : ''}${sd}</b><small>sets ±</small></span>
+            <span><b>${f1(mean(sets.map(x => x.tot)))}</b><small>avg set</small></span>
+          </div>
+          <div class="tb-form"><small>Form</small><${Form} list=${o.form.slice(-5)} /></div>
+        </div>
+        <span class="tb-go">View team →</span></a>`; })}</div></div>`;
 }
 
 export function TeamPage({ code }) {

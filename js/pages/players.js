@@ -17,8 +17,9 @@ export function Players() {
     <div class="filters"><input class="search" type="search" placeholder="Search archers" value=${q} onInput=${e => setQ(e.target.value)} /><${Sel} label="Category" value=${cat} onChange=${setCat} options=${CAT_OPTS} /></div>
     ${CAT_ORDER.filter(c => catOk(c, cat)).map(c => { const l = list.filter(a => a.cat === c); if (!l.length) return null;
       return html`<h2 class="hsec">${CATS[c]}</h2><div class="pgrid">${l.map(a => { const s = stats[a.id];
-        return html`<a class="pcard" href=${'#/player/' + a.id} style=${`--tc:${tc(a.team)}`}><${Avatar} ar=${a} size=${52} /><span><b>${a.name}</b><small class="muted"><${Team} code=${a.team} link=${false} />${a.country ? ' · ' + a.country : ''}</small>
-          <small>${s ? html`${f2(s.avg)} avg · ${s.n} arrows` : html`<span class="muted">no recorded arrows yet</span>`}</small></span></a>`; })}</div>`; })}
+        return html`<a class="pcard" href=${'#/player/' + a.id} style=${`--tc:${tc(a.team)}`}><${Avatar} ar=${a} size=${52} /><span class="pc-t"><b class="pc-n" title=${a.name}>${a.name}</b>
+          <span class="pc-m"><i></i><span class="pc-tm">${S.T(a.team).name || a.team}</span>${a.country ? html`<em>${a.country}</em>` : ''}</span>
+          <span class="pc-s">${s ? html`<b>${f2(s.avg)}</b> avg · ${s.n} arrows` : 'No recorded arrows yet'}</span></span></a>`; })}</div>`; })}
   </div>`;
 }
 
