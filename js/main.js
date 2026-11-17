@@ -57,16 +57,55 @@ function Gate() {
 }
 
 /* light / dark switch: light half on the left, dark half on the right, an arrow in the middle pointing at the theme in use */
+/* Theme switch: a tiny archery range. Tap it and the sun sets while the moon rises, the stars come out,
+   an arrow lands dead centre in the target, and the new theme spreads across the page from the switch. */
 function ThemeBtn() {
-  const [t, setT] = useState(document.documentElement.getAttribute('data-theme') || 'dark');
-  const flip = () => { const n = t === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('apl-theme', n); } catch (e) { } setT(n); };
+  const root = document.documentElement;
+  const [t, setT] = useState(root.getAttribute('data-theme') || 'dark');
+  const [shot, setShot] = useState(0);
   const dark = t === 'dark';
-  const sun = html`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" />${[0, 45, 90, 135, 180, 225, 270, 315].map(a => html`<line x1="12" y1="2.6" x2="12" y2="5" transform=${`rotate(${a} 12 12)`} />`)}</svg>`;
-  const moon = html`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A8 8 0 0 1 9.4 4.5a8 8 0 1 0 10.1 10.1z" /></svg>`;
-  return html`<button class=${'tsw ' + t} onClick=${flip} role="switch" aria-checked=${dark} aria-label="Dark theme" title=${dark ? 'Switch to light' : 'Switch to dark'}>
-    <span class="tsw-sun">${sun}</span><span class="tsw-moon">${moon}</span>
-    <svg class="tsw-arw" viewBox="0 0 20 10" aria-hidden="true"><path d="M2 5h14" /><path d="M12.5 2l3.5 3-3.5 3" /><path d="M2 5 0.5 2.6M4 5 2.5 2.6M2 5 0.5 7.4M4 5 2.5 7.4" class="fl" /></svg>
-    <span class="tsw-knob">${dark ? moon : sun}</span></button>`;
+  const turn = (root.dataset.turn = root.dataset.turn || (dark ? '180' : '0'));   // the sky keeps turning one way
+  const apply = n => { root.setAttribute('data-theme', n); try { localStorage.setItem('apl-theme', n); } catch (e) { } setT(n); };
+  const flip = e => {
+    const n = dark ? 'light' : 'dark';
+    root.dataset.turn = String(+turn + 180);
+    const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (calm || !document.startViewTransition) return apply(n);
+    setShot(s => s + 1);
+    const r = e.currentTarget.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    const far = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const vt = document.startViewTransition(() => apply(n));
+    vt.ready.then(() => root.animate({ clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${far}px at ${x}px ${y}px)`] },
+      { duration: 900, easing: 'cubic-bezier(.65,0,.35,1)', pseudoElement: '::view-transition-new(root)' })).catch(() => { });
+  };
+  return html`<button class=${'rng ' + t + (shot ? ' shot' : '')} onClick=${flip} role="switch" aria-checked=${dark} aria-label="Dark theme" title=${dark ? 'Switch to light' : 'Switch to dark'}>
+    <svg viewBox="0 0 132 40" aria-hidden="true">
+      <defs>
+        <linearGradient id="rg-day" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0ff" /><stop offset="1" stop-color="#fff1c9" /></linearGradient>
+        <linearGradient id="rg-night" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#060b1d" /><stop offset="1" stop-color="#25335e" /></linearGradient>
+        <radialGradient id="rg-sun" cx=".4" cy=".4" r=".7"><stop offset="0" stop-color="#fff6c2" /><stop offset=".6" stop-color="#f5c518" /><stop offset="1" stop-color="#f59e0b" /></radialGradient>
+        <clipPath id="rg-clip"><rect width="132" height="40" rx="20" /></clipPath>
+      </defs>
+      <g clip-path="url(#rg-clip)">
+        <rect width="132" height="40" fill="url(#rg-day)" />
+        <rect class="rg-night" width="132" height="40" fill="url(#rg-night)" />
+        <g class="rg-stars"><circle cx="58" cy="8" r=".9" /><circle cx="74" cy="15" r=".7" /><circle cx="50" cy="22" r=".6" /><circle cx="88" cy="7" r=".8" /><circle cx="97" cy="16" r=".6" /></g>
+        <g class="rg-arm" style=${`transform:rotate(${turn}deg)`}>
+          <circle class="rg-glow" cx="66" cy="16" r="9" />
+          <circle cx="66" cy="16" r="5.8" fill="url(#rg-sun)" />
+          <g transform="rotate(180 66 46)"><circle cx="66" cy="16" r="5.6" fill="#e8ecf2" /><circle cx="68.6" cy="14.4" r="4.6" class="rg-bite" /></g>
+        </g>
+        <rect class="rg-ground" y="33" width="132" height="7" />
+        <g class="rg-boss">
+          <line x1="110" y1="27" x2="107" y2="36" class="rg-leg" /><line x1="118" y1="27" x2="121" y2="36" class="rg-leg" />
+          <circle cx="114" cy="22" r="9" fill="#f4f4ef" /><circle cx="114" cy="22" r="7" fill="#3b8fd9" /><circle cx="114" cy="22" r="4.7" fill="#e5484d" /><circle cx="114" cy="22" r="2.4" fill="#f5c518" />
+        </g>
+        <g class="rg-arrow" key=${'a' + shot}><line x1="90" y1="22" x2="114" y2="22" class="rg-shaft" /><path d="M90 22l-2.6-2.6M93 22l-2.6-2.6M90 22l-2.6 2.6M93 22l-2.6 2.6" class="rg-fl" /></g>
+      </g>
+      <rect x=".5" y=".5" width="131" height="39" rx="19.5" fill="none" class="rg-edge" />
+    </svg>
+    <span class="rg-lbl"><span>Light</span><span>Dark</span></span>
+  </button>`;
 }
 
 const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['ideas', 'Ideas', '#/ideas']];

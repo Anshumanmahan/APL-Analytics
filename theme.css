@@ -435,33 +435,43 @@ select option { background: var(--solid); color: var(--tx); }
 }
 @media (max-width: 520px) { .hteam-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .h2-cta .btn { flex: 1 1 auto; text-align: center; white-space: nowrap; padding: 10px 14px; font-size: 14px; } }
 
-/* ---------- theme switch: light half, dark half, archery arrow pointing where a tap takes you ---------- */
+/* ---------- theme switch: range at dusk ---------- */
 .themebtn { display: none; }
-.tsw { --w: 78px; --h: 32px; --k: 24px; position: relative; flex: none; width: var(--w); height: var(--h); padding: 0; margin-left: 8px; border-radius: 999px; cursor: pointer; overflow: hidden;
-  border: 1px solid var(--line); background: linear-gradient(90deg, #f6f1e1 0, #ece4cc 42%, #1a2130 58%, #0d121b 100%);
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.25); transition: border-color .2s, box-shadow .2s; }
-.tsw:hover, .tsw:focus-visible { border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); box-shadow: inset 0 1px 2px rgba(0,0,0,.25), 0 0 0 3px color-mix(in srgb, var(--gold) 18%, transparent); outline: none; }
-.tsw svg { display: block; }
-.tsw-sun, .tsw-moon { position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; transition: opacity .3s, transform .4s; }
-.tsw-sun { left: 8px; } .tsw-moon { right: 8px; }
-.tsw-sun svg, .tsw-moon svg, .tsw-knob svg { width: 100%; height: 100%; }
-.tsw-sun svg { fill: #c99a00; stroke: #c99a00; stroke-width: 2; stroke-linecap: round; }
-.tsw-moon svg { fill: #cfd6e2; }
-.tsw.light .tsw-sun, .tsw.dark .tsw-moon { opacity: 0; transform: scale(.6); }
-.tsw-arw { position: absolute; top: 50%; left: 50%; width: 18px; height: 9px; margin: -4.5px 0 0 -9px; fill: none; stroke: var(--gold); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
-  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--gold) 55%, transparent)); transition: transform .45s cubic-bezier(.3,.7,.3,1.3); }
-.tsw-arw .fl { stroke-width: 1.2; opacity: .8; }
-.tsw.dark .tsw-arw { transform: translateX(-3px) scaleX(-1); }   /* knob on the right: arrow points left, to the sun */
-.tsw.light .tsw-arw { transform: translateX(3px); }              /* knob on the left: arrow points right, to the moon */
-.tsw-knob { position: absolute; top: calc((var(--h) - 2px - var(--k)) / 2); left: 3px; width: var(--k); height: var(--k); border-radius: 50%; display: grid; place-items: center; padding: 5px;
-  background: radial-gradient(circle at 35% 30%, #ffe37a, #f5c518 55%, #c99a00); box-shadow: 0 2px 6px rgba(0,0,0,.35), 0 0 12px -2px var(--glow);
-  transition: transform .45s cubic-bezier(.3,.7,.3,1.3); }
-.tsw-knob svg { fill: #2a2000; stroke: #2a2000; stroke-width: 2; stroke-linecap: round; }
-.tsw.dark .tsw-knob { transform: translateX(calc(var(--w) - 2px - 6px - var(--k))); }
-@media (max-width: 640px) { .tsw { --w: 64px; --h: 28px; --k: 20px; margin-left: 4px; } .tsw-knob { padding: 4px; }
-  .tsw-sun, .tsw-moon { width: 13px; height: 13px; margin-top: -6.5px; } .tsw-sun { left: 7px; } .tsw-moon { right: 7px; }
-  .tsw-arw { width: 15px; margin-left: -7.5px; } }
-@media (prefers-reduced-motion: reduce) { .tsw-knob, .tsw-arw, .tsw-sun, .tsw-moon { transition: none; } }
+.rng { position: relative; flex: none; width: 132px; height: 40px; padding: 0; margin-left: 8px; border: 0; border-radius: 999px; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.rng svg { display: block; width: 100%; height: 100%; }
+.rng:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.rng:hover .rg-edge { stroke: var(--gold); }
+.rng .rg-edge { stroke: var(--line); transition: stroke .2s; }
+.rng .rg-night { opacity: 0; transition: opacity .9s cubic-bezier(.65,0,.35,1); }
+.rng.dark .rg-night { opacity: 1; }
+.rng .rg-arm { transform-box: view-box; transform-origin: 66px 46px; transition: transform .9s cubic-bezier(.65,0,.35,1); will-change: transform; }
+.rng .rg-glow { fill: #f5c518; opacity: .28; }
+.rng .rg-bite { fill: #0d1530; }
+.rng .rg-stars { fill: #fff; opacity: 0; transition: opacity .6s ease .3s; }
+.rng.dark .rg-stars { opacity: .9; }
+.rng.dark .rg-stars circle { animation: rg-twinkle 3s ease-in-out infinite 1s; }
+.rng.dark .rg-stars circle:nth-child(2n) { animation-delay: 2s; }
+.rng .rg-ground { fill: #7cc36a; transition: fill .9s cubic-bezier(.65,0,.35,1); }
+.rng.dark .rg-ground { fill: #1b2a1f; }
+.rng .rg-leg { stroke: #6b4f2a; stroke-width: 1.6; stroke-linecap: round; }
+.rng .rg-boss { transform-box: view-box; transform-origin: 114px 22px; }
+.rng .rg-shaft { stroke: #2a2f3a; stroke-width: 1.6; stroke-linecap: butt; transition: stroke .9s; }
+.rng.dark .rg-shaft { stroke: #e8ecf2; }
+.rng .rg-fl { stroke: #e5484d; stroke-width: 1.4; stroke-linecap: round; fill: none; }
+.rng .rg-arrow { transform-box: view-box; will-change: transform; }
+.rng.shot .rg-arrow { animation: rg-fly .55s cubic-bezier(.22,.61,.36,1) .3s both; }
+.rng.shot .rg-boss { animation: rg-thud .4s cubic-bezier(.3,.7,.3,1.2) .83s; }
+@keyframes rg-fly { from { transform: translateX(-104px); opacity: 0; } 25% { opacity: 1; } to { transform: translateX(0); opacity: 1; } }
+@keyframes rg-thud { 35% { transform: scale(.9); } }
+@keyframes rg-twinkle { 50% { opacity: .3; } }
+.rg-lbl { position: absolute; left: 14px; top: 12px; height: 16px; overflow: hidden; font: 600 12.5px/16px var(--f); text-align: left; pointer-events: none; }
+.rg-lbl span { display: block; color: #1f2633; text-shadow: 0 1px 0 rgba(255,255,255,.55); transition: transform .6s cubic-bezier(.65,0,.35,1); }
+.rg-lbl span + span { color: #eef0f3; text-shadow: none; }
+.rng.dark .rg-lbl span { transform: translateY(-100%); }
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 2; }
+@media (max-width: 640px) { .rng { width: 104px; height: 32px; margin-left: 4px; } .rg-lbl { left: 11px; top: 8px; font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .rng *, .rng .rg-arm { animation: none !important; transition: none !important; } }
 
 /* ---------- weather: match conditions ---------- */
 .mrow2 { grid-template-columns: 110px minmax(0, 1fr) auto 150px 130px; }
