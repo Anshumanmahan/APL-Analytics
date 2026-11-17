@@ -10,7 +10,7 @@ export const PROFILE = {
   tags: ['Creator of APL Analytics'],   // short chips
   badge: "India's first archery data scientist at a high-performance centre",  // understated first-of-its-kind line
   bio: '',                   // a few lines about you
-  portrait: '/img/creator-dp.webp',
+  portrait: '/img/creator-dp.jpg',
   facts: [],                 // rapid fire: [question, answer]
   roles: [                   // [role, detail]
     ['Sports data scientist, high-performance centre', 'Bringing data and video analysis into daily archery training.'],
@@ -20,10 +20,10 @@ export const PROFILE = {
   timeline: [],              // [year, what happened]
   why: '',                   // why you built this site
   gallery: [                 // [src, caption, wide?]
-    ['/img/creator-recording.webp', 'Recording data at a competition on an app I built myself'],
-    ['/img/creator-kim-hyung-tak.webp', 'With Coach Kim at the Kim Hyung Tak Archery Training Center', 'wide'],
-    ['/img/creator-korea-camp.webp', 'Korea training camp with the archers and Coach Kim', 'wide'],
-    ['/img/creator-vbf-range.webp', "Strolling around VBF's archery range"]
+    ['/img/creator-recording.jpg', 'Recording data at a competition on an app I built myself'],
+    ['/img/creator-kim-hyung-tak.jpg', 'With Coach Kim at the Kim Hyung Tak Archery Training Center', 'wide'],
+    ['/img/creator-korea-camp.jpg', 'Korea training camp with the archers and Coach Kim', 'wide'],
+    ['/img/creator-vbf-range.jpg', "Strolling around VBF's archery range"]
   ],
   // only what you choose to show publicly: [label, value, href]
   contacts: []
@@ -65,7 +65,7 @@ export function About() {
       ${P.timeline.length ? html`<section class="panel"><h2>Archery journey</h2><ol class="cr-tl">${P.timeline.map(([y, t]) => html`<li><time>${y}</time><span>${t}</span></li>`)}</ol></section>` : ''}
     </div>` : ''}
 
-    ${P.gallery.length ? html`<section class="panel"><h2>On the range</h2><div class="cr-gal">${P.gallery.map(([src, cap, wide]) => html`<figure class=${wide || ''}><img src=${src} alt=${cap} loading="lazy" /><figcaption>${cap}</figcaption></figure>`)}</div></section>` : ''}
+    ${P.gallery.length ? html`<section class="panel"><h2>On the range</h2><div class="cr-gal">${P.gallery.map(([src, cap, wide]) => html`<figure class=${wide || ''}><img src=${src} alt=${cap}  decoding="async" /><figcaption>${cap}</figcaption></figure>`)}</div></section>` : ''}
 
     <div class="grid2">
       <section class="panel"><h2>Why APL Analytics</h2>
@@ -84,7 +84,7 @@ export function Contact() {
     <section class="me"><${Photo} size=${110} />
       <div><p class="kicker">Contact us</p><h1 class="pt">Get in touch</h1>
         <p class="lead">Questions, ideas for new stats, or spotted a number that looks wrong? Reach out to ${PROFILE.name}.</p></div></section>
-    <figure class="ct-banner"><img src="/img/creator-kim-hyung-tak.webp" alt=${PROFILE.name + ' with Coach Kim at the Kim Hyung Tak Archery Training Center'} /><figcaption>${PROFILE.name} with Coach Kim at the Kim Hyung Tak Archery Training Center</figcaption></figure>
+    <figure class="ct-banner"><img src="/img/creator-kim-hyung-tak.jpg" alt=${PROFILE.name + ' with Coach Kim at the Kim Hyung Tak Archery Training Center'} /><figcaption>${PROFILE.name} with Coach Kim at the Kim Hyung Tak Archery Training Center</figcaption></figure>
     <section class="panel"><h2>Reach ${PROFILE.name}</h2>
       ${c.length ? html`<div class="contacts">${c.map(([l, v, h]) => html`<a class="contact" href=${h} target=${h.startsWith('http') ? '_blank' : null} rel="noopener"><small>${l}</small><b>${v}</b></a>`)}</div>`
         : html`<p class="muted">Contact details coming soon.</p>`}</section>

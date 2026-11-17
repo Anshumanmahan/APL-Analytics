@@ -241,3 +241,8 @@ button.th { text-transform: inherit; letter-spacing: inherit; font-family: inher
 .toplink.on svg { stroke: var(--goldtx); }
 @media (max-width: 1100px) { .toplink span { display: none; } .toplink { padding: 7px; } }
 @media (max-width: 640px) { .topr { gap: 0; } .toplink { padding: 6px 5px; } .toplink svg { width: 17px; height: 17px; } .topr .themebtn { margin-left: 4px; } }
+/* older browsers without aspect-ratio: let photos keep their natural height instead of collapsing */
+@supports not (aspect-ratio: 1 / 1) {
+  .cr-gal figure, .cr-gal figure.wide, .cr-gal figure.full, .ct-banner { height: auto !important; }
+  .cr-gal img, .ct-banner img { height: auto !important; }
+}
