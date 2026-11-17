@@ -305,3 +305,12 @@ button.th { text-transform: inherit; letter-spacing: inherit; font-family: inher
   .tb-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
   .tb-stats b { font-size: 18px; }
 }
+/* player tiles tinted in their team colour */
+.pcard { position: relative; overflow: hidden; border-color: color-mix(in srgb, var(--tc) 35%, var(--line));
+  background: linear-gradient(120deg, color-mix(in srgb, var(--tc) 26%, transparent), color-mix(in srgb, var(--tc) 8%, transparent) 70%), var(--panel); }
+.pcard::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--tc); box-shadow: 0 0 12px var(--tc); }
+.pcard:hover { background: linear-gradient(120deg, color-mix(in srgb, var(--tc) 36%, transparent), color-mix(in srgb, var(--tc) 12%, transparent) 70%), var(--panel); border-color: color-mix(in srgb, var(--tc) 65%, var(--line)); }
+:root[data-theme="light"] .pcard { background: linear-gradient(120deg, color-mix(in srgb, var(--tc) 16%, #fff), color-mix(in srgb, var(--tc) 5%, #fff) 70%); }
+:root[data-theme="light"] .pcard:hover { background: linear-gradient(120deg, color-mix(in srgb, var(--tc) 24%, #fff), color-mix(in srgb, var(--tc) 8%, #fff) 70%); }
+.pcard .pc-m, .pcard .pc-s { color: color-mix(in srgb, var(--tx) 72%, transparent); }
+@media (max-width: 640px) { .pcard::before { left: 0; right: 0; bottom: auto; width: auto; height: 3px; } }
