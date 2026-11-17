@@ -226,3 +226,6 @@ button.th { text-transform: inherit; letter-spacing: inherit; font-family: inher
   .ct-banner { aspect-ratio: 4 / 3; }
 }
 @media (prefers-reduced-motion: reduce) { .cr-ring { animation: none; } }
+.cr-tags .cr-first { display: inline-flex; align-items: center; gap: 7px; color: var(--goldtx); border-color: color-mix(in srgb, var(--gold) 35%, var(--line)); background: color-mix(in srgb, var(--gold) 7%, transparent); }
+.cr-first i { width: 6px; height: 6px; flex: none; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px var(--glow); }
+@media (max-width: 640px) { .cr-tags span { white-space: normal; line-height: 1.35; } }

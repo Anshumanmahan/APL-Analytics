@@ -5,13 +5,15 @@ import { app } from '../lib/ui.js';
 
 export const PROFILE = {
   name: 'Anshuman',
-  title: 'Creator of APL Analytics',
+  title: 'Sports data scientist · Archery',
   place: '',                 // e.g. "From X · based in Y"
-  tags: [],                  // short chips, e.g. ['Recurve', 'Analyst']
+  tags: ['Creator of APL Analytics'],   // short chips
+  badge: "India's first archery data scientist at a high-performance centre",  // understated first-of-its-kind line
   bio: '',                   // a few lines about you
   portrait: '/img/creator-dp.webp',
   facts: [],                 // rapid fire: [question, answer]
   roles: [                   // [role, detail]
+    ['Sports data scientist, high-performance centre', 'Bringing data and video analysis into daily archery training.'],
     ['Competition data recording', 'I record scores live at competitions on an app I built myself.'],
     ['Korea training camp', 'Travelled with archers to the Kim Hyung Tak Archery Training Center and learnt a lot from Coach Kim about video analysis and archers in general.']
   ],
@@ -45,8 +47,8 @@ export function About() {
       <div class="cr-id"><p class="kicker">Meet the creator</p><h1 class="pt">${P.name}</h1>
         ${P.title && html`<p class="me-role">${P.title}</p>`}
         ${P.place && html`<p class="muted cr-place">${P.place}</p>`}
-        ${P.tags.length ? html`<div class="cr-tags">${P.tags.map(t => html`<span>${t}</span>`)}</div>` : ''}
-        <p class="lead">${P.bio || 'Archery fan, number cruncher and the person recording every APL arrow behind this site.'}</p>
+        ${(P.tags.length || P.badge) ? html`<div class="cr-tags">${P.badge && html`<span class="cr-first"><i></i>${P.badge}</span>`}${P.tags.map(t => html`<span>${t}</span>`)}</div>` : ''}
+        <p class="lead">${P.bio || 'Number cruncher on the archery range, and the person recording every APL arrow behind this site.'}</p>
         <div class="cr-cta"><a class="btn pri" href="#/contact">Get in touch</a><a class="btn" href="#/ideas">See what's being built</a></div></div>
     </section>
 
