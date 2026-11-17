@@ -1,6 +1,6 @@
 /* Teams: a card for each team, and a team page with its squad, who shot when, and its timing. */
 import { html } from '../../vendor/preact-htm.js';
-import { TEAMS, standings, teamSets, archers, sideOf, opp } from '../lib/season.js';
+import { TEAMS, standings, finalStandings, teamSets, archers, sideOf, opp } from '../lib/season.js';
 import { app, cls, f1, f2, pct, tc, Result, Tiles, matchTitle } from '../lib/ui.js';
 import { Crest, Avatar } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
@@ -10,23 +10,27 @@ import { summarize } from '../lib/season.js';
 
 const mpos = g => g.reduce((x, v, i) => x + v * i, 0) / Math.max(1, g.reduce((x, v) => x + v, 0));
 
+const ordn = n => n + (['st', 'nd', 'rd'][n - 1] || 'th');
+
 export function Teams() {
-  const S = app.S; const st = standings(S);
+  const S = app.S; const st = finalStandings(S);
+  const rec = code => { let w = 0, l = 0; S.matches.forEach(m => { if (!sideOf(m, code) || (m.win !== m.teams.A && m.win !== m.teams.B)) return; if (m.win === code) w++; else l++; }); return [w, l]; };
   return html`<div class="page"><h1 class="pt">Teams</h1>
-    <div class="tblocks">${st.map((o, i) => { const sets = teamSets(S, o.t); const t = S.T(o.t); const sd = o.SF - o.SA;
-      return html`<a class="tblock" href=${'#/team/' + o.t} style=${`--tc:${tc(o.t)}`}>
+    <p class="lead small">Final standings for the whole tournament: champions, runners-up, then by playoff exit, then league position.</p>
+    <div class="tblocks">${st.map((o, i) => { const sets = teamSets(S, o.t); const t = S.T(o.t); const sd = o.SF - o.SA; const [w, l] = rec(o.t); const form = S.matches.filter(m => sideOf(m, o.t) && (m.win === m.teams.A || m.win === m.teams.B)).map(m => ({ m, won: m.win === o.t }));
+      return html`<a class=${'tblock' + (o.tier === 0 ? ' champ' : '')} href=${'#/team/' + o.t} style=${`--tc:${tc(o.t)}`}>
         <span class="tb-glow"></span><span class="tb-rank">${String(i + 1).padStart(2, '0')}</span>
         <div class="tb-crest"><${Crest} code=${o.t} size=${132} /></div>
         <div class="tb-body">
-          <small class="tb-pos">${i + 1}${['st', 'nd', 'rd'][i] || 'th'} in the league${t.state ? ' · ' + t.state : ''}</small>
+          <small class="tb-pos"><span class="tb-stage">${o.tier === 0 ? '🏆 ' : ''}${o.stage}</span> · ${ordn(o.league)} in league</small>
           <b class="tb-name">${t.name}</b>
           <div class="tb-stats">
-            <span><b>${o.W}–${o.L}</b><small>won–lost</small></span>
-            <span><b>${o.Pts}</b><small>points</small></span>
-            <span><b>${sd > 0 ? '+' : ''}${sd}</b><small>sets ±</small></span>
-            <span><b>${f1(mean(sets.map(x => x.tot)))}</b><small>avg set</small></span>
+            <span><b>${w}–${l}</b><small>W–L, all</small></span>
+            <span><b>${o.Pts}</b><small>Points</small></span>
+            <span><b>${sd > 0 ? '+' : ''}${sd}</b><small>Sets ±</small></span>
+            <span><b>${f1(mean(sets.map(x => x.tot)))}</b><small>Avg set</small></span>
           </div>
-          <div class="tb-form"><small>Form</small><${Form} list=${o.form.slice(-5)} /></div>
+          <div class="tb-form"><small>Form</small><${Form} list=${form.slice(-5)} /></div>
         </div>
         <span class="tb-go">View team →</span></a>`; })}</div></div>`;
 }
@@ -34,7 +38,7 @@ export function Teams() {
 export function TeamPage({ code }) {
   const S = app.S; const t = S.T(code);
   if (!TEAMS.includes(code)) return html`<div class="page"><p class="empty">No such team.</p></div>`;
-  const st = standings(S); const me = st.find(o => o.t === code); const rank = st.indexOf(me) + 1;
+  const st = standings(S); const me = st.find(o => o.t === code); const rank = st.indexOf(me) + 1; const fs = finalStandings(S); const fme = fs.find(o => o.t === code);
   const ctx = context(S).filter(o => o.code === code);
   const all = summarize(ctx); const sets = teamSets(S, code);
   const used = sets.map(x => x.used).filter(v => v != null);
@@ -46,7 +50,7 @@ export function TeamPage({ code }) {
   const ms = S.matches.filter(m => sideOf(m, code));
   return html`<div class="page">
     <p class="kicker"><a href="#/teams">Teams</a> · ${t.state || ''}</p>
-    <section class="thero2" style=${`--tc:${tc(code)}`}><${Crest} code=${code} size=${96} /><div><h1>${t.name}</h1><p class="lead">${rank}${['st', 'nd', 'rd'][rank - 1] || 'th'} in the league · ${me.W} won, ${me.L} lost · ${me.Pts} points</p><${Form} list=${me.form} /></div></section>
+    <section class="thero2" style=${`--tc:${tc(code)}`}><${Crest} code=${code} size=${96} /><div><h1>${t.name}</h1><p class="lead">${fme.tier === 0 ? '🏆 Champions' : fme.stage === 'League stage' ? ordn(fs.indexOf(fme) + 1) + ' overall' : fme.stage} · ${rank}${['st', 'nd', 'rd'][rank - 1] || 'th'} in the league · ${me.W} won, ${me.L} lost · ${me.Pts} points</p><${Form} list=${me.form} /></div></section>
     <${Tiles} items=${[[f1(mean(sets.map(x => x.tot))), 'Average set', `${sets.length} sets, both bows`]]} />
     ${bw.map(x => html`<h3 class="bowh">${x.b}</h3><${Tiles} items=${[[f2(x.s.avg), 'Arrow average', `${x.s.n} recorded arrows`], [pct(x.s.tenRate), '10s'], [x.s.at ? f1(x.s.at) + ' s' : '–', 'Average time per arrow', `${x.s.tn} timed`], [x.cr.length ? f2(mean(x.cr.map(o => o.a.s))) : '–', 'Average in a time crunch', `${x.cr.length} arrows with ≤${CRUNCH} s left`]]} />`)}
 

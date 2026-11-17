@@ -244,3 +244,20 @@ function dirOf(x, y) {
   const a = (Math.atan2(-y, x) * 180 / Math.PI + 360) % 360;
   return ['right', 'high right', 'high', 'high left', 'left', 'low left', 'low', 'low right'][Math.round(a / 45) % 8];
 }
+
+/* Final standings for the whole tournament: champion, runner-up, then by playoff exit (Eliminator 2 before Eliminator 1),
+   then the teams that missed the playoffs in league order. Teams still alive in unfinished playoffs sit above anyone already out. */
+export function finalStandings(S) {
+  const lg = standings(S); const lpos = Object.fromEntries(lg.map((o, i) => [o.t, i + 1]));
+  const po = S.matches.filter(m => m.stage !== 'League');
+  const inPO = new Set(po.flatMap(m => [m.teams.A, m.teams.B]));
+  const done = m => m.win === m.teams.A || m.win === m.teams.B;
+  const fin = po.find(m => m.stage === 'Final'), e2 = po.find(m => m.stage === 'Eliminator 2'), e1 = po.find(m => m.stage === 'Eliminator 1');
+  const tier = {}, note = {};
+  lg.forEach(o => { if (inPO.has(o.t)) { tier[o.t] = 1.5; note[o.t] = 'In the playoffs'; } else { tier[o.t] = 4; note[o.t] = 'League stage'; } });
+  const lost = (m, tr, n) => { if (m && done(m)) { const l = opp(m, m.win); tier[l] = tr; note[l] = n; } };
+  lost(e1, 3, 'Out in Eliminator 1'); lost(e2, 2, 'Out in Eliminator 2');
+  if (fin && done(fin)) { tier[fin.win] = 0; note[fin.win] = 'Champions'; tier[opp(fin, fin.win)] = 1; note[opp(fin, fin.win)] = 'Runners-up'; }
+  return lg.map(o => Object.assign({}, o, { league: lpos[o.t], stage: note[o.t], tier: tier[o.t] }))
+    .sort((a, b) => a.tier - b.tier || a.league - b.league);
+}

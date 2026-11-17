@@ -314,3 +314,26 @@ button.th { text-transform: inherit; letter-spacing: inherit; font-family: inher
 :root[data-theme="light"] .pcard:hover { background: linear-gradient(120deg, color-mix(in srgb, var(--tc) 24%, #fff), color-mix(in srgb, var(--tc) 8%, #fff) 70%); }
 .pcard .pc-m, .pcard .pc-s { color: color-mix(in srgb, var(--tx) 72%, transparent); }
 @media (max-width: 640px) { .pcard::before { left: 0; right: 0; bottom: auto; width: auto; height: 3px; } }
+.tb-stage { color: var(--tx); font-weight: 600; }
+.tblock.champ { border-color: color-mix(in srgb, var(--gold) 55%, var(--line)); box-shadow: 0 0 0 1px color-mix(in srgb, var(--gold) 25%, transparent), 0 20px 50px -28px var(--gold); }
+.tblock.champ .tb-stage { color: var(--goldtx); }
+
+/* filter controls: one family. Search box and dropdowns share height, font, border and radius; the dropdown label sits inside the control */
+.filters { align-items: center; gap: 10px; }
+.search, .sel, select { height: 38px; }
+.search { font: 400 14px var(--f); padding: 0 12px 0 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--raise) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a7' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 11px 50% / 15px; color: var(--tx); min-width: 220px; }
+.search::placeholder { color: var(--mut); }
+.sel { display: inline-flex; flex-direction: row; align-items: center; gap: 0; padding: 0 0 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--raise); font-size: 12px; transition: border-color .15s, box-shadow .15s; }
+.sel:focus-within { border-color: color-mix(in srgb, var(--gold) 60%, var(--line)); box-shadow: 0 0 0 3px var(--glow); }
+.sel > span { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--mut); white-space: nowrap; padding-right: 8px; border-right: 1px solid var(--line); }
+select, .sel select { -webkit-appearance: none; appearance: none; font: 500 14px var(--f); color: var(--tx); border: 1px solid var(--line); border-radius: 10px; background: var(--raise) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b95a7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center / 14px; padding: 0 32px 0 12px; cursor: pointer; }
+.sel select { height: 100%; border: 0; background-color: transparent; padding-left: 10px; box-shadow: none !important; }
+.sel select:focus { outline: none; }
+select option { background: var(--solid); color: var(--tx); }
+@media (max-width: 640px) {
+  .filters { flex-wrap: wrap; }
+  .search { flex: 1 1 100%; min-width: 0; }
+  .sel { flex: 1 1 auto; }
+  .sel select { flex: 1; min-width: 0; font-size: 13.5px; }
+}
+.tb-pos { padding-right: 90px; } @media (max-width:640px){ .tb-pos { padding-right: 0; } }
