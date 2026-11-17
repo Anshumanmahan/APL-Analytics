@@ -31,6 +31,8 @@ export const IDEAS = [
   ['Last 2 arrows: time needed for the best result', '#/analytics/time', R],
   ['Ideal time to shoot for each archer', '#/analytics/time', D],
   ['Running news ticker with cool analytics', '#/', D, 'Under the header; pauses on hover; every item links to its source.'],
+  ['Light and dark theme with an archery-style switch', '#/', D, 'Follows the device setting until you pick one.'],
+  ['Works on phones, tablets and laptops', '#/', D],
   ['Trends in team strategies', '#/teams', W, 'Set orders are shown; trend lines need more recorded matches.']
 ];
 const LBL = { [D]: 'Built', [R]: 'Rough first pass', [W]: 'Waiting on data' };

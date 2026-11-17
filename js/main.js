@@ -53,6 +53,20 @@ function Gate() {
     <button class="btn pri" disabled=${!v}>Open</button></form></div>`;
 }
 
+/* light / dark switch, styled as a target with an arrow in it */
+function ThemeBtn() {
+  const [t, setT] = useState(document.documentElement.getAttribute('data-theme') || 'dark');
+  const flip = () => { const n = t === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', n); try { localStorage.setItem('apl-theme', n); } catch (e) { } setT(n); };
+  const dark = t === 'dark';
+  return html`<button class="themebtn" onClick=${flip} aria-label=${dark ? 'Switch to light theme' : 'Switch to dark theme'} title=${dark ? 'Light theme' : 'Dark theme'}>
+    <svg viewBox="-12 -12 24 24" aria-hidden="true">
+      <circle r="11" fill=${dark ? '#2a2a2a' : '#f4f4ef'} stroke=${dark ? '#55627a' : '#c9cfd9'} stroke-width="1" />
+      <circle r="8" fill="#3b8fd9" /><circle r="5.5" fill="#e5484d" /><circle r="3" fill="#f5c518" />
+      <g class="arw" key=${t}><line x1="0" y1="0" x2="10" y2="-10" stroke=${dark ? '#e8ecf2' : '#162033'} stroke-width="1.6" stroke-linecap="round" />
+        <path d="M8 -12 L12 -12 L12 -8 M6.5 -10.5 L10.5 -6.5" stroke=${dark ? '#e8ecf2' : '#162033'} stroke-width="1.3" fill="none" stroke-linecap="round" /></g>
+    </svg><span>${dark ? 'Dark' : 'Light'}</span></button>`;
+}
+
 const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['ideas', 'Ideas', '#/ideas']];
 function App() {
   if (state.status === 'gate') return html`<${Gate} />`;
@@ -60,7 +74,7 @@ function App() {
   const r = route(); const S = app.S; const rec = S.matches.filter(m => m.src === 'recorded').length;
   return html`<div class="shell">
     <header class="top"><a class="brand" href="#/"><svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r="1" fill="#3b8fd9"/><circle r=".8" fill="#e5484d"/><circle r=".6" fill="#f5c518"/><circle r=".3" fill="#161c27"/><circle r=".12" fill="#f5c518"/></svg><span>APL <b>Analytics</b></span></a>
-      <nav class="tabs">${TABS.map(([k, l, h]) => html`<a class=${cls(r.tab === k && 'on')} href=${h} aria-current=${r.tab === k ? 'page' : null}>${l}</a>`)}</nav></header>
+      <nav class="tabs">${TABS.map(([k, l, h]) => html`<a class=${cls(r.tab === k && 'on')} href=${h} aria-current=${r.tab === k ? 'page' : null}>${l}</a>`)}</nav><${ThemeBtn} /></header>
     <${Ticker} S=${S} />
     <main>${r.el}</main>
     <footer class="foot"><p><b>${rec} of ${S.matches.length}</b> matches recorded arrow by arrow so far; the rest come from the TV scoreboard read and the official results, and fill in as more are recorded.
