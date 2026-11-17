@@ -79,7 +79,7 @@ function App() {
   if (!app.S) return html`<div class="loading"><span class="spin"></span>Loading the season…</div>`;
   const r = route(); const S = app.S; const rec = S.matches.filter(m => m.src === 'recorded').length;
   return html`<div class="shell">
-    <header class="top"><a class="brand" href="#/"><img src="/logo.svg" alt="" width="26" height="26" /><span>APL <b>Analytics</b></span></a>
+    <header class="top"><a class="brand" href="#/" aria-label="APL Analytics home"><img src="/logo.svg" alt="" width="32" height="32" /><span class="wm"><b>APL</b><small>ANALYTICS</small></span></a>
       <nav class="tabs">${TABS.map(([k, l, h]) => html`<a class=${cls(r.tab === k && 'on')} href=${h} aria-current=${r.tab === k ? 'page' : null}>${l}</a>`)}</nav><${ThemeBtn} /></header>
     <${Ticker} S=${S} />
     <main>${r.el}</main>
