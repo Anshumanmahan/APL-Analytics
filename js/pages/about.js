@@ -109,7 +109,7 @@ export function About() {
 
 /* Contact form → Google Sheet. Paste the Apps Script web app URL here (ends in /exec); see docs/contact-form-google-sheet.md.
    Until it is set, the form opens the visitor's email app with the message filled in instead. */
-export const FORM_URL = '';
+export const FORM_URL = 'https://script.google.com/macros/s/AKfycbwXQMrDEspoWBU6NKdVQFU481jw2CX7r2DIKLeZfxPUKT4T4MszWEepb3RnbHaHy4uU_Q/exec';
 const TOPICS = ['General question', 'Spotted a data error', 'Idea for a stat or feature', 'Collaboration or media', 'Other'];
 
 function ContactForm() {
