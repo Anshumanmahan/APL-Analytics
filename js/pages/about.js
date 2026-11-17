@@ -1,6 +1,6 @@
 /* Meet the creator (a mini resume) and Contact. Everything personal lives in PROFILE, so it is one place to edit.
    Sections with nothing filled in are left out, so the page never shows empty boxes. */
-import { html } from '../../vendor/preact-htm.js';
+import { html, useState } from '../../vendor/preact-htm.js';
 import { app } from '../lib/ui.js';
 
 export const TAGLINE = 'The only stats platform for the Archery Premier League';
@@ -107,19 +107,53 @@ export function About() {
   </div>`;
 }
 
+/* Contact form → Google Sheet. Paste the Apps Script web app URL here (ends in /exec); see docs/contact-form-google-sheet.md.
+   Until it is set, the form opens the visitor's email app with the message filled in instead. */
+export const FORM_URL = '';
+const TOPICS = ['General question', 'Spotted a data error', 'Idea for a stat or feature', 'Collaboration or media', 'Other'];
+
+function ContactForm() {
+  const [f, setF] = useState({ name: '', email: '', topic: TOPICS[0], match: '', message: '', website: '' });
+  const [st, setSt] = useState('idle'); // idle | sending | sent | error
+  const set = k => e => setF(Object.assign({}, f, { [k]: e.target.value }));
+  const submit = async e => {
+    e.preventDefault(); if (f.website) return setSt('sent'); // honeypot: bots fill the hidden field
+    const body = { name: f.name.trim(), email: f.email.trim(), topic: f.topic, match: f.match.trim(), message: f.message.trim(), page: location.href, sent: new Date().toISOString() };
+    if (!FORM_URL) {
+      const mail = PROFILE.contacts.find(c => c[0] === 'Email');
+      location.href = (mail ? mail[2] : 'mailto:') + '?subject=' + encodeURIComponent('APL Analytics: ' + body.topic) + '&body=' + encodeURIComponent(`${body.message}\n\n${body.match ? 'Match: ' + body.match + '\n' : ''}From: ${body.name} <${body.email}>`);
+      return;
+    }
+    setSt('sending');
+    try { await fetch(FORM_URL, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(body) }); setSt('sent'); }
+    catch (err) { setSt('error'); }
+  };
+  if (st === 'sent') return html`<div class="cf-done"><b>Thanks, ${f.name.split(' ')[0] || 'friend'}!</b><p class="muted">Your message is in. ${PROFILE.name.split(' ')[0]} will get back to you at ${f.email || 'your email'}.</p><button class="btn" onClick=${() => { setF(Object.assign({}, f, { message: '', match: '' })); setSt('idle'); }}>Send another</button></div>`;
+  return html`<form class="cf" onSubmit=${submit}>
+    <label class="cf-f"><span>Name</span><input required maxlength="80" autocomplete="name" value=${f.name} onInput=${set('name')} placeholder="Your name" /></label>
+    <label class="cf-f"><span>Email</span><input required type="email" maxlength="120" autocomplete="email" value=${f.email} onInput=${set('email')} placeholder="you@example.com" /></label>
+    <label class="cf-f"><span>Topic</span><select value=${f.topic} onChange=${set('topic')}>${TOPICS.map(t => html`<option value=${t} selected=${t === f.topic}>${t}</option>`)}</select></label>
+    <label class="cf-f"><span>Match, set or arrow <em>(optional)</em></span><input maxlength="120" value=${f.match} onInput=${set('match')} placeholder="e.g. Day 4, match 2, set 3, arrow 6" /></label>
+    <label class="cf-f cf-wide"><span>Message</span><textarea required rows="5" maxlength="3000" value=${f.message} onInput=${set('message')} placeholder="What's on your mind?"></textarea></label>
+    <label class="cf-hp" aria-hidden="true">Website<input tabindex="-1" autocomplete="off" value=${f.website} onInput=${set('website')} /></label>
+    <div class="cf-go cf-wide"><button class="btn pri" disabled=${st === 'sending'}>${st === 'sending' ? 'Sending…' : 'Send message'}</button>
+      ${st === 'error' ? html`<span class="err">That didn't go through. Check your connection, or email instead.</span>` : html`<small class="muted">Your details are only used to reply to you.</small>`}</div>
+  </form>`;
+}
+
 export function Contact() {
   const c = PROFILE.contacts;
   return html`<div class="page about">
     <section class="me"><${Photo} size=${110} />
       <div><p class="kicker">Contact us</p><h1 class="pt">Get in touch</h1>
         <p class="lead">Questions, ideas for new stats, or spotted a number that looks wrong? Reach out to ${PROFILE.name.split(' ')[0]}.</p></div></section>
-    <figure class="ct-banner"><img src="/img/creator-kim-hyung-tak.jpg" alt=${PROFILE.name + ' with Coach Kim at the Kim Hyung Tak Archery Training Center'} /><figcaption>${PROFILE.name} with Coach Kim at the Kim Hyung Tak Archery Training Center</figcaption></figure>
-    <section class="panel"><h2>Reach ${PROFILE.name.split(' ')[0]}</h2>
-      ${c.length ? html`<div class="contacts">${c.map(([l, v, h]) => html`<a class="contact" href=${h} target=${h.startsWith('http') ? '_blank' : null} rel="noopener"><small>${l}</small><b>${v}</b></a>`)}</div>`
-        : html`<p class="muted">Contact details coming soon.</p>`}</section>
-    <div class="grid2">
-      <section class="panel"><h2>Report a data error</h2><p>If an arrow, score or result looks wrong, give the match (day and match number), the set and the arrow, and it will be checked against the video.</p></section>
-      <section class="panel"><h2>Meet the creator</h2><p>Who is behind the numbers, and why this site exists.</p><a class="lnk" href="#/creator">Read the story →</a></section>
+    <div class="ct-grid">
+      <section class="panel"><h2>Send a message</h2><${ContactForm} /></section>
+      <section class="panel"><h2>Or reach ${PROFILE.name.split(' ')[0]} directly</h2>
+        ${c.length ? html`<div class="contacts ct-list">${c.map(([l, v, h]) => html`<a class="contact" href=${h} target=${h.startsWith('http') ? '_blank' : null} rel="noopener"><small>${l}</small><b>${v}</b></a>`)}</div>`
+          : html`<p class="muted">Contact details coming soon.</p>`}
+        <h3 class="sub">Reporting a data error?</h3><p class="small">Give the match (day and match number), the set and the arrow, and it will be checked against the video.</p>
+        <a class="lnk" href="#/creator">Meet the creator →</a></section>
     </div>
   </div>`;
 }

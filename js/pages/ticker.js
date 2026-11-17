@@ -46,6 +46,6 @@ export function facts(S) {
 
 export function Ticker({ S }) {
   const list = facts(S); if (!list.length) return null;
-  const run = list.map(f => html`<a class="tk-i" href=${f.href}><b style=${`--c:${f.color}`}>${f.tag}</b>${f.text}</a>`);
+  const run = list.map(f => html`<a class="tk-i" href=${f.href} onClick=${e => e.currentTarget.blur()}><b style=${`--c:${f.color}`}>${f.tag}</b>${f.text}</a>`);
   return html`<div class="ticker" aria-label="Season headlines"><div class="tk-track" style=${`--dur:${Math.max(40, list.length * 7)}s`}>${run}<span aria-hidden="true" class="tk-dup">${run}</span></div></div>`;
 }
