@@ -214,7 +214,7 @@ export function records(S) {
 
 /* ---------- grouping ----------
    Spots are stored with the face radius as 1. The APL face is the 122 cm face, so 1 unit = 61 cm.
-   AGI (Arrow Grouping Indicator, Archery Analytics / ianseo):
+   AGI (Arrow Grouping Index, Archery Analytics / ianseo):
      covariance of the hits about their own centre (n − 1), eigenvalues λM, λm,
      pooled SD  psd = √((n − 1)/(2n) · (λM + λm)),  angular SD = psd / distance,
      AGI = 100 · (αmax − asd) / αmax  with αmax = 1.22 m / 70 m (the whole 122 cm face at 70 m), floored at 0.

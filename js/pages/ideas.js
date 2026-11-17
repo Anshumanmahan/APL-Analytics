@@ -17,7 +17,7 @@ export const IDEAS = [
   ['Shoot-off stats', '#/analytics/comebacks', R],
   ['Sets won by a trailing team', '#/analytics/comebacks', R],
   ['Average time by each teammate', '#/teams', D, 'Squad table on each team page.'],
-  ['AGI for every archer', '#/players', D],
+  ['Arrow Grouping Index (AGI) for every archer', '#/players', D],
   ['Pressure index at every arrow', '#/analytics/pressure', R, 'First formula; weights can be tuned.'],
   ['Time taken vs score', '#/analytics/time', D],
   ['Event-wise analytics', '#/analytics/events', R],

@@ -78,7 +78,7 @@ function Leaderboard({ S, rctx, bow }) {
       <${Table} sort="avg" rows=${rows} cols=${[
         ['rank', '#', (r, i) => i + 1], ['name', 'Archer', r => html`<${Arch} id=${r.id} />`, { sort: r => r.ar.name }], ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat, sm: 0 }],
         ['n', 'Arrows', null, { num: 1, sm: 0 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['x', 'X', null, { num: 1, sm: 0 }],
-        ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1, sm: 0 }], ['agi', 'AGI', r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }], ['group', 'Group cm', r => (r.group != null ? r.group.toFixed(1) : '–'), { num: 1, sm: 0 }]]} />
+        ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1, sm: 0 }], ['agi', html`<abbr title="Arrow Grouping Index">AGI</abbr>`, r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }], ['group', 'Group cm', r => (r.group != null ? r.group.toFixed(1) : '–'), { num: 1, sm: 0 }]]} />
     </${Panel}>`;
 }
 

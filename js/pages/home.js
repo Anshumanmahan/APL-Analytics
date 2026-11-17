@@ -58,7 +58,7 @@ export function Home() {
         <section class="panel"><h2>Leaders so far</h2>
           ${byBow.map(x => html`<h3 class="bowh">${x.b}</h3><div class="leaders">
             <div><h3 class="sub">Arrow average</h3>${x.topAvg.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${f2(a.avg)}</b></div>`)}</div>
-            <div><h3 class="sub">Tightest group (AGI)</h3>${x.topAgi.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${a.agi.toFixed(1)}</b></div>`)}</div>
+            <div><h3 class="sub">Arrow Grouping Index (AGI)</h3>${x.topAgi.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${a.agi.toFixed(1)}</b></div>`)}</div>
           </div>
           ${x.clutch && html`<p class="small">Best team on crucial ${x.b.toLowerCase()} arrows (last two of a set within 3 points): <b><a href=${'#/team/' + x.clutch.k}>${S.T(x.clutch.k).name}</a></b>, ${f2(x.clutch.avg)} from ${x.clutch.n}.</p>`}`)}
           <a class="lnk" href="#/analytics">All analytics →</a>

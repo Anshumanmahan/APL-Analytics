@@ -58,7 +58,7 @@ export function TeamPage({ code }) {
       <${Table} sort="n" rows=${sq} cols=${[
         ['name', 'Archer', r => html`<span class="sqn"><${Avatar} ar=${r.ar} size=${28} /><a href=${'#/player/' + r.ar.id}><span class="nm-f">${r.ar.name}</span><span class="nm-s">${r.ar.name.split(' ')[0]}</span></a></span>`, { sort: r => r.ar.name }],
         ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat }], ['matches', 'Matches', r => r.matches || 0, { num: 1, sm: 0 }], ['n', 'Arrows', r => r.n, { num: 1 }],
-        ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1 }], ['agi', 'AGI', r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }]]} />
+        ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1 }], ['agi', html`<abbr title="Arrow Grouping Index">AGI</abbr>`, r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }]]} />
     </${Panel}>
 
     <div class="grid2">
