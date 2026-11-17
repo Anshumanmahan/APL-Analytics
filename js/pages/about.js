@@ -9,7 +9,7 @@ export const PROFILE = {
   place: '',                 // e.g. "From X · based in Y"
   tags: [],                  // short chips, e.g. ['Recurve', 'Analyst']
   bio: '',                   // a few lines about you
-  portrait: '/img/creator.webp',
+  portrait: '/img/creator-dp.webp',
   facts: [],                 // rapid fire: [question, answer]
   roles: [                   // [role, detail]
     ['Competition data recording', 'I record scores live at competitions on an app I built myself.'],
