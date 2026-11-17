@@ -9,6 +9,7 @@ import { Players, PlayerPage } from './pages/players.js';
 import { Matches, MatchPage } from './pages/matches.js';
 import { Analytics } from './pages/analytics.js';
 import { Ideas } from './pages/ideas.js';
+import { Ticker } from './pages/ticker.js';
 
 const state = { status: 'loading', msg: '', loadedAt: null, open: false };
 const rerender = () => render(html`<${App} />`, document.getElementById('root'));
@@ -60,6 +61,7 @@ function App() {
   return html`<div class="shell">
     <header class="top"><a class="brand" href="#/"><svg viewBox="-1 -1 2 2" aria-hidden="true"><circle r="1" fill="#3b8fd9"/><circle r=".8" fill="#e5484d"/><circle r=".6" fill="#f5c518"/><circle r=".3" fill="#161c27"/><circle r=".12" fill="#f5c518"/></svg><span>APL <b>Analytics</b></span></a>
       <nav class="tabs">${TABS.map(([k, l, h]) => html`<a class=${cls(r.tab === k && 'on')} href=${h} aria-current=${r.tab === k ? 'page' : null}>${l}</a>`)}</nav></header>
+    <${Ticker} S=${S} />
     <main>${r.el}</main>
     <footer class="foot"><p><b>${rec} of ${S.matches.length}</b> matches recorded arrow by arrow so far; the rest come from the TV scoreboard read and the official results, and fill in as more are recorded.
       ${state.loadedAt ? ` Data loaded ${state.loadedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.` : ''}
