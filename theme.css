@@ -246,3 +246,16 @@ button.th { text-transform: inherit; letter-spacing: inherit; font-family: inher
   .cr-gal figure, .cr-gal figure.wide, .cr-gal figure.full, .ct-banner { height: auto !important; }
   .cr-gal img, .ct-banner img { height: auto !important; }
 }
+/* tagline: the only APL stats platform */
+.cr-only { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 5px 12px; border-radius: 999px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .04em; color: var(--goldtx); border: 1px solid color-mix(in srgb, var(--gold) 40%, var(--line)); background: color-mix(in srgb, var(--gold) 8%, transparent); }
+.cr-only i { width: 6px; height: 6px; flex: none; background: var(--gold); transform: rotate(45deg); box-shadow: 0 0 8px var(--glow); }
+.hh-only { margin: 14px 0 2px; }
+.foot-tag { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--goldtx); margin: 0 0 6px; }
+.cr-story p { max-width: 72ch; font-size: 15px; line-height: 1.6; margin: 0 0 10px; }
+.cr-story p:last-child { margin-bottom: 0; color: var(--mut); }
+.contact b { word-break: normal; overflow-wrap: anywhere; }
+@media (max-width: 640px) { .cr-only { font-size: 10.5px; padding: 4px 10px; } }
+.gate-only { justify-self: center; margin: 0; color: var(--goldtx) !important; }
+/* no backdrop blur behind photos: some mobile browsers skip painting images inside blurred layers */
+.cr-galp, .about .panel, .ct-banner { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+.cr-galp { background: color-mix(in srgb, var(--solid) 92%, transparent); }

@@ -50,7 +50,7 @@ function Gate() {
   const [v, setV] = useState('');
   return html`<div class="gate"><form onSubmit=${e => { e.preventDefault(); if (v) open(v); }}>
     <img class="gate-t" src="/logo.svg" alt="" />
-    <h1>APL Analytics</h1><p>Enter the scorebook passcode to see the season.</p>
+    <h1>APL Analytics</h1><p class="cr-only gate-only"><i></i>The only stats platform for the Archery Premier League</p><p>Enter the scorebook passcode to see the season.</p>
     <input type="password" autocomplete="off" maxlength="24" value=${v} placeholder="••••" aria-label="Passcode" autofocus onInput=${e => setV(e.target.value.trim())} />
     ${state.msg && html`<p class="err" role="alert">${state.msg}</p>`}
     <button class="btn pri" disabled=${!v}>Open</button></form></div>`;
@@ -87,7 +87,7 @@ function App() {
       <div class="topr"><a class=${cls('toplink', r.tab === 'about' && 'on')} href="#/creator" aria-label="Meet the creator" aria-current=${r.tab === 'about' ? 'page' : null}><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>Meet the creator</span></a><a class=${cls('toplink', r.tab === 'contact' && 'on')} href="#/contact" aria-label="Contact us" aria-current=${r.tab === 'contact' ? 'page' : null}><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg><span>Contact us</span></a><${ThemeBtn} /></div></header>
     <${Ticker} S=${S} />
     <main>${r.el}</main>
-    <footer class="foot"><p><b>${rec} of ${S.matches.length}</b> matches recorded arrow by arrow so far; the rest come from the TV scoreboard read and the official results, and fill in as more are recorded.
+    <footer class="foot"><p class="foot-tag">APL Analytics · The only stats platform for the Archery Premier League</p><p><b>${rec} of ${S.matches.length}</b> matches recorded arrow by arrow so far; the rest come from the TV scoreboard read and the official results, and fill in as more are recorded.
       ${state.loadedAt ? ` Data loaded ${state.loadedAt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}.` : ''}
       <button class="lnk" onClick=${() => open()}>${state.refreshing ? 'Refreshing…' : 'Refresh'}</button></p>
       <p class="footnav"><a href="#/creator">Meet the creator</a><a href="#/contact">Contact us</a><a href="#/ideas">Ideas board</a></p>

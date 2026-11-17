@@ -5,6 +5,7 @@ import { app, cls, f2, pct, tc, Result, matchTitle } from '../lib/ui.js';
 import { Crest, LEAGUE_LOGO } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
 import { Arch } from './common.js';
+import { TAGLINE } from './about.js';
 import { context, isCrucial, groupBy, bowOf, ofBow, BOWS } from '../lib/insights.js';
 
 const ord = n => n + (['st', 'nd', 'rd'][n - 1] || 'th');
@@ -26,6 +27,7 @@ export function Home() {
     <section class="hhero">
       ${LEAGUE_LOGO && logoOk && html`<img class="hlogo" src=${LEAGUE_LOGO} alt="Archery Premier League" referrerpolicy="no-referrer" onError=${() => setLogoOk(false)} />`}
       <div><p class="kicker">Archery Premier League · Season 2</p><h1>APL Analytics</h1>
+        <p class="cr-only hh-only"><i></i>${TAGLINE}</p>
         <p class="lead">Every arrow of the season: who shoots best, when, under what pressure, and how teams plan their sets.</p></div>
     </section>
 

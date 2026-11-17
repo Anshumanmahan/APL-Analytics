@@ -3,30 +3,56 @@
 import { html } from '../../vendor/preact-htm.js';
 import { app } from '../lib/ui.js';
 
+export const TAGLINE = 'The only stats platform for the Archery Premier League';
+
 export const PROFILE = {
-  name: 'Anshuman',
+  name: 'Anshuman Dixit',
   title: 'Sports data scientist · Archery',
-  place: '',                 // e.g. "From X · based in Y"
-  tags: ['Creator of APL Analytics'],   // short chips
+  place: 'From Lucknow · based in Ahmedabad',
+  tags: ['Creator of APL Analytics', 'Vijayi Bharat Foundation', 'M.S. Sports Analytics, Indiana University', 'Dartfish'],
   badge: "India's first archery data scientist at a high-performance centre",  // understated first-of-its-kind line
-  bio: '',                   // a few lines about you
+  bio: 'A sports data scientist building data tools for Indian archery at Vijayi Bharat Foundation, and the person recording every APL arrow behind this site.',
   portrait: '/img/creator-dp.jpg',
-  facts: [],                 // rapid fire: [question, answer]
-  roles: [                   // [role, detail]
-    ['Sports data scientist, high-performance centre', 'Bringing data and video analysis into daily archery training.'],
-    ['Competition data recording', 'I record scores live at competitions on an app I built myself.'],
-    ['Korea training camp', 'Travelled with archers to the Kim Hyung Tak Archery Training Center and learnt a lot from Coach Kim about video analysis and archers in general.']
+  story: [
+    'I fell for archery after joining VBF. I could see how much potential the sport has in India, and how much data science could add to it.',
+    'India is still waiting for its first Olympic medal in archery. That one fact pushed my motivation through the roof.',
+    "I've even shot recurve myself, from 20 to 30 metres. We all start somewhere."
   ],
-  timeline: [],              // [year, what happened]
-  why: '',                   // why you built this site
+  facts: [                   // rapid fire: [question, answer]
+    ['Best archer of all time', 'Mete Gazoz. I love his shooting style and his personality.'],
+    ['Favourite APL team', 'Rajputana Royals'],
+    ['Favourite archer this season', 'Elia Canales'],
+    ['Recurve or compound?', 'Recurve'],
+    ["A moment I'll never forget", 'Last season\'s final: Mathias Grande hit an 8 when he needed a 9 to win, and Rajputana Royals took the league.'],
+    ['The stat every archer should track', 'Hold time under pressure, and how hold time relates to score.']
+  ],
+  roles: [                   // [role, detail]
+    ['Sports data scientist, Vijayi Bharat Foundation', 'Since June 2025. I build, and keep improving, apps for VBF\'s archers and coaches, and help the coaches with video analysis using Dartfish.'],
+    ['On the road with the team', 'Multiple competitions with the VBF squad, recording data live on an app I built myself.'],
+    ['Working with the best', 'National and international coaches, and national and international medal-winning archers.'],
+    ['Korea training camp', 'Went with our archers to the Kim Hyung Tak Archery Training Center and learnt a lot from Coach Kim about video analysis and archers in general.']
+  ],
+  timeline: [                // [when, what happened]
+    ['Study', 'B.Tech in Computer Science and Engineering'],
+    ['Study', 'M.S. in Sports Analytics, Indiana University'],
+    ['USA', 'Worked in football in the United States'],
+    ['2 years', 'Inspire Institute of Sport (JSW)'],
+    ['Jun 2025', 'Joined Vijayi Bharat Foundation as a sports data scientist'],
+    ['Korea', 'Training camp at the Kim Hyung Tak Archery Training Center']
+  ],
+  why: 'I built APL Analytics for coaches, archers and Indian archery as a whole. Archers and coaches love numbers, and until now no platform showed the APL\'s stats. This one does, arrow by arrow.',
   gallery: [                 // [src, caption, wide?]
     ['/img/creator-recording.jpg', 'Recording data at a competition on an app I built myself'],
     ['/img/creator-kim-hyung-tak.jpg', 'With Coach Kim at the Kim Hyung Tak Archery Training Center', 'wide'],
     ['/img/creator-korea-camp.jpg', 'Korea training camp with the archers and Coach Kim', 'wide'],
     ['/img/creator-vbf-range.jpg', "Strolling around VBF's archery range"]
   ],
-  // only what you choose to show publicly: [label, value, href]
-  contacts: []
+  // only what was given for the site, shown on Contact: [label, value, href]
+  contacts: [
+    ['Email', 'anshumandixit1996@gmail.com', 'mailto:anshumandixit1996@gmail.com'],
+    ['Instagram', '@arrowlyticx', 'https://www.instagram.com/arrowlyticx/'],
+    ['LinkedIn', 'in/anshumandixit26', 'https://www.linkedin.com/in/anshumandixit26/']
+  ]
 };
 
 const initials = n => n.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -58,17 +84,20 @@ export function About() {
       <div><b>${st.total}</b><span>matches tracked this season</span></div>
     </div>
 
+    ${P.story && P.story.length ? html`<section class="panel cr-story"><h2>How archery found me</h2>${P.story.map(t => html`<p>${t}</p>`)}</section>` : ''}
+
     ${P.facts.length ? html`<section class="panel"><h2>Rapid fire</h2><div class="cr-facts">${P.facts.map(([q, a]) => html`<div class="cr-fact"><small>${q}</small><b>${a}</b></div>`)}</div></section>` : ''}
 
     ${(P.roles.length || P.timeline.length) ? html`<div class=${P.roles.length && P.timeline.length ? 'grid2' : ''}>
       ${P.roles.length ? html`<section class="panel"><h2>In the sport</h2><div class="cr-roles">${P.roles.map(([r, d]) => html`<div><b>${r}</b>${d && html`<span class="muted">${d}</span>`}</div>`)}</div></section>` : ''}
-      ${P.timeline.length ? html`<section class="panel"><h2>Archery journey</h2><ol class="cr-tl">${P.timeline.map(([y, t]) => html`<li><time>${y}</time><span>${t}</span></li>`)}</ol></section>` : ''}
+      ${P.timeline.length ? html`<section class="panel"><h2>Journey so far</h2><ol class="cr-tl">${P.timeline.map(([y, t]) => html`<li><time>${y}</time><span>${t}</span></li>`)}</ol></section>` : ''}
     </div>` : ''}
 
-    ${P.gallery.length ? html`<section class="panel"><h2>On the range</h2><div class="cr-gal">${P.gallery.map(([src, cap, wide]) => html`<figure class=${wide || ''}><img src=${src} alt=${cap}  decoding="async" /><figcaption>${cap}</figcaption></figure>`)}</div></section>` : ''}
+    ${P.gallery.length ? html`<section class="panel cr-galp"><h2>On the range</h2><div class="cr-gal">${P.gallery.map(([src, cap, wide]) => html`<figure class=${wide || ''}><img src=${src} alt=${cap}  /><figcaption>${cap}</figcaption></figure>`)}</div></section>` : ''}
 
     <div class="grid2">
       <section class="panel"><h2>Why APL Analytics</h2>
+        <p class="cr-only"><i></i>${TAGLINE}</p>
         ${P.why ? html`<p>${P.why}</p>` : html`<p>APL Analytics looks at the Archery Premier League arrow by arrow. It covers who shoots best and at which position, how archers use the shot clock, who rises under pressure, and how teams plan their sets.</p>`}
         <p>Recurve and compound are always kept apart, because compound scores run higher by nature.</p></section>
       <section class="panel"><h2>Where the numbers come from</h2>
@@ -83,9 +112,9 @@ export function Contact() {
   return html`<div class="page about">
     <section class="me"><${Photo} size=${110} />
       <div><p class="kicker">Contact us</p><h1 class="pt">Get in touch</h1>
-        <p class="lead">Questions, ideas for new stats, or spotted a number that looks wrong? Reach out to ${PROFILE.name}.</p></div></section>
+        <p class="lead">Questions, ideas for new stats, or spotted a number that looks wrong? Reach out to ${PROFILE.name.split(' ')[0]}.</p></div></section>
     <figure class="ct-banner"><img src="/img/creator-kim-hyung-tak.jpg" alt=${PROFILE.name + ' with Coach Kim at the Kim Hyung Tak Archery Training Center'} /><figcaption>${PROFILE.name} with Coach Kim at the Kim Hyung Tak Archery Training Center</figcaption></figure>
-    <section class="panel"><h2>Reach ${PROFILE.name}</h2>
+    <section class="panel"><h2>Reach ${PROFILE.name.split(' ')[0]}</h2>
       ${c.length ? html`<div class="contacts">${c.map(([l, v, h]) => html`<a class="contact" href=${h} target=${h.startsWith('http') ? '_blank' : null} rel="noopener"><small>${l}</small><b>${v}</b></a>`)}</div>`
         : html`<p class="muted">Contact details coming soon.</p>`}</section>
     <div class="grid2">
