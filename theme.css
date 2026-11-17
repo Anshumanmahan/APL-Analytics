@@ -337,3 +337,6 @@ select option { background: var(--solid); color: var(--tx); }
   .sel select { flex: 1; min-width: 0; font-size: 13.5px; }
 }
 .tb-pos { padding-right: 90px; } @media (max-width:640px){ .tb-pos { padding-right: 0; } }
+
+/* news ticker stays at the top of the page and scrolls away with it (only the header sticks) */
+.ticker { position: relative !important; top: auto !important; }
