@@ -396,7 +396,7 @@ select option { background: var(--solid); color: var(--tx); }
 @keyframes al-rot { to { transform: rotate(360deg); } }
 /* 1. the arrow flies in and strikes (lands at .8s) */
 .alogo .al-arrow { animation: al-fly .6s cubic-bezier(.35,.1,.6,1) .2s both; }
-@keyframes al-fly { from { transform: translate(-34px, 34px); opacity: 0; } 25% { opacity: 1; } to { transform: none; opacity: 1; } }
+@keyframes al-fly { from { transform: translate(var(--fx, -34px), var(--fy, 34px)); opacity: 0; } 25% { opacity: 1; } to { transform: none; opacity: 1; } }
 /* 2. it quivers in the boss while the target takes the hit */
 .alogo .al-quiver { transform-box: view-box; transform-origin: 32px 32px; animation: al-quiver .7s ease-out .8s both; }
 @keyframes al-quiver { 0% { transform: rotate(0); } 18% { transform: rotate(-3deg); } 40% { transform: rotate(2deg); } 62% { transform: rotate(-1deg); } 82% { transform: rotate(.4deg); } 100% { transform: rotate(0); } }

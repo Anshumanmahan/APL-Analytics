@@ -19,16 +19,18 @@ export const ARROW_DEFS = html`
   <pattern id="ar-bars" width="1.1" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-25)"><rect width="1.1" height="4" fill="#d8d2c6" /><rect width=".45" height="4" fill="#4a4036" /></pattern>
   <filter id="ar-soft" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation=".5" /></filter>
   <clipPath id="ar-face"><circle cx="0" cy="0" r="30.6" /></clipPath>
+  <clipPath id="ar-faceL"><ellipse cx="0" cy="0" rx="36.4" ry="18" /></clipPath>
+  <clipPath id="ar-face8"><circle cx="0" cy="0" r="38.2" /></clipPath>
   <clipPath id="ar-faceG"><circle cx="32" cy="32" r="30.6" /></clipPath>`;
 
 /* shadow of a side-on arrow: it starts at the point and drifts away from the shaft as the arrow leaves the face */
-const Shadow = ({ len = 38, w = 1 }) => html`<g clip-path="url(#ar-face)" filter="url(#ar-soft)" opacity=".5">
+const Shadow = ({ len = 38, w = 1, clip = 'ar-face' }) => html`<g clip-path=${`url(#${clip})`} filter="url(#ar-soft)" opacity=".5">
   <path d=${`M0 -.3 L${-len} ${2.9 * len / 38} L${-len} ${(2.9 + w * 1.3) * len / 38} L0 .5 Z`} fill="#000" />
   <path d=${`M${-len + 7} ${2.9 + .5} L${-len + 1.5} ${3.1 + .4} L${-len + 1.5} ${5.4} L${-len + 6} ${4.4} Z`} fill="#000" opacity=".6" /></g>`;
 
 /* A — carbon target arrow, three gold plastic vanes */
-const Carbon = () => html`
-  <${Shadow} />
+const Carbon = ({ clip }) => html`
+  <${Shadow} clip=${clip} />
   <path d="M-29.6 .45 C-30.8 .9 -32.9 2.1 -34.6 2.3 Q-35.2 2.35 -35.2 1.8 L-35 .45 Z" fill="url(#ar-vgoldD)" />
   <path d="M-29.6 -.45 C-30.8 -.9 -32.9 -2.1 -34.6 -2.3 Q-35.2 -2.35 -35.2 -1.8 L-35 -.45 Z" fill="url(#ar-vgold)" />
   <path d="M-29.6 -.45 C-30.8 -.9 -32.9 -2.1 -34.6 -2.3" fill="none" stroke="#fff7d1" stroke-width=".12" />
@@ -93,7 +95,14 @@ const Pov = () => { const back = VANES.filter(([th]) => Math.sin(th) < 0), front
 export const ARROWS = { A: Carbon, B: Spin, C: Feather, D: Pov };
 export const ARROW_NAMES = { A: 'Carbon target arrow', B: 'Spin wings', C: 'Traditional wood and feather', D: "Shooter's view" };
 
-export const ArrowArt = ({ v = 'A' }) => { const C = ARROWS[v] || Carbon;
+/* poses: diag (from lower left), left (flat, from the left), right (flat, from the right), persp (from the left, target turned) */
+export const POSES = {
+  diag: { t: 'translate(32 32) rotate(-45)', clip: 'ar-face', fx: -34, fy: 34 },
+  left: { t: 'translate(32 32) scale(.84 1.7)', clip: 'ar-faceL', fx: -40, fy: 0 },
+  right: { t: 'translate(32 32) scale(-.8 .8)', clip: 'ar-face8', fx: 40, fy: 0 },
+  persp: { t: 'translate(32 32) rotate(-8) scale(.8)', clip: 'ar-face8', fx: -40, fy: 6 } };
+
+export const ArrowArt = ({ v = 'A', pose = 'diag' }) => { const C = ARROWS[v] || Carbon; const P = POSES[pose] || POSES.diag;
   return v === 'D'
     ? html`<defs><linearGradient id="ar-carbonD" gradientUnits="userSpaceOnUse" x1=${at(.5, -1)[0]} y1=${at(.5, -1)[1]} x2=${at(.5, 1)[0]} y2=${at(.5, 1)[1]}><stop offset="0" stop-color="#3a3e45" /><stop offset=".3" stop-color="#c3c9d1" /><stop offset=".5" stop-color="#2c3036" /><stop offset="1" stop-color="#0e1013" /></linearGradient></defs><${C} />`
-    : html`<g transform="translate(32 32) rotate(-45)"><${C} /></g>`; };
+    : html`<g transform=${P.t}><${C} clip=${P.clip} /></g>`; };
