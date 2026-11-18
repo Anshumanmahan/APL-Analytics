@@ -119,24 +119,3 @@ export function Rotations({ S }) {
   </div>`;
 }
 
-/* match page: both teams' order in every set, side by side, against each team's usual season order */
-export function MatchRotation({ m, S = app.S }) {
-  const side = ['A', 'B'].map(k => { const code = m.teams[k]; return { k, code, R: rotation(S, code, m), season: rotation(S, code) }; });
-  if (!side.some(x => x.R.n)) return '';
-  const sets = [...new Set(side.flatMap(x => x.R.sets.map(s => s.n)))].sort((a, b) => a - b);
-  const usual = x => (x.season.sig ? x.season.sig.join(' ') : '');
-  return html`<section class="panel mrot"><h2>Rotation, set by set</h2>
-    <p class="muted">The order each team sent its archers to the line across the 8 arrows. A glowing set broke from that team's usual season order.</p>
-    <${CatKey} />
-    <div class="mrot-top">${side.map(x => html`<div class="mrot-team" style=${`--tc:${tc(x.code)}`}>
-      <a href=${'#/team/' + x.code}><${Crest} code=${x.code} size=${34} /></a>
-      ${x.R.n ? html`<${Wheel} R=${x.R} code=${x.code} size=${120} label="this match" />` : ''}
-      <div><b>${S.T(x.code).name}</b><small>${!x.R.n ? 'Not recorded' : x.R.orders.length === 1 ? 'Same order in every set' : `${x.R.orders.length} different orders`}${x.R.n && x.season.sig && x.R.sig.join(' ') !== usual(x) ? ' · not their usual' : ''}</small></div></div>`)}</div>
-    <div class="mrot-sets">${sets.map(n => html`<div class="mrot-set"><span class="mrot-n">Set ${n}</span>
-      ${side.map(x => { const st = x.R.sets.find(s => s.n === n); if (!st) return html`<div class="mrot-row empty-row" style=${`--tc:${tc(x.code)}`}><em>${x.code}</em><span class="muted small">not recorded</span></div>`;
-        const off = usual(x) && st.cats.join(' ') !== usual(x);
-        return html`<div class=${cls('mrot-row', off && 'off')} style=${`--tc:${tc(x.code)}`}><em>${x.code}</em>
-          <ol>${st.cats.map((c, i) => html`<li style=${`--c:${CAT_COL[c]};--ink:${CAT_INK[c]};animation-delay:${(i * 0.04).toFixed(2)}s`} title=${`Arrow ${i + 1}: ${S.A(st.ids[i]).name} (${CATS[c]})`}><b>${c}</b><small>${S.A(st.ids[i]).name.split(' ')[0]}</small></li>`)}</ol>
-          ${off ? html`<i class="mrot-tag">changed</i>` : ''}</div>`; })}</div>`)}</div>
-  </section>`;
-}

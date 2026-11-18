@@ -7,7 +7,7 @@ import { Lines } from '../lib/charts.js';
 import { fmtTs } from '../lib/rules.js';
 import { Arch, Table } from './common.js';
 import { context } from '../lib/insights.js';
-import { MatchRotation } from './rotation.js';
+import { CAT_COL, rotation } from './rotation.js';
 import { loadWeather, wxAt, wxStatus, wxModel, startOf, compass, sky, windWord, ms, VENUE, TIMES_SRC, WX_SRC } from '../lib/weather.js';
 
 /* the arrow points the way the wind blows (it comes FROM the given direction) */
@@ -48,6 +48,7 @@ export function MatchPage({ k }) {
   if (!m) return html`<div class="page"><p class="empty">No such match. <a href="#/matches">All matches</a></p></div>`;
   const ctx = context(S).filter(o => o.m === m); const piOf = new Map(ctx.map(o => [o.a, o]));
   const pos = positions(m); const sp = span(m);
+  const usual = {}; ['A', 'B'].forEach(t => { const r = m.src === 'recorded' ? rotation(S, m.teams[t]) : null; usual[t] = r && r.sig ? r.sig.join(' ') : ''; });
   const side = t => html`<a class="mside" href=${'#/team/' + m.teams[t]} style=${`--tc:${tc(m.teams[t])}`}><${Crest} code=${m.teams[t]} size=${56} /><b>${S.T(m.teams[t]).name}</b></a>`;
   return html`<div class="page">
     <p class="kicker"><a href="#/matches">Matches</a> · ${matchTitle(m)}${startOf(m) ? ' · ' + startOf(m) + ' IST' : ''} <${Src} m=${m} /></p>
@@ -61,16 +62,15 @@ export function MatchPage({ k }) {
       <tbody>${m.sets.map(st => { const tens = t => m.arrows.filter(a => a.ph === 'S' && a.set === st.n && a.t === t && a.s === 10).length;
         return html`<tr><td>${st.n}${!st.full ? html` <small class="warn">incomplete</small>` : ''}</td><td class=${cls('n', st.tot.A > st.tot.B && 'w')}>${st.tot.A}</td><td class=${cls('n', st.tot.B > st.tot.A && 'w')}>${st.tot.B}</td><td class="n">${st.pts.A}–${st.pts.B}</td><td class="n">${tens('A')}</td><td class="n">${tens('B')}</td></tr>`; })}</tbody></table></div></section>
 
-    <${MatchRotation} m=${m} />
-
     ${m.sets.map(st => { const l = t => m.arrows.filter(a => a.ph === 'S' && a.set === st.n && a.t === t);
       // set race: running difference after each pair of arrows
       const race = []; let ra = 0, rb = 0; const A = l('A'), B = l('B');
       for (let i = 0; i < Math.max(A.length, B.length); i++) { ra += (A[i] && A[i].s) || 0; rb += (B[i] && B[i].s) || 0; race.push({ y: ra - rb }); }
       return html`<section class="panel"><h2>Set ${st.n} <small class="muted">${st.tot.A}–${st.tot.B}</small></h2>
-        <div class="arrowgrid">${['A', 'B'].map(t => html`<div class="ag-row"><span class="ag-t"><${Team} code=${m.teams[t]} /></span>${l(t).map(a => { const o = piOf.get(a);
+        <div class="arrowgrid">${['A', 'B'].map(t => { const cats = l(t).map(a => (a.a ? S.A(a.a).cat : '')); const off = cats.length >= 8 && cats.every(Boolean) && usual[t] && cats.slice(0, 8).join(' ') !== usual[t];
+          return html`<div class="ag-row"><span class="ag-t"><${Team} code=${m.teams[t]} />${off ? html`<small class="ag-new" title=${'Usual order: ' + usual[t]}>new order</small>` : ''}</span>${l(t).map(a => { const o = piOf.get(a); const c = a.a && S.A(a.a).cat;
           return html`<span class="ag-c" title=${`${a.a ? S.A(a.a).name : 'Archer not recorded'} · arrow ${pos.get(a)} · ${a.dt != null ? a.dt + ' s' : 'time n/a'}${o ? ' · pressure ' + o.pi : ''}`}>
-            <span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small><small class="muted">${a.dt != null ? Math.round(a.dt) + 's' : ''}</small>${o ? html`<i class="pi" style=${`--p:${o.pi}`} title=${'Pressure ' + o.pi}></i>` : ''}</span>`; })}</div>`)}</div>
+            <span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small>${c ? html`<small class="ag-cat" style=${`--c:${CAT_COL[c]}`}>${c}</small>` : ''}<small class="muted">${a.dt != null ? Math.round(a.dt) + 's' : ''}</small>${o ? html`<i class="pi" style=${`--p:${o.pi}`} title=${'Pressure ' + o.pi}></i>` : ''}</span>`; })}</div>`; })}</div>
         ${race.length > 1 && html`<div class="race"><${Lines} xs=${race.map((_, i) => i + 1)} series=${[{ key: 'd', label: m.teams.A + ' lead', color: tc(m.teams.A), pts: race }]} height=${150} xLabel="Arrow pair" xFmt=${v => v} fmt=${v => (v > 0 ? '+' : '') + v} /></div>`}
       </section>`; })}
 
