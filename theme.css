@@ -389,17 +389,24 @@ select option { background: var(--solid); color: var(--tx); }
 @keyframes halo { 50% { transform: scale(1.12); opacity: .7; } }
 
 /* logo animation */
-.alogo .al-arc { stroke-dashoffset: var(--len); animation: al-draw 1.3s cubic-bezier(.3,.7,.2,1) both; }
-@keyframes al-draw { from { stroke-dashoffset: var(--len); opacity: 0; } 15% { opacity: 1; } to { stroke-dashoffset: 0; } }
-.alogo .al-spin { transform-box: view-box; transform-origin: 32px 32px; animation: al-rot 40s linear infinite 1.6s; }
+.alogo .al-arc { stroke-dashoffset: var(--len); animation: al-draw 1.1s cubic-bezier(.25,.8,.25,1) both; }
+@keyframes al-draw { from { stroke-dashoffset: var(--len); opacity: 0; } 12% { opacity: 1; } to { stroke-dashoffset: 0; } }
+.alogo .al-spin { transform-box: view-box; transform-origin: 32px 32px; animation: al-rot 40s linear infinite 2.6s; }
 .alogo .al-orbit { transform-box: view-box; transform-origin: 32px 32px; animation: al-rot 26s linear infinite reverse; }
 @keyframes al-rot { to { transform: rotate(360deg); } }
-.alogo .al-arrow { animation: al-fly .8s cubic-bezier(.2,.9,.25,1.15) 1.1s both; }
-@keyframes al-fly { from { transform: translate(-26px, 26px); opacity: 0; } 60% { opacity: 1; } to { transform: none; opacity: 1; } }
-.alogo .al-ripple { transform-box: fill-box; transform-origin: center; opacity: 0; animation: al-rip 2.6s ease-out 1.9s infinite; }
+/* 1. the arrow flies in and strikes (lands at .8s) */
+.alogo .al-arrow { animation: al-fly .6s cubic-bezier(.35,.1,.6,1) .2s both; }
+@keyframes al-fly { from { transform: translate(-34px, 34px); opacity: 0; } 25% { opacity: 1; } to { transform: none; opacity: 1; } }
+/* 2. it quivers in the boss while the target takes the hit */
+.alogo .al-quiver { transform-box: view-box; transform-origin: 32px 32px; animation: al-quiver .7s ease-out .8s both; }
+@keyframes al-quiver { 0% { transform: rotate(0); } 18% { transform: rotate(-3deg); } 40% { transform: rotate(2deg); } 62% { transform: rotate(-1deg); } 82% { transform: rotate(.4deg); } 100% { transform: rotate(0); } }
+.alogo .al-target { transform-box: view-box; transform-origin: 32px 32px; animation: al-thud .45s cubic-bezier(.3,1.6,.5,1) .8s both; }
+@keyframes al-thud { 0% { transform: scale(1); } 30% { transform: scale(.965) translate(.5px, -.5px); } 100% { transform: scale(1); } }
+/* 3. then the rings ripple out from the impact (delays set inline) and the pulse begins */
+.alogo .al-ripple { transform-box: fill-box; transform-origin: center; opacity: 0; animation: al-rip 2.6s ease-out .8s infinite; }
 @keyframes al-rip { 0% { transform: scale(1); opacity: .9; } 100% { transform: scale(7); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .alogo .al-arc, .alogo .al-arrow, .alogo .al-spin, .alogo .al-orbit, .h2-halo, .h2-text .kicker::before { animation: none; }
+  .alogo .al-arc, .alogo .al-arrow, .alogo .al-quiver, .alogo .al-target, .alogo .al-spin, .alogo .al-orbit, .h2-halo, .h2-text .kicker::before { animation: none; }
   .alogo .al-arc { stroke-dashoffset: 0; } .alogo .al-ripple { display: none; } }
 
 .h2-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; margin: 0 0 18px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--line); }

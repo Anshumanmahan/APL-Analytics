@@ -7,7 +7,7 @@ import { AnimatedLogo } from '../lib/logo.js';
 import { Form } from '../lib/charts.js';
 import { Arch } from './common.js';
 import { TAGLINE } from './about.js';
-import { context, isCrucial, groupBy, bowOf, ofBow, BOWS } from '../lib/insights.js';
+import { context, bowOf, ofBow, BOWS } from '../lib/insights.js';
 
 const ord = n => n + (['st', 'nd', 'rd'][n - 1] || 'th');
 
@@ -19,8 +19,7 @@ export function Home() {
   const ar = archers(S).filter(a => a.n >= 16);
   // recurve and compound are always shown apart
   const byBow = BOWS.map(([b]) => { const l = ar.filter(a => bowOf(a.ar.cat) === b); const c = ofBow(ctx, b);
-    return { b, all: summarize(c), topAvg: l.slice().sort((x, y) => y.avg - x.avg).slice(0, 3), topAgi: l.filter(a => a.agi != null).sort((x, y) => y.agi - x.agi).slice(0, 3),
-      clutch: groupBy(c.filter(isCrucial), o => o.code, 4).sort((x, y) => y.avg - x.avg)[0] }; });
+    return { b, all: summarize(c), topAvg: l.slice().sort((x, y) => y.avg - x.avg).slice(0, 3), topAgi: l.filter(a => a.agi != null).sort((x, y) => y.agi - x.agi).slice(0, 3) }; });
   const allN = summarize(pool(S)).n;
   const playoffs = S.matches.filter(m => m.stage !== 'League');
   const latest = rec.slice().sort((a, b) => b.no - a.no).slice(0, 4);
@@ -59,8 +58,7 @@ export function Home() {
           ${byBow.map(x => html`<h3 class="bowh">${x.b}</h3><div class="leaders">
             <div><h3 class="sub">Arrow average</h3>${x.topAvg.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${f2(a.avg)}</b></div>`)}</div>
             <div><h3 class="sub">Arrow Grouping Index (AGI)</h3>${x.topAgi.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${a.agi.toFixed(1)}</b></div>`)}</div>
-          </div>
-          ${x.clutch && html`<p class="small">Best team on crucial ${x.b.toLowerCase()} arrows (last two of a set within 3 points): <b><a href=${'#/team/' + x.clutch.k}>${S.T(x.clutch.k).name}</a></b>, ${f2(x.clutch.avg)} from ${x.clutch.n}.</p>`}`)}
+          </div>`)}
           <a class="lnk" href="#/analytics">All analytics →</a>
         </section>
       </div>

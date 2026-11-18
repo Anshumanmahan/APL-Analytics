@@ -22,8 +22,6 @@ export function facts(S) {
     const fast = l.filter(a => a.tn >= 16).sort((x, y) => x.at - y.at)[0];
     if (fast) add('Clock', `Quickest ${b.toLowerCase()} archer: ${fast.ar.name}, ${f1(fast.at)} s an arrow`, '#/analytics/time/' + bk, tc(fast.ar.team));
     const c = I.ofBow(ctx, b);
-    const cl = I.groupBy(c.filter(I.isCrucial), o => o.code, 4).sort((x, y) => y.avg - x.avg)[0];
-    if (cl) add('Clutch', `${S.T(cl.k).name} average ${f2(cl.avg)} on crucial ${b.toLowerCase()} arrows`, '#/analytics/pressure/' + bk, tc(cl.k));
     const rise = I.pressure(c, o => o.a.a).filter(r => r.lift != null && r.hi.n >= 4).sort((x, y) => y.lift - x.lift)[0];
     if (rise && rise.lift > 0) add('Pressure', `${S.A(rise.k).name} scores ${f2(rise.lift)} more under high pressure`, '#/analytics/pressure/' + bk, tc(S.A(rise.k).team));
     const c9 = I.close9s(c)[0];
