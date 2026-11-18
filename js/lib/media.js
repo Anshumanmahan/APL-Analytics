@@ -62,6 +62,11 @@ export const PHOTO = {
   'py-kirti-sharma': WAP + '53250',
   'rr-sangeeta': WAP + '21148',
   'py-raj-kaur': WAP + '30248',
+  /* photos supplied by the organiser, cropped to head and shoulders */
+  'ca-jasveer-kaur': '/img/players/ca-jasveer-kaur.jpg',
+  'cc-yuktha-sri-kondapavuluri': '/img/players/cc-yuktha-sri-kondapavuluri.jpg',
+  'kk-shivshankar-sakharam-landkar': '/img/players/kk-shivshankar-sakharam-landkar.jpg',
+  'rr-abhyuday-amol-pakhale': '/img/players/rr-abhyuday-amol-pakhale.jpg',
 };
 /* World Archery athlete pages, where confirmed */
 export const WA = {
