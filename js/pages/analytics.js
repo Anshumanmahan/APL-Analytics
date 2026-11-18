@@ -9,6 +9,7 @@ import * as I from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
 import { WindArrow } from './matches.js';
+import { Rotations } from './rotation.js';
 
 /* average wind over a day's match start times */
 function dayWind(ms) {
@@ -188,14 +189,14 @@ function Comebacks({ S }) {
 function Strategy({ S, ctx, rctx, full, bow }) {
   const pr = I.predictability(S, full); const subs = I.substitutes(S, rctx);
   return html`
+    <${Panel} title="How teams rotate their archers" sub="Every set, each team's four archers (recurve man, recurve woman, compound man, compound woman) shoot two arrows each. This is the order they choose across the 8 arrows. Recorded matches only.">
+      <${Rotations} S=${S} />
+    </${Panel}>
     <${Panel} title="How predictable is each team?" sub="Set totals always combine both bows (every set has two recurve and two compound archers). Spread of set totals (lower is steadier), and how close a set total lands to what the four archers' season averages predict.">
       <${Table} sort="sd" dir=${1} rows=${pr} cols=${[['t', 'Team', r => html`<${Team} code=${r.t} full />`], ['n', 'Sets', null, { num: 1 }], ['avg', 'Avg set', r => f1(r.avg), { num: 1 }], ['sd', 'Spread (±)', r => f1(r.sd), { num: 1 }], ['mae', 'Prediction miss', r => (r.mae != null ? '±' + f1(r.mae) : '–'), { num: 1 }], ['en', 'Sets predicted', null, { num: 1 }]]} />
     </${Panel}>
     <${Panel} title=${'Best ' + bow.toLowerCase() + ' substitute'} sub="Archers who were not in the first-set line-up but came in later in the match.">
       <${Table} sort="avg" rows=${subs} cols=${[['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['apps', 'Times subbed in', null, { num: 1 }], ['n', 'Arrows', null, { num: 1 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }]]} empty="No substitutions in the recorded matches yet." />
-    </${Panel}>
-    <${Panel} title="Who shot when" sub="Each team's shooting order is on its team page.">
-      <div class="explore">${TEAMS.map(t => html`<a href=${'#/team/' + t} style=${`--tc:${tc(t)}`}><b>${S.T(t).name}</b><span>Shooting order and set strategy</span></a>`)}</div>
     </${Panel}>`;
 }
 

@@ -44,7 +44,13 @@ async function open(p) {
   const first = !app.S;
   state.refreshing = true; if (!first) rerender();
   // the site's own read-only proxy first (no passcode needed once APL_KEY is set on Vercel)
-  if (!p) { const rows = await loadOpen(); if (rows) { if (first) L().start(); return finish(rows, first); } }
+  if (!p) {
+    // start the loader if the check takes more than a blink, so a visitor never stares at a blank page
+    const t = first && setTimeout(() => L().start(), 250);
+    const rows = await loadOpen(); clearTimeout(t);
+    if (rows) { if (first) L().start(true); return finish(rows, first); }
+    if (first && !hasPass()) L().hide();
+  }
   if (!p && !hasPass()) { state.status = app.S ? 'ready' : 'gate'; state.refreshing = false; return rerender(); }
   if (first) L().start();
   const r = await load(p);

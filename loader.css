@@ -66,14 +66,26 @@ html.ld-on body { overflow: hidden; }
 .ld-tag { margin: 0; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ldmut);
   opacity: 0; animation: ld-word .6s ease 1.3s forwards; }
 
-/* an end of four arrows: each slot fills as that step finishes */
-.ld-end { display: grid; gap: 12px; width: min(100%, 340px); opacity: 0; animation: ld-word .5s ease 1.45s forwards; }
-.ld-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; list-style: none; margin: 0; padding: 0; }
-.ld-slots li { position: relative; height: 4px; border-radius: 4px; background: var(--ldline); overflow: hidden; }
-.ld-slots li::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ldgold), #fff3b8); transform: scaleX(0); transform-origin: left; transition: transform .5s cubic-bezier(.3,.8,.3,1); }
-.ld-slots li.on::after { transform: scaleX(1); }
-.ld-slots li.go::after { transform: scaleX(.55); animation: ld-pulse 1s ease-in-out infinite; }
-@keyframes ld-pulse { 50% { opacity: .5; } }
+/* progress: an arrow in flight along a lane, passing four target faces; each lights as its step finishes */
+.ld-end { display: grid; gap: 14px; width: min(100%, 320px); opacity: 0; animation: ld-word .5s ease 1.45s forwards; }
+.ld-lane { position: relative; height: 22px; margin: 0 11px 0 4px; }
+.ld-lane::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%);
+  background: repeating-linear-gradient(90deg, var(--ldline) 0 6px, transparent 6px 10px); }
+.ld-fill { position: absolute; left: 0; top: 50%; width: 0; height: 2px; transform: translateY(-50%); border-radius: 2px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ldgold) 55%, transparent) 30%, var(--ldgold));
+  box-shadow: 0 0 10px color-mix(in srgb, var(--ldgold) 55%, transparent); transition: width .7s cubic-bezier(.3,.8,.3,1); }
+/* gold vanes trail the arrow; the point leads */
+.ld-fl { position: absolute; right: 30px; top: 50%; width: 12px; height: 9px; transform: translateY(-50%);
+  background: linear-gradient(160deg, var(--ldgold) 0 40%, transparent 41%) top / 100% 50% no-repeat, linear-gradient(20deg, var(--ldgold) 0 40%, transparent 41%) bottom / 100% 50% no-repeat; opacity: .85; }
+.ld-hd { position: absolute; right: -7px; top: 50%; width: 0; height: 0; transform: translateY(-50%);
+  border-left: 8px solid #fff3b8; border-top: 4px solid transparent; border-bottom: 4px solid transparent; filter: drop-shadow(0 0 4px var(--ldgold)); }
+.ld-ring { position: absolute; top: 50%; width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; z-index: 1;
+  background: radial-gradient(circle, var(--ldline) 0 22%, transparent 23% 46%, var(--ldline) 47% 52%, transparent 53% 78%, var(--ldline) 79% 84%, transparent 85%);
+  transition: transform .35s cubic-bezier(.3,1.6,.5,1), box-shadow .35s; }
+.ld-ring.on { transform: scale(1.18); box-shadow: 0 0 14px color-mix(in srgb, var(--ldgold) 60%, transparent);
+  background: radial-gradient(circle, #f5c518 0 24%, #e5484d 25% 50%, #3b8fd9 51% 76%, #f4f4ef 77% 100%); }
+.ld-ring.x.on { animation: ld-pop .5s ease-out; }
+@keyframes ld-pop { 50% { transform: scale(1.5); } }
 .ld-step { margin: 0; min-height: 1.4em; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ldmut); }
 .ld-step b { color: var(--ldtx); font-weight: 500; }
 .ld-count { font-variant-numeric: tabular-nums; }

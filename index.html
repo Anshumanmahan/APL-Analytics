@@ -56,7 +56,7 @@
 <path d="M-36.9 -.46 L-37.9 -.55 Q-38.5 -.55 -38.5 -.2 L-37.7 0 L-38.5 .2 Q-38.5 .55 -37.9 .55 L-36.9 .46 Z" fill="url(#ld-nock)" fill-opacity=".93"/>
 <path d="M-1.9 -.5 L-.8 -.5 L-.15 -.36 L-.15 .36 L-.8 .5 L-1.9 .5 Z" fill="url(#ld-steel)"/></g></g></svg></div>
     <div class="ld-wm"><h1 class="ld-name"><span>APL</span><span>Analytics</span></h1><p class="ld-tag">The only stats platform for the Archery Premier League</p></div>
-    <div class="ld-end" id="ld-end"><ol class="ld-slots" aria-hidden="true"><li></li><li></li><li></li><li></li></ol><p class="ld-step" id="ld-step">Opening the scorebook</p></div>
+    <div class="ld-end" id="ld-end"><div class="ld-lane" aria-hidden="true"><span class="ld-fill"><i class="ld-fl"></i><i class="ld-hd"></i></span><b class="ld-ring" style="left:25%"></b><b class="ld-ring" style="left:50%"></b><b class="ld-ring" style="left:75%"></b><b class="ld-ring x" style="left:100%"></b></div><p class="ld-step" id="ld-step">Opening the scorebook</p></div>
   </div>
 </div>
 <script>
@@ -64,16 +64,16 @@
    season loads; main.js then calls done(stats), or hide() when the passcode was wrong. */
 (function () {
   var root = document.documentElement, el = document.getElementById('ldr'), step = document.getElementById('ld-step');
-  var slots = el.querySelectorAll('.ld-slots li'), calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var slots = el.querySelectorAll('.ld-ring'), fill = el.querySelector('.ld-fill'), calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var STEPS = ['Opening the scorebook', 'Reading every match', 'Counting the arrows', 'Ranking the archers'];
   var MIN = calm ? 300 : 2300, t0 = 0, at = 0, timer, waits = [];
-  function show(i) { at = i; for (var k = 0; k < slots.length; k++) slots[k].className = k < i ? 'on' : k === i ? 'go' : ''; if (STEPS[i]) step.textContent = STEPS[i]; }
+  function show(i) { at = i; fill.style.width = Math.min(100, i * 25 + (i < 4 ? 13 : 0)) + '%'; for (var k = 0; k < slots.length; k++) slots[k].classList.toggle('on', k < i); if (STEPS[i]) step.textContent = STEPS[i]; }
   function later(f, ms) { waits.push(setTimeout(f, ms)); }
   function stop() { clearInterval(timer); waits.forEach(clearTimeout); waits = []; }
   function count(node, n, ms) { var s = Date.now(); (function f() { var p = Math.min(1, (Date.now() - s) / ms); node.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))).toLocaleString('en-IN'); if (p < 1) requestAnimationFrame(f); })(); }
   function leave() { root.classList.add('ld-reveal'); el.classList.add('out'); root.classList.remove('ld-on'); setTimeout(function () { el.remove(); root.classList.remove('ld-reveal'); }, 1100); }
   window.APL_LOADER = {
-    start: function () { stop(); t0 = Date.now(); show(0); el.classList.remove('idle'); root.classList.add('ld-on');
+    start: function (keep) { if (keep && !el.classList.contains('idle')) return; stop(); t0 = Date.now(); show(0); el.classList.remove('idle'); root.classList.add('ld-on');
       // walk through the first three steps while waiting; the last finishes only when the data is in
       timer = setInterval(function () { if (at < 2) show(at + 1); }, 700); },
     hide: function () { stop(); el.classList.add('idle'); root.classList.remove('ld-on'); },

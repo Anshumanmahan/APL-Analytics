@@ -5,6 +5,7 @@ import { app, cls, f1, f2, pct, tc, Result, Tiles, matchTitle } from '../lib/ui.
 import { Crest, Avatar } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
 import { Arch, Table, Panel } from './common.js';
+import { RotationCard, CatKey } from './rotation.js';
 import { context, halves, shootingOrder, mean, CRUNCH, BOWS, ofBow } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 
@@ -61,6 +62,10 @@ export function TeamPage({ code }) {
         ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1 }], ['agi', html`<abbr title="Arrow Grouping Index">AGI</abbr>`, r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }]]} />
     </${Panel}>
 
+    <${Panel} title="Rotation across the 8 arrows" sub="The order this team sends its four archers to the line in a set. Recorded matches only.">
+      <${CatKey} /><${RotationCard} code=${code} wide />
+    </${Panel}>
+
     <div class="grid2">
       <${Panel} title="Who shot when" sub="How often each archer shot each arrow of the set (1st to 8th), across recorded matches. Darker is more often.">
         ${Object.keys(ord.grid).length ? html`<div class="tbl"><table class="heat"><thead><tr><th>Archer</th>${[1, 2, 3, 4, 5, 6, 7, 8].map(p => html`<th class="n">${p}</th>`)}</tr></thead><tbody>
@@ -69,8 +74,6 @@ export function TeamPage({ code }) {
       </${Panel}>
       <${Panel} title="First 4 vs last 4 arrows" sub="Average score of the first half of each set against the second half.">
         ${bw.map(({ b, hv }) => html`<h3 class="sub">${b}</h3>${hv ? html`<div class="kv"><span>Arrows 1–4</span><b>${f2(hv.first.avg)}</b><span>Arrows 5–8</span><b>${f2(hv.last.avg)}</b><span>Difference</span><b class=${hv.delta >= 0 ? 'pos' : 'neg'}>${hv.delta >= 0 ? '+' : ''}${f2(hv.delta)}</b></div>` : html`<p class="empty">Not enough data yet.</p>`}`)}
-        <h3 class="sub">Set orders (team strategy)</h3>
-        ${ord.sets.length ? html`<div class="orders">${ord.sets.slice(0, 16).map(x => html`<div class="ord"><a class="muted small" href=${'#/match/' + x.m.key}>D${x.m.d} v ${opp(x.m, code)} · S${x.n}</a><span>${x.order.map(id => html`<i title=${id ? S.A(id).name : ''}>${id ? S.A(id).name.split(' ').map(w => w[0]).join('').slice(0, 2) : '·'}</i>`)}</span></div>`)}</div>` : html`<p class="empty">No recorded matches yet.</p>`}
       </${Panel}>
     </div>
 
