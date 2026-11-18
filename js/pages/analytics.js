@@ -4,7 +4,7 @@ import { archers, TEAMS, dayName } from '../lib/season.js';
 import { CATS } from '../lib/rules.js';
 import { app, cls, f1, f2, pct, tc, Team } from '../lib/ui.js';
 import { Columns, Bars, Scatter } from '../lib/charts.js';
-import { Arch, Pick, Table, Sel, CAT_OPTS, catOk, Panel } from './common.js';
+import { Arch, Pick, Table, catOk, Panel, Seg, Steps, CrestPick, FGroup } from './common.js';
 import * as I from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
@@ -56,9 +56,9 @@ export function Analytics({ sec, bow: b0 }) {
 
 /* ---------- leaderboard with filters ---------- */
 function Leaderboard({ S, rctx, bow }) {
-  const [cat, setCat] = useState(''); const [team, setTeam] = useState(''); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('16');
+  const [cat, setCat] = useState(''); const [teams, setTeams] = useState([]); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('16');
   const f = it => (!stage || (stage === 'League' ? it.m.stage === 'League' : it.m.stage !== 'League')) && (!set || String(it.a.set) === set) && (!half || (half === 'f' ? it.pos <= 4 : it.pos >= 5));
-  const rows = archers(S, f).filter(a => I.bowOf(a.ar.cat) === bow && catOk(a.ar.cat, cat) && (!team || a.ar.team === team) && a.n >= +min);
+  const rows = archers(S, f).filter(a => I.bowOf(a.ar.cat) === bow && catOk(a.ar.cat, cat) && (!teams.length || teams.includes(a.ar.team)) && a.n >= +min);
   const bestOf = b => { const l = archers(S, f).filter(a => I.bowOf(a.ar.cat) === b && a.n >= 16).sort((x, y) => y.avg - x.avg); return l[0]; };
   const bc = bestOf('Compound'), br = bestOf('Recurve');
   return html`
@@ -67,13 +67,13 @@ function Leaderboard({ S, rctx, bow }) {
       <${Panel} title="Best recurver">${br ? html`<div class="big"><${Arch} id=${br.id} /><b>${f2(br.avg)}</b><small class="muted">${br.n} arrows · AGI ${br.agi != null ? br.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>
     </div>
     <${Panel} title=${bow + ' leaderboard'} sub="Recorded matches only. Pick filters, then sort by any column. Switch bow at the top.">
-      <div class="filters">
-        <${Sel} label="Category" value=${cat} onChange=${setCat} options=${[['', 'Men and women'], ...Object.entries(CATS).filter(([k]) => k[0] === bow[0])]} />
-        <${Sel} label="Team" value=${team} onChange=${setTeam} options=${[['', 'All teams'], ...TEAMS.map(t => [t, S.T(t).name])]} />
-        <${Sel} label="Stage" value=${stage} onChange=${setStage} options=${[['', 'All'], ['League', 'League'], ['PO', 'Playoffs']]} />
-        <${Sel} label="Set" value=${set} onChange=${setSet} options=${[['', 'All sets'], ['1', 'Set 1'], ['2', 'Set 2'], ['3', 'Set 3'], ['4', 'Set 4']]} />
-        <${Sel} label="Arrows" value=${half} onChange=${setHalf} options=${[['', '1–8'], ['f', 'First 4'], ['l', 'Last 4']]} />
-        <${Sel} label="Min arrows" value=${min} onChange=${setMin} options=${[['1', '1'], ['8', '8'], ['16', '16'], ['32', '32']]} />
+      <div class="fbar">
+        <${FGroup} label="Division"><${Seg} small label="Division" value=${cat} onPick=${setCat} opts=${[['', 'All'], [bow[0] + 'M', 'Men'], [bow[0] + 'W', 'Women']]} /></${FGroup}>
+        <${FGroup} label="Stage"><${Seg} small label="Stage" value=${stage} onPick=${setStage} opts=${[['', 'All'], ['League', 'League'], ['PO', 'Playoffs']]} /></${FGroup}>
+        <${FGroup} label="Set"><${Seg} small label="Set" value=${set} onPick=${setSet} opts=${[['', 'All'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']]} /></${FGroup}>
+        <${FGroup} label="Arrows of the set"><${Seg} small label="Arrows of the set" value=${half} onPick=${setHalf} opts=${[['', '1–8'], ['f', '1–4'], ['l', '5–8']]} /></${FGroup}>
+        <${FGroup} label="At least this many arrows"><${Steps} label="Minimum arrows" values=${['1', '8', '16', '32']} value=${min} onPick=${setMin} unit=" arrows" /></${FGroup}>
+        <div class="fg fg-wide"><span class="fg-l">Teams</span><${CrestPick} compact value=${teams} onChange=${setTeams} /></div>
       </div>
       <${Table} sort="avg" rows=${rows} cols=${[
         ['rank', '#', (r, i) => i + 1], ['name', 'Archer', r => html`<${Arch} id=${r.id} />`, { sort: r => r.ar.name }], ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat, sm: 0 }],

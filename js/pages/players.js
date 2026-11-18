@@ -5,17 +5,30 @@ import { CATS, CAT_ORDER } from '../lib/rules.js';
 import { app, f1, f2, pct, tc, Tiles, chipStyle, matchTitle, Team } from '../lib/ui.js';
 import { Avatar } from '../lib/media.js';
 import { Columns, Face, RingBar, RingKey } from '../lib/charts.js';
-import { Panel, Sel, CAT_OPTS, catOk, Table } from './common.js';
+import { Panel, Table, Seg, CrestPick } from './common.js';
 import { context, TBUCKETS, bucketOf, mean, CRUNCH, CLOSE9, radius, bowOf } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 
+/* Filters without dropdowns: a bow switch, a division switch and a strip of team crests (tap to pick, tap again to drop).
+   Recurve and compound stay in separate sections whatever is picked. */
+const BOW_SEG = [['', 'All bows'], ['R', 'Recurve'], ['C', 'Compound']];
+const DIV_SEG = [['', 'Everyone'], ['M', 'Men'], ['W', 'Women']];
 export function Players() {
-  const S = app.S; const [q, setQ] = useState(''); const [cat, setCat] = useState('');
+  const S = app.S; const [q, setQ] = useState(''); const [bow, setBow] = useState(''); const [div, setDiv] = useState(''); const [teams, setTeams] = useState([]);
   const stats = Object.fromEntries(archers(S).map(a => [a.id, a]));
-  const list = S.roster.teams.flatMap(t => t.archers.map(a => S.A(a.id))).filter(a => catOk(a.cat, cat) && (!q || a.name.toLowerCase().includes(q.toLowerCase())));
+  const all = S.roster.teams.flatMap(t => t.archers.map(a => S.A(a.id)));
+  const ok = a => (!bow || (a.cat || '')[0] === bow) && (!div || (a.cat || '')[1] === div) && (!teams.length || teams.includes(a.team)) && (!q || a.name.toLowerCase().includes(q.toLowerCase()));
+  const list = all.filter(ok);
+  const any = q || bow || div || teams.length;
   return html`<div class="page"><h1 class="pt">Players</h1>
-    <div class="filters"><input class="search" type="search" placeholder="Search archers" value=${q} onInput=${e => setQ(e.target.value)} /><${Sel} label="Category" value=${cat} onChange=${setCat} options=${CAT_OPTS} /></div>
-    ${CAT_ORDER.filter(c => catOk(c, cat)).map(c => { const l = list.filter(a => a.cat === c); if (!l.length) return null;
+    <div class="pfilt">
+      <div class="pf-row"><input class="search" type="search" placeholder="Search archers" value=${q} onInput=${e => setQ(e.target.value)} />
+        <${Seg} label="Bow" opts=${BOW_SEG} value=${bow} onPick=${setBow} /><${Seg} label="Division" opts=${DIV_SEG} value=${div} onPick=${setDiv} /></div>
+      <${CrestPick} value=${teams} onChange=${setTeams} counts=${Object.fromEntries(S.roster.teams.map(t => [t.short, all.filter(a => a.team === t.short).length]))} />
+      <p class="pf-n"><b>${list.length}</b> of ${all.length} archers${any ? html` · <button type="button" class="pf-clear" onClick=${() => { setQ(''); setBow(''); setDiv(''); setTeams([]); }}>Clear filters</button>` : ''}</p>
+    </div>
+    ${list.length ? '' : html`<p class="empty">No archers match these filters.</p>`}
+    ${CAT_ORDER.map(c => { const l = list.filter(a => a.cat === c); if (!l.length) return null;
       return html`<h2 class="hsec">${CATS[c]}</h2><div class="pgrid">${l.map(a => { const s = stats[a.id];
         return html`<a class="pcard" href=${'#/player/' + a.id} style=${`--tc:${tc(a.team)}`}><${Avatar} ar=${a} size=${52} /><span class="pc-t"><b class="pc-n" title=${a.name}>${a.name}</b>
           <span class="pc-m"><i></i><span class="pc-tm">${S.T(a.team).name || a.team}</span>${a.country ? html`<em>${a.country}</em>` : ''}</span>

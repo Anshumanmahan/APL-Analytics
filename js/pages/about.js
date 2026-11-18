@@ -132,7 +132,7 @@ function ContactForm() {
   return html`<form class="cf" onSubmit=${submit}>
     <label class="cf-f"><span>Name</span><input required maxlength="80" autocomplete="name" value=${f.name} onInput=${set('name')} placeholder="Your name" /></label>
     <label class="cf-f"><span>Email</span><input required type="email" maxlength="120" autocomplete="email" value=${f.email} onInput=${set('email')} placeholder="you@example.com" /></label>
-    <label class="cf-f"><span>Topic</span><select value=${f.topic} onChange=${set('topic')}>${TOPICS.map(t => html`<option value=${t} selected=${t === f.topic}>${t}</option>`)}</select></label>
+    <div class="cf-f cf-wide"><span>Topic</span><div class="chips" role="radiogroup" aria-label="Topic">${TOPICS.map(t => html`<button type="button" role="radio" aria-checked=${t === f.topic} class=${'chip' + (t === f.topic ? ' on' : '')} onClick=${() => setF(Object.assign({}, f, { topic: t }))}>${t}</button>`)}</div></div>
     <label class="cf-f"><span>Match, set or arrow <em>(optional)</em></span><input maxlength="120" value=${f.match} onInput=${set('match')} placeholder="e.g. Day 4, match 2, set 3, arrow 6" /></label>
     <label class="cf-f cf-wide"><span>Message</span><textarea required rows="5" maxlength="3000" value=${f.message} onInput=${set('message')} placeholder="What's on your mind?"></textarea></label>
     <label class="cf-hp" aria-hidden="true">Website<input tabindex="-1" autocomplete="off" value=${f.website} onInput=${set('website')} /></label>

@@ -521,3 +521,63 @@ a.tm:hover { text-decoration: none; } a.tm:hover .tm-n { text-decoration: underl
 .hteams .ph { flex-wrap: wrap; } .hteams-n { font-size: 12.5px; color: var(--mut); margin-right: auto; }
 .hteam .tchip { color: color-mix(in srgb, var(--tc) 45%, var(--tx)); background: color-mix(in srgb, var(--tc) 26%, transparent); border-color: color-mix(in srgb, var(--tc) 55%, transparent); }
 @media (max-width: 520px) { .hteams-n { order: 3; flex-basis: 100%; } }
+
+/* Players filters: segmented switches and a strip of team crests, no dropdowns */
+.pfilt { display: grid; gap: 12px; margin: 4px 0 18px; }
+.pf-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid var(--line); border-radius: 999px; background: var(--raise); }
+.seg button { border: 0; background: none; color: var(--mut); font: 500 13px var(--f); padding: 7px 14px; border-radius: 999px; cursor: pointer; transition: background .2s, color .2s, box-shadow .2s; }
+.seg button:hover { color: var(--tx); }
+.seg button.on { background: color-mix(in srgb, var(--gold) 18%, var(--panel)); color: var(--tx); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 55%, transparent); }
+.seg button:focus-visible, .crest:focus-visible, .pf-clear:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.crests { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+.crest { position: relative; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 14px; cursor: pointer; text-align: left; color: var(--tx);
+  border: 1px solid var(--line); background: linear-gradient(135deg, color-mix(in srgb, var(--tc) 14%, var(--panel)), var(--panel)); transition: transform .18s, box-shadow .2s, border-color .2s, opacity .2s, filter .2s; }
+.crest:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--tc) 60%, var(--line)); }
+.crest.on { border-color: var(--tc); box-shadow: 0 0 0 2px color-mix(in srgb, var(--tc) 55%, transparent), 0 8px 22px -10px var(--tc); background: linear-gradient(135deg, color-mix(in srgb, var(--tc) 34%, var(--panel)), var(--panel)); }
+.crest.on::after { content: '✓'; position: absolute; top: -7px; right: -7px; width: 18px; height: 18px; border-radius: 50%; background: var(--tc); color: #fff; font: 700 11px/18px var(--f); text-align: center; box-shadow: 0 0 0 2px var(--bg, #0b0f16); }
+.crest.dim { opacity: .55; filter: saturate(.5); }
+.cr-l { width: 34px; height: 34px; flex: none; display: grid; place-items: center; }
+.cr-l img, .cr-l svg { width: 34px; height: 34px; object-fit: contain; }
+.cr-t { display: grid; line-height: 1.1; min-width: 0; }
+.cr-t b { font: 700 14px var(--mono); letter-spacing: .04em; }
+.cr-t small { color: var(--mut); font-size: 11px; }
+.pf-n { margin: 0; color: var(--mut); font-size: 13px; }
+.pf-n b { color: var(--tx); }
+.pf-clear { border: 0; background: none; color: var(--goldtx, var(--gold)); font: inherit; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 900px) { .crests { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .pf-row .seg { flex: 1 1 100%; } .seg button { flex: 1; padding: 8px 6px; }
+  .crests { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 8px 2px 6px; margin: 0 -2px; scrollbar-width: none; }
+  .crests::-webkit-scrollbar { display: none; } .crest { flex: 0 0 auto; scroll-snap-align: start; } }
+@media (prefers-reduced-motion: reduce) { .crest, .seg button { transition: none; } .crest:hover { transform: none; } }
+
+/* shared filter bar (leaderboard etc.): labelled groups of segmented switches, a stepped slider and crests */
+.fbar { display: flex; flex-wrap: wrap; gap: 14px 18px; align-items: flex-end; margin: 6px 0 16px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: color-mix(in srgb, var(--raise) 70%, transparent); }
+.fg { display: grid; gap: 6px; }
+.fg-wide { flex: 1 1 100%; }
+.fg-l { font: 500 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mut); }
+.seg-s button { padding: 6px 11px; font-size: 12.5px; }
+.crests-s { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.crests-s .crest { padding: 6px 8px; border-radius: 12px; }
+.crests-s .cr-l, .crests-s .cr-l img, .crests-s .cr-l svg { width: 26px; height: 26px; }
+.steps { position: relative; width: 190px; padding-top: 2px; }
+.steps input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 6px; margin: 8px 0 4px; border-radius: 999px; cursor: pointer;
+  background: linear-gradient(90deg, var(--gold) var(--p), var(--line) var(--p)); }
+.steps input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle, #fff 0 22%, var(--gold) 24% 100%); border: 2px solid var(--panel); box-shadow: 0 0 0 1px var(--gold), 0 2px 8px rgba(0,0,0,.35); }
+.steps input[type=range]::-moz-range-thumb { width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle, #fff 0 22%, var(--gold) 24% 100%); border: 2px solid var(--panel); box-shadow: 0 0 0 1px var(--gold); }
+.steps input[type=range]:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.st-k { display: flex; justify-content: space-between; }
+.st-k button { border: 0; background: none; padding: 2px 0; font: 500 12px var(--mono); color: var(--mut); cursor: pointer; min-width: 24px; }
+.st-k button.on { color: var(--tx); }
+/* contact form topic chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--raise); color: var(--mut); font: 500 13px var(--f); padding: 7px 13px; border-radius: 999px; cursor: pointer; transition: all .18s; }
+.chip:hover { color: var(--tx); border-color: color-mix(in srgb, var(--gold) 45%, var(--line)); }
+.chip.on { color: var(--tx); background: color-mix(in srgb, var(--gold) 18%, var(--panel)); border-color: color-mix(in srgb, var(--gold) 60%, transparent); }
+.chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 900px) { .crests-s { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .fbar { padding: 12px; gap: 12px; } .fbar .fg { flex: 1 1 100%; } .fbar .seg { display: flex; } .fbar .seg button { flex: 1; }
+  .steps { width: 100%; }
+  .crests-s { display: flex; overflow-x: auto; scrollbar-width: none; padding: 8px 2px 6px; } .crests-s .crest { flex: 0 0 auto; } }

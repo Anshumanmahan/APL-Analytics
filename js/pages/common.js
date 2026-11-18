@@ -2,6 +2,7 @@
 import { html, useState } from '../../vendor/preact-htm.js';
 import { app, cls, tc } from '../lib/ui.js';
 import { CATS } from '../lib/rules.js';
+import { Crest } from '../lib/media.js';
 
 export const Arch = ({ id, team = true }) => {
   const a = app.S.A(id);
@@ -25,6 +26,24 @@ export function Table({ cols, rows, sort: s0, dir: d0 = -1, limit, empty = 'Not 
 }
 
 export const Sel = ({ value, onChange, options, label }) => html`<label class="sel"><span>${label}</span><select value=${value} onChange=${e => onChange(e.target.value)}>${options.map(([k, l]) => html`<option value=${k}>${l}</option>`)}</select></label>`;
+/* Tappable filter controls, used instead of dropdowns across the site. */
+export const Seg = ({ label, opts, value, onPick, small }) => html`<div class=${'seg' + (small ? ' seg-s' : '')} role="radiogroup" aria-label=${label}>
+  ${opts.map(([v, l]) => html`<button type="button" role="radio" aria-checked=${value === v} class=${value === v ? 'on' : ''} onClick=${() => onPick(v)}>${l}</button>`)}</div>`;
+/* labelled group for a filter bar */
+export const FGroup = ({ label, children }) => html`<div class="fg"><span class="fg-l">${label}</span>${children}</div>`;
+/* team crests: tap to pick, tap again to drop; several can be picked */
+export const CrestPick = ({ value, onChange, counts = {}, compact }) => { const S = app.S;
+  const toggle = code => onChange(value.includes(code) ? value.filter(t => t !== code) : [...value, code]);
+  return html`<div class=${'crests' + (compact ? ' crests-s' : '')} role="group" aria-label="Teams">
+    ${S.roster.teams.map(t => { const code = t.short; const on = value.includes(code);
+      return html`<button type="button" class=${'crest' + (on ? ' on' : '') + (value.length && !on ? ' dim' : '')} aria-pressed=${on} style=${`--tc:${tc(code)}`} onClick=${() => toggle(code)} title=${S.T(code).name}>
+        <span class="cr-l"><${Crest} code=${code} size=${compact ? 26 : 34} /></span><span class="cr-t"><b>${code}</b>${counts[code] != null ? html`<small>${counts[code]}</small>` : ''}</span></button>`; })}
+  </div>`; };
+/* a stepped slider over a few fixed values, with the stops labelled underneath */
+export const Steps = ({ label, values, value, onPick, unit = '' }) => { const i = Math.max(0, values.indexOf(value));
+  return html`<div class="steps" style=${`--p:${(i / (values.length - 1)) * 100}%`}>
+    <input type="range" min="0" max=${values.length - 1} step="1" value=${i} aria-label=${label} aria-valuetext=${values[i] + unit} onInput=${e => onPick(values[+e.target.value])} />
+    <div class="st-k">${values.map((v, j) => html`<button type="button" class=${j === i ? 'on' : ''} onClick=${() => onPick(v)}>${v}</button>`)}</div></div>`; };
 export const CAT_OPTS = [['', 'All categories'], ...Object.entries(CATS), ['R', 'All recurve'], ['C', 'All compound']];
 export const catOk = (cat, f) => !f || cat === f || (f.length === 1 && cat && cat[0] === f);
 export const Sample = ({ children }) => html`<p class="samp">${children}</p>`;
