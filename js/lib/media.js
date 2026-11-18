@@ -67,6 +67,7 @@ export const PHOTO = {
   'cc-yuktha-sri-kondapavuluri': '/img/players/cc-yuktha-sri-kondapavuluri.jpg',
   'kk-shivshankar-sakharam-landkar': '/img/players/kk-shivshankar-sakharam-landkar.jpg',
   'rr-abhyuday-amol-pakhale': '/img/players/rr-abhyuday-amol-pakhale.jpg',
+  'cc-pawan': '/img/players/cc-pawan.jpg',
 };
 /* World Archery athlete pages, where confirmed */
 export const WA = {
