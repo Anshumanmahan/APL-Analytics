@@ -21,7 +21,7 @@
 <link rel="stylesheet" href="/loader.css">
 </head>
 <body>
-<div class="ldr" id="ldr" role="status" aria-live="polite" aria-label="Loading APL Analytics">
+<div class="ldr idle" id="ldr" role="status" aria-live="polite" aria-label="Loading APL Analytics">
   <div class="ld-in">
     <div class="ld-stage"><span class="ld-halo"></span><svg class="ld-target" viewBox="0 0 64 64" aria-hidden="true"><defs>
 <radialGradient id="ld-face" cx="40%" cy="34%" r="72%"><stop offset="0" stop-color="#26334a"/><stop offset=".62" stop-color="#141b28"/><stop offset="1" stop-color="#090c12"/></radialGradient>
@@ -60,33 +60,29 @@
   </div>
 </div>
 <script>
-/* the loader: steps fill while the season loads; main.js calls APL_LOADER.done(stats) or .fail(message) */
+/* the loader: hidden until start() (after the passcode, or at once when none is needed). Steps fill while the
+   season loads; main.js then calls done(stats), or hide() when the passcode was wrong. */
 (function () {
   var root = document.documentElement, el = document.getElementById('ldr'), step = document.getElementById('ld-step');
   var slots = el.querySelectorAll('.ld-slots li'), calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var STEPS = ['Opening the scorebook', 'Reading every match', 'Counting the arrows', 'Ranking the archers'];
-  var t0 = Date.now(), MIN = calm ? 300 : 2300, at = 0, timer, finished = false;
-  root.classList.add('ld-on');
+  var MIN = calm ? 300 : 2300, t0 = 0, at = 0, timer, waits = [];
   function show(i) { at = i; for (var k = 0; k < slots.length; k++) slots[k].className = k < i ? 'on' : k === i ? 'go' : ''; if (STEPS[i]) step.textContent = STEPS[i]; }
-  show(0);
-  // walk through the first three steps while waiting; the last one only finishes when the data is in
-  timer = setInterval(function () { if (at < 2) show(at + 1); }, 700);
+  function later(f, ms) { waits.push(setTimeout(f, ms)); }
+  function stop() { clearInterval(timer); waits.forEach(clearTimeout); waits = []; }
   function count(node, n, ms) { var s = Date.now(); (function f() { var p = Math.min(1, (Date.now() - s) / ms); node.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))).toLocaleString('en-IN'); if (p < 1) requestAnimationFrame(f); })(); }
   function leave() { root.classList.add('ld-reveal'); el.classList.add('out'); root.classList.remove('ld-on'); setTimeout(function () { el.remove(); root.classList.remove('ld-reveal'); }, 1100); }
   window.APL_LOADER = {
-    done: function (st) { if (finished) return; finished = true;
-      setTimeout(function () { clearInterval(timer); show(3);
-        setTimeout(function () { show(4);
+    start: function () { stop(); t0 = Date.now(); show(0); el.classList.remove('idle'); root.classList.add('ld-on');
+      // walk through the first three steps while waiting; the last finishes only when the data is in
+      timer = setInterval(function () { if (at < 2) show(at + 1); }, 700); },
+    hide: function () { stop(); el.classList.add('idle'); root.classList.remove('ld-on'); },
+    done: function (st) {
+      later(function () { clearInterval(timer); show(3);
+        later(function () { show(4);
           if (st && st.arrows) { step.innerHTML = '<b class="ld-count">0</b> arrows · <b class="ld-count">0</b> matches';
             var c = step.querySelectorAll('.ld-count'); count(c[0], st.arrows, calm ? 1 : 700); count(c[1], st.matches || 0, calm ? 1 : 700); }
-          setTimeout(leave, calm ? 200 : 1000); }, calm ? 0 : 350); }, Math.max(0, MIN - (Date.now() - t0))); },
-    fail: function (msg, retry) { clearInterval(timer);
-      var end = document.getElementById('ld-end'); end.style.opacity = 1;
-      end.innerHTML = '<div class="ld-err"><p></p><button type="button">Try again</button></div>';
-      end.querySelector('p').textContent = msg;
-      end.querySelector('button').onclick = function () { end.innerHTML = '<ol class="ld-slots" aria-hidden="true"><li></li><li></li><li></li><li></li></ol><p class="ld-step" id="ld-step"></p>';
-        slots = end.querySelectorAll('.ld-slots li'); step = document.getElementById('ld-step'); finished = false; t0 = Date.now() - MIN; show(0);
-        timer = setInterval(function () { if (at < 2) show(at + 1); }, 500); retry && retry(); }; }
+          later(leave, calm ? 200 : 1000); }, calm ? 0 : 350); }, Math.max(0, MIN - (Date.now() - t0))); }
   };
 })();
 </script>

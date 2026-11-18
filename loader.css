@@ -17,6 +17,7 @@
   background-size: 48px 48px; opacity: .45;
   -webkit-mask-image: radial-gradient(60% 55% at 50% 42%, #000, transparent 80%); mask-image: radial-gradient(60% 55% at 50% 42%, #000, transparent 80%); }
 html.ld-on body { overflow: hidden; }
+.ldr.idle { display: none; }
 
 .ld-in { position: relative; display: grid; justify-items: center; gap: 22px; padding: 16px; width: 100%; max-width: 520px; text-align: center; }
 
@@ -76,10 +77,6 @@ html.ld-on body { overflow: hidden; }
 .ld-step { margin: 0; min-height: 1.4em; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ldmut); }
 .ld-step b { color: var(--ldtx); font-weight: 500; }
 .ld-count { font-variant-numeric: tabular-nums; }
-.ld-err { display: grid; gap: 12px; justify-items: center; }
-.ld-err p { margin: 0; color: var(--ldmut); max-width: 320px; }
-.ld-err button { font: inherit; font-weight: 600; cursor: pointer; padding: 10px 22px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ldgold) 60%, transparent);
-  background: color-mix(in srgb, var(--ldgold) 16%, transparent); color: var(--ldtx); }
 
 /* exit: the target rushes at the viewer and the page opens up behind it */
 .ldr.out { opacity: 0; visibility: hidden; pointer-events: none; }
