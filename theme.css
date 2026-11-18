@@ -498,3 +498,15 @@ select option { background: var(--solid); color: var(--tx); }
 @media (max-width: 1000px) { .mrow2 { grid-template-columns: 100px minmax(0, 1fr) auto 140px; } .mrow2 .wx-chip { grid-column: 2 / -1; } }
 @media (max-width: 820px) { .wx-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .wx-grid .wx-wind { grid-column: 1 / -1; } }
 @media (max-width: 760px) { .mrow2 { grid-template-columns: minmax(0, 1fr) auto; } .mrow2 .wx-chip { grid-column: 1 / -1; } }
+
+/* ---------- archer name + team chip ---------- */
+.tm i { background: var(--tc, var(--mut)); }
+.tm .tm-n { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.tchip { flex: none; font: 600 10px/1 var(--mono); font-style: normal; letter-spacing: .06em; padding: 3px 5px 2px; border-radius: 5px; margin-left: 2px;
+  color: color-mix(in srgb, var(--tc) 70%, var(--tx)); background: color-mix(in srgb, var(--tc) 16%, transparent); border: 1px solid color-mix(in srgb, var(--tc) 35%, transparent); }
+a.tm:hover .tchip { text-decoration: none; }
+a.tm:hover { text-decoration: none; } a.tm:hover .tm-n { text-decoration: underline; text-underline-offset: 3px; }
+.pick { display: inline-flex; flex-direction: column; gap: 3px; min-width: 0; padding: 2px 0; }
+.pk-s { font-size: 12px; color: var(--mut); padding-left: 10px; white-space: nowrap; }
+.pk-s b { font-family: var(--mono); font-size: 13px; color: var(--tx); font-weight: 600; }
+.ldr .tm, .big .tm { min-width: 0; max-width: 100%; }

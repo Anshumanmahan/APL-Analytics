@@ -4,7 +4,7 @@ import { archers, TEAMS, dayName } from '../lib/season.js';
 import { CATS } from '../lib/rules.js';
 import { app, cls, f1, f2, pct, tc, Team } from '../lib/ui.js';
 import { Columns, Bars, Scatter } from '../lib/charts.js';
-import { Arch, Table, Sel, CAT_OPTS, catOk, Panel } from './common.js';
+import { Arch, Pick, Table, Sel, CAT_OPTS, catOk, Panel } from './common.js';
 import * as I from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
@@ -88,7 +88,7 @@ function Positions({ S, rctx, bow }) {
   return html`<${Panel} title=${'Best ' + bow.toLowerCase() + ' archer at each position'} sub="Arrow 1 to 8 of a team's set. Top three by average, at least 3 arrows at that position.">
       <${Columns} data=${rows.map(r => ({ x: r.pos, y: r.all.avg, n: r.all.n }))} yMin=${8} yMax=${10} fmt=${f2} xLabel="Arrow of the set (everyone)" tip=${d => html`<b>Arrow ${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />
       <div class="tbl"><table><thead><tr><th>Arrow</th><th class="n">League avg</th><th>1st</th><th>2nd</th><th>3rd</th></tr></thead><tbody>
-      ${rows.map(r => html`<tr><td>${r.pos}</td><td class="n">${f2(r.all.avg)}</td>${[0, 1, 2].map(i => html`<td>${r.best[i] ? html`<${Arch} id=${r.best[i].k} /> <b>${f2(r.best[i].avg)}</b> <small class="muted">${r.best[i].n}</small>` : '–'}</td>`)}</tr>`)}</tbody></table></div>
+      ${rows.map(r => html`<tr><td>${r.pos}</td><td class="n">${f2(r.all.avg)}</td>${[0, 1, 2].map(i => html`<td>${r.best[i] ? html`<${Pick} id=${r.best[i].k} v=${f2(r.best[i].avg)} n=${r.best[i].n} />` : '–'}</td>`)}</tr>`)}</tbody></table></div>
     </${Panel}>
     <${Panel} title="First 4 vs last 4 arrows" sub="Who finishes a set stronger than they start it.">
       <${Table} sort="delta" rows=${I.halves(rctx.filter(o => o.a.a), o => o.a.a, 4)} limit=${15} cols=${[
@@ -134,7 +134,7 @@ function Time({ S, ctx, rctx, bow }) {
       </${Panel}>
     </div>
     <${Panel} title="Best player in each time window">
-      <div class="tbl"><table><thead><tr><th>Seconds taken</th><th>1st</th><th>2nd</th><th>3rd</th></tr></thead><tbody>${win.map(w => html`<tr><td>${w.label}</td>${[0, 1, 2].map(i => html`<td>${w.best[i] ? html`<${Arch} id=${w.best[i].k} /> <b>${f2(w.best[i].avg)}</b> <small class="muted">${w.best[i].n}</small>` : '–'}</td>`)}</tr>`)}</tbody></table></div>
+      <div class="tbl"><table><thead><tr><th>Seconds taken</th><th>1st</th><th>2nd</th><th>3rd</th></tr></thead><tbody>${win.map(w => html`<tr><td>${w.label}</td>${[0, 1, 2].map(i => html`<td>${w.best[i] ? html`<${Pick} id=${w.best[i].k} v=${f2(w.best[i].avg)} n=${w.best[i].n} />` : '–'}</td>`)}</tr>`)}</tbody></table></div>
     </${Panel}>
     <${Panel} title="Time crunch vs shot made" sub=${`Archers with ${I.CRUNCH} s or less left when they shot, against their other arrows.`}>
       <${Table} sort="n" rows=${I.crunch(rctx.filter(o => o.a.a), o => o.a.a, 2)} limit=${12} cols=${[['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['n', 'Crunch arrows', null, { num: 1 }], ['avg', 'Crunch avg', r => f2(r.avg), { num: 1 }], ['r', 'Other arrows', r => f2(r.rest.avg), { num: 1, sort: r => r.rest.avg }]]} />

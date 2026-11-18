@@ -5,8 +5,10 @@ import { CATS } from '../lib/rules.js';
 
 export const Arch = ({ id, team = true }) => {
   const a = app.S.A(id);
-  return html`<a class="tm" href=${'#/player/' + id}><i style=${`background:${tc(a.team)}`}></i>${a.name}${team && a.team ? html`<small class="muted"> ${a.team}</small>` : ''}</a>`;
+  return html`<a class="tm" href=${'#/player/' + id} style=${`--tc:${tc(a.team)}`}><i></i><span class="tm-n">${a.name}</span>${team && a.team ? html`<em class="tchip" title=${app.S.T(a.team).name}>${a.team}</em>` : ''}</a>`;
 };
+/* an archer in a ranking cell: name and team on one line, the number and sample size underneath */
+export const Pick = ({ id, v, n, unit = 'avg' }) => html`<span class="pick"><${Arch} id=${id} /><span class="pk-s"><b>${v}</b> ${unit} · ${n} arrows</span></span>`;
 
 /* cols: [key, label, render?, {num, sort}] ; rows: objects */
 export function Table({ cols, rows, sort: s0, dir: d0 = -1, limit, empty = 'Not enough data yet.' }) {
