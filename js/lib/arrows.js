@@ -20,6 +20,7 @@ export const ARROW_DEFS = html`
   <filter id="ar-soft" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation=".5" /></filter>
   <clipPath id="ar-face"><circle cx="0" cy="0" r="30.6" /></clipPath>
   <clipPath id="ar-faceL"><ellipse cx="0" cy="0" rx="36.4" ry="18" /></clipPath>
+  <clipPath id="ar-faceI"><ellipse cx="0" cy="0" rx="36.4" ry="9" /></clipPath>
   <clipPath id="ar-face8"><circle cx="0" cy="0" r="38.2" /></clipPath>
   <clipPath id="ar-faceG"><circle cx="32" cy="32" r="30.6" /></clipPath>`;
 
@@ -99,6 +100,7 @@ export const ARROW_NAMES = { A: 'Carbon target arrow', B: 'Spin wings', C: 'Trad
 export const POSES = {
   diag: { t: 'translate(32 32) rotate(-45)', clip: 'ar-face', fx: -34, fy: 34 },
   left: { t: 'translate(32 32) scale(.84 1.7)', clip: 'ar-faceL', fx: -40, fy: 0 },
+  icon: { t: 'translate(32 32) scale(.84 3.4)', clip: 'ar-faceI', fx: -40, fy: 0 }, // bolder, for the small header logo and favicon
   right: { t: 'translate(32 32) scale(-.8 .8)', clip: 'ar-face8', fx: 40, fy: 0 },
   persp: { t: 'translate(32 32) rotate(-8) scale(.8)', clip: 'ar-face8', fx: -40, fy: 6 } };
 
