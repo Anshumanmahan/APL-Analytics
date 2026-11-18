@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Site loader: shown the moment the URL opens, before any script runs.
+   A carbon arrow flies in from the left edge, strikes the centre, the target
+   takes the hit and the scoring rings draw outward. Below it the wordmark and
+   an "end" of four arrow slots that fill as the season loads. When the data
+   is in, the arrow and match counts tick up and the target swallows the screen
+   to reveal the site.
+   ========================================================================== */
+.ldr { --ldbg: #06080c; --ldtx: #eef1f6; --ldmut: #8b95a7; --ldline: rgba(255,255,255,.09); --ldgold: #f5c518; --ldgoldtx: #f7cf3c; --ldcyan: #5cc8ff;
+  position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  background: radial-gradient(900px 560px at 50% 38%, color-mix(in srgb, var(--ldcyan) 12%, transparent), transparent 70%), var(--ldbg);
+  color: var(--ldtx); font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  transition: opacity .55s ease .25s, visibility 0s linear .8s; }
+:root[data-theme="light"] .ldr { --ldbg: #f5f6f8; --ldtx: #0d1320; --ldmut: #5a6478; --ldline: rgba(10,20,40,.1); --ldgoldtx: #946e00; --ldcyan: #0a78c2; }
+.ldr::before { content: ''; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(var(--ldline) 1px, transparent 1px), linear-gradient(90deg, var(--ldline) 1px, transparent 1px);
+  background-size: 48px 48px; opacity: .45;
+  -webkit-mask-image: radial-gradient(60% 55% at 50% 42%, #000, transparent 80%); mask-image: radial-gradient(60% 55% at 50% 42%, #000, transparent 80%); }
+html.ld-on body { overflow: hidden; }
+
+.ld-in { position: relative; display: grid; justify-items: center; gap: 22px; padding: 16px; width: 100%; max-width: 520px; text-align: center; }
+
+/* the target and the arrow share one square stage */
+.ld-stage { --s: min(46vw, 230px); position: relative; width: var(--s); height: var(--s); }
+.ld-stage svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ld-halo { position: absolute; inset: -18%; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--ldgold) 32%, transparent), transparent 66%);
+  filter: blur(14px); opacity: 0; animation: ld-halo 1.2s ease-out .78s forwards; }
+@keyframes ld-halo { 0% { opacity: 0; transform: scale(.6); } 35% { opacity: 1; } 100% { opacity: .55; transform: scale(1); } }
+
+.ld-target { transform-origin: 50% 50%; animation: ld-rise .5s cubic-bezier(.2,.9,.3,1) both, ld-thud .45s cubic-bezier(.3,1.6,.5,1) .78s both; }
+@keyframes ld-rise { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: none; } }
+@keyframes ld-thud { 0% { transform: scale(1); } 30% { transform: scale(.955) translate(1.2%, -.6%); } 100% { transform: scale(1); } }
+.ld-arc { animation: ld-draw 1.1s cubic-bezier(.25,.8,.25,1) both; }
+@keyframes ld-draw { from { stroke-dashoffset: var(--len); opacity: 0; } 12% { opacity: 1; } to { stroke-dashoffset: 0; opacity: 1; } }
+/* svg parts turn about the target centre */
+.ld-spin, .ld-orbit, .ld-rip, .ld-flash, .ld-quiver { transform-box: view-box; }
+.ld-spin { transform-origin: 32px 32px; animation: ld-rot 30s linear 2s infinite; }
+.ld-orbit { transform-origin: 32px 32px; animation: ld-rot 22s linear infinite reverse; }
+@keyframes ld-rot { to { transform: rotate(360deg); } }
+.ld-rip { transform-origin: 32px 32px; opacity: 0; animation: ld-rip 1.9s ease-out .78s infinite; }
+.ld-rip.b { animation-delay: 1.4s; }
+@keyframes ld-rip { 0% { transform: scale(1); opacity: .95; } 100% { transform: scale(13); opacity: 0; } }
+.ld-flash { transform-origin: 32px 32px; opacity: 0; animation: ld-flash .5s ease-out .76s both; }
+@keyframes ld-flash { 0% { opacity: 0; transform: scale(.3); } 20% { opacity: 1; } 100% { opacity: 0; transform: scale(3.2); } }
+
+/* the arrow flies from beyond the left edge of the screen */
+.ld-arrow { animation: ld-fly .58s cubic-bezier(.4,.05,.7,1) .2s both; }
+@keyframes ld-fly { from { transform: translateX(calc(-50vw - 100%)); } to { transform: none; } }
+.ld-quiver { transform-origin: 32px 32px; animation: ld-quiver .75s ease-out .78s both; }
+@keyframes ld-quiver { 0% { transform: rotate(0); } 16% { transform: rotate(-3.2deg); } 38% { transform: rotate(2.2deg); } 60% { transform: rotate(-1.1deg); } 80% { transform: rotate(.4deg); } 100% { transform: rotate(0); } }
+.ld-shadow { opacity: 0; animation: ld-fade .3s ease-out .8s forwards; }
+@keyframes ld-fade { to { opacity: .5; } }
+/* motion streak behind the arrow while it is in the air */
+.ld-streak { position: absolute; top: 50%; right: 54%; height: 2px; width: 60vw; margin-top: -1px; pointer-events: none; transform-origin: right center;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--ldgold) 70%, transparent) 85%, #fff); border-radius: 2px;
+  opacity: 0; animation: ld-streak .78s ease-out .2s both; }
+@keyframes ld-streak { 0% { opacity: 0; transform: translateX(-50vw) scaleX(.2); } 20% { opacity: .9; } 74% { opacity: .9; transform: none; } 100% { opacity: 0; transform: scaleX(0); } }
+
+/* wordmark */
+.ld-wm { display: grid; gap: 6px; }
+.ld-name { margin: 0; font-size: clamp(30px, 8vw, 44px); font-weight: 700; letter-spacing: -.02em; line-height: 1; display: flex; justify-content: center; gap: .28em; }
+.ld-name span { display: inline-block; opacity: 0; transform: translateY(12px); filter: blur(6px); animation: ld-word .6s cubic-bezier(.2,.9,.3,1) forwards; }
+.ld-name span:nth-child(1) { animation-delay: .95s; } .ld-name span:nth-child(2) { animation-delay: 1.1s; color: var(--ldgoldtx); }
+@keyframes ld-word { to { opacity: 1; transform: none; filter: none; } }
+.ld-tag { margin: 0; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--ldmut);
+  opacity: 0; animation: ld-word .6s ease 1.3s forwards; }
+
+/* an end of four arrows: each slot fills as that step finishes */
+.ld-end { display: grid; gap: 12px; width: min(100%, 340px); opacity: 0; animation: ld-word .5s ease 1.45s forwards; }
+.ld-slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; list-style: none; margin: 0; padding: 0; }
+.ld-slots li { position: relative; height: 4px; border-radius: 4px; background: var(--ldline); overflow: hidden; }
+.ld-slots li::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--ldgold), #fff3b8); transform: scaleX(0); transform-origin: left; transition: transform .5s cubic-bezier(.3,.8,.3,1); }
+.ld-slots li.on::after { transform: scaleX(1); }
+.ld-slots li.go::after { transform: scaleX(.55); animation: ld-pulse 1s ease-in-out infinite; }
+@keyframes ld-pulse { 50% { opacity: .5; } }
+.ld-step { margin: 0; min-height: 1.4em; font-family: 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 12px; color: var(--ldmut); }
+.ld-step b { color: var(--ldtx); font-weight: 500; }
+.ld-count { font-variant-numeric: tabular-nums; }
+.ld-err { display: grid; gap: 12px; justify-items: center; }
+.ld-err p { margin: 0; color: var(--ldmut); max-width: 320px; }
+.ld-err button { font: inherit; font-weight: 600; cursor: pointer; padding: 10px 22px; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--ldgold) 60%, transparent);
+  background: color-mix(in srgb, var(--ldgold) 16%, transparent); color: var(--ldtx); }
+
+/* exit: the target rushes at the viewer and the page opens up behind it */
+.ldr.out { opacity: 0; visibility: hidden; pointer-events: none; }
+.ldr.out .ld-stage { animation: ld-zoom .8s cubic-bezier(.6,0,.4,1) forwards; }
+.ldr.out .ld-wm, .ldr.out .ld-end { animation: ld-away .35s ease forwards; }
+@keyframes ld-zoom { to { transform: scale(9); opacity: 0; } }
+@keyframes ld-away { to { opacity: 0; transform: translateY(10px); } }
+html.ld-reveal #root { animation: ld-page .7s cubic-bezier(.2,.9,.3,1) .2s both; }
+@keyframes ld-page { from { opacity: 0; transform: scale(.985); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .ldr *, .ldr *::before, .ldr *::after { animation-duration: .01s !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; }
+  .ld-rip, .ld-flash, .ld-streak { display: none; }
+  html.ld-reveal #root { animation: none; }
+}

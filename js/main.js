@@ -1,7 +1,7 @@
-/* APL Analytics: routes, the data gate and the page shell. */
+/* APL Analytics: routes, loading the season and the page shell. */
 import { html, render, useState } from './../vendor/preact-htm.js';
-import { buildSeason } from './lib/season.js';
-import { load, loadOpen, hasPass, forget } from './lib/store.js';
+import { buildSeason, pool, summarize } from './lib/season.js';
+import { load } from './lib/store.js';
 import { app, cls } from './lib/ui.js';
 import { Home } from './pages/home.js';
 import { Teams, TeamPage } from './pages/teams.js';
@@ -34,26 +34,21 @@ function route() {
 window.addEventListener('hashchange', () => { rerender(); window.scrollTo(0, 0); });
 
 function ready(rows) { app.S = buildSeason(rows); state.status = 'ready'; state.loadedAt = new Date(); state.msg = ''; }
-async function open(p) {
-  state.status = app.S ? 'ready' : 'loading'; state.refreshing = true; rerender();
-  // the site's own read-only proxy first (no passcode needed once it is set up)
-  if (!p) { const rows = await loadOpen(); if (rows) { state.open = true; ready(rows); state.refreshing = false; return rerender(); } }
-  if (!p && !hasPass()) { state.status = app.S ? 'ready' : 'gate'; state.refreshing = false; return rerender(); }
-  const r = await load(p);
-  if (r.status === 'ok') ready(r.rows);
-  else if (r.status === 'wrong') { forget(); state.status = 'gate'; state.msg = p ? 'That passcode didn’t work. Try again.' : ''; }
-  else { state.status = app.S ? 'ready' : 'gate'; state.msg = 'The season data can’t be reached right now. Check your connection and try again.'; }
-  state.refreshing = false; rerender();
-}
-
-function Gate() {
-  const [v, setV] = useState('');
-  return html`<div class="gate"><form onSubmit=${e => { e.preventDefault(); if (v) open(v); }}>
-    <img class="gate-t" src="/logo.svg" alt="" />
-    <h1>APL Analytics</h1><p class="cr-only gate-only"><i></i>The only stats platform for the Archery Premier League</p><p>Enter the scorebook passcode to see the season.</p>
-    <input type="password" autocomplete="off" maxlength="24" value=${v} placeholder="••••" aria-label="Passcode" autofocus onInput=${e => setV(e.target.value.trim())} />
-    ${state.msg && html`<p class="err" role="alert">${state.msg}</p>`}
-    <button class="btn pri" disabled=${!v}>Open</button></form></div>`;
+const L = () => window.APL_LOADER;
+async function open() {
+  const first = !app.S; state.refreshing = true; rerender();
+  const r = await load();
+  state.refreshing = false;
+  if (r.status === 'ok') {
+    ready(r.rows); rerender();
+    if (first && L()) { let arrows = 0; try { arrows = summarize(pool(app.S)).n; } catch (e) { } L().done({ arrows, matches: app.S.matches.length }); }
+    return;
+  }
+  const msg = r.status === 'setup' ? 'The season data isn’t switched on for this site yet. Please check back soon.'
+    : 'The season data can’t be reached right now. Check your connection and try again.';
+  if (first && L()) L().fail(msg, () => open());
+  else state.msg = msg;
+  rerender();
 }
 
 /* light / dark switch: light half on the left, dark half on the right, an arrow in the middle pointing at the theme in use */
@@ -110,8 +105,7 @@ function ThemeBtn() {
 
 const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['ideas', 'Ideas', '#/ideas']];
 function App() {
-  if (state.status === 'gate') return html`<${Gate} />`;
-  if (!app.S) return html`<div class="loading"><span class="spin"></span>Loading the season…</div>`;
+  if (!app.S) return null; // the loader in index.html covers the screen until the season is in
   const r = route(); const S = app.S; const rec = S.matches.filter(m => m.src === 'recorded').length;
   return html`<div class="shell">
     <header class="top"><a class="brand" href="#/" aria-label="APL Analytics home"><img src="/logo.svg" alt="" width="32" height="32" /><span class="wm"><b>APL</b><small>ANALYTICS</small></span></a>

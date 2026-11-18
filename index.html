@@ -18,6 +18,77 @@
 <link rel="stylesheet" href="/app.css">
 <link rel="stylesheet" href="/analytics.css">
 <link rel="stylesheet" href="/theme.css">
+<link rel="stylesheet" href="/loader.css">
 </head>
-<body><div id="root"></div><script type="module" src="/js/main.js"></script></body>
+<body>
+<div class="ldr" id="ldr" role="status" aria-live="polite" aria-label="Loading APL Analytics">
+  <div class="ld-in">
+    <div class="ld-stage"><span class="ld-halo"></span><svg class="ld-target" viewBox="0 0 64 64" aria-hidden="true"><defs>
+<radialGradient id="ld-face" cx="40%" cy="34%" r="72%"><stop offset="0" stop-color="#26334a"/><stop offset=".62" stop-color="#141b28"/><stop offset="1" stop-color="#090c12"/></radialGradient>
+<linearGradient id="ld-rim" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity=".04"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></linearGradient>
+<radialGradient id="ld-hole"><stop offset="0" stop-color="#000"/><stop offset=".6" stop-color="#05070a"/><stop offset="1" stop-color="#05070a" stop-opacity="0"/></radialGradient>
+<radialGradient id="ld-fl"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#fff3b8" stop-opacity=".8"/><stop offset="1" stop-color="#f5c518" stop-opacity="0"/></radialGradient>
+<linearGradient id="ld-r0" gradientUnits="userSpaceOnUse" x1="10" y1="8" x2="54" y2="56"><stop offset="0" stop-color="#7cc0ff"/><stop offset=".45" stop-color="#3b8fd9"/><stop offset="1" stop-color="#1f5f9e"/></linearGradient><linearGradient id="ld-r1" gradientUnits="userSpaceOnUse" x1="10" y1="8" x2="54" y2="56"><stop offset="0" stop-color="#ff8a8d"/><stop offset=".45" stop-color="#e5484d"/><stop offset="1" stop-color="#a8262b"/></linearGradient><linearGradient id="ld-r2" gradientUnits="userSpaceOnUse" x1="10" y1="8" x2="54" y2="56"><stop offset="0" stop-color="#ffe682"/><stop offset=".45" stop-color="#f5c518"/><stop offset="1" stop-color="#c08f00"/></linearGradient></defs>
+<circle cx="32" cy="32" r="31" fill="url(#ld-face)"/><circle cx="32" cy="32" r="30.6" fill="none" stroke="url(#ld-rim)" stroke-width=".8"/>
+<circle class="ld-orbit" cx="32" cy="32" r="29.4" fill="none" stroke="#f4f4ef" stroke-opacity=".3" stroke-width=".9" style="stroke-dasharray:.22 2.859"/>
+<circle cx="32" cy="32" r="27.5" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width=".18"/><circle cx="32" cy="32" r="20.25" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width=".18"/><circle cx="32" cy="32" r="12.75" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width=".18"/><circle cx="32" cy="32" r="5.2" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width=".18"/><circle cx="32" cy="32" r="24" fill="none" stroke="#3b8fd9" stroke-opacity=".13" stroke-width="4.4"/><circle cx="32" cy="32" r="16.5" fill="none" stroke="#e5484d" stroke-opacity=".13" stroke-width="4.4"/><circle cx="32" cy="32" r="9" fill="none" stroke="#f5c518" stroke-opacity=".13" stroke-width="4.4"/><g class="ld-spin"><circle class="ld-arc" cx="32" cy="32" r="24" fill="none" stroke="url(#ld-r0)" stroke-width="4.4" stroke-linecap="round" transform="rotate(-90 32 32)" style="stroke-dasharray:120.6 150.8;stroke-dashoffset:120.6;--len:120.6;animation-delay:1.25s"/><circle class="ld-arc" cx="32" cy="32" r="16.5" fill="none" stroke="url(#ld-r1)" stroke-width="4.4" stroke-linecap="round" transform="rotate(-90 32 32)" style="stroke-dasharray:72.6 103.7;stroke-dashoffset:72.6;--len:72.6;animation-delay:1.05s"/><circle class="ld-arc" cx="32" cy="32" r="9" fill="none" stroke="url(#ld-r2)" stroke-width="4.4" stroke-linecap="round" transform="rotate(-90 32 32)" style="stroke-dasharray:45.2 56.5;stroke-dashoffset:45.2;--len:45.2;animation-delay:0.85s"/></g>
+<circle class="ld-rip" cx="32" cy="32" r="2.4" fill="none" stroke="#f4f4ef" stroke-width=".45"/><circle class="ld-rip b" cx="32" cy="32" r="2.4" fill="none" stroke="#f5c518" stroke-width=".35"/>
+<circle class="ld-flash" cx="32" cy="32" r="3" fill="url(#ld-fl)"/><circle cx="32" cy="32" r="1.9" fill="url(#ld-hole)"/></svg><span class="ld-streak"></span><svg class="ld-arrow" viewBox="0 0 64 64" aria-hidden="true"><defs>
+<linearGradient id="ld-carbon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a3e45"/><stop offset=".26" stop-color="#b9bfc7"/><stop offset=".42" stop-color="#2c3036"/><stop offset=".8" stop-color="#121417"/><stop offset="1" stop-color="#3a3f47"/></linearGradient>
+<linearGradient id="ld-steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8e959e"/><stop offset=".3" stop-color="#fff"/><stop offset=".6" stop-color="#7d838b"/><stop offset="1" stop-color="#22262b"/></linearGradient>
+<linearGradient id="ld-wrap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b8bcc2"/><stop offset=".28" stop-color="#fff"/><stop offset="1" stop-color="#7d838b"/></linearGradient>
+<linearGradient id="ld-vgold" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#b78400"/><stop offset=".55" stop-color="#f5c518"/><stop offset="1" stop-color="#fff0b3"/></linearGradient>
+<linearGradient id="ld-vgoldD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6200"/><stop offset="1" stop-color="#e0ad0c"/></linearGradient>
+<linearGradient id="ld-nock" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc2c4"/><stop offset=".3" stop-color="#e5484d"/><stop offset="1" stop-color="#7d151a"/></linearGradient>
+<pattern id="ld-weave" width=".7" height=".7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width=".3" height=".7" fill="#fff" fill-opacity=".09"/></pattern>
+<filter id="ld-soft" x="-30%" y="-60%" width="160%" height="220%"><feGaussianBlur stdDeviation=".5"/></filter>
+<clipPath id="ld-faceL"><ellipse cx="0" cy="0" rx="36.4" ry="18"/></clipPath></defs>
+<g class="ld-quiver"><g transform="translate(32 32) scale(.84 1.7)">
+<g class="ld-shadow" clip-path="url(#ld-faceL)" filter="url(#ld-soft)"><path d="M0 -.3 L-38 2.9 L-38 4.2 L0 .5 Z" fill="#000"/><path d="M-31 3.4 L-36.5 3.5 L-36.5 5.4 L-32 4.4 Z" fill="#000" opacity=".6"/></g>
+<path d="M-29.6 .45 C-30.8 .9 -32.9 2.1 -34.6 2.3 Q-35.2 2.35 -35.2 1.8 L-35 .45 Z" fill="url(#ld-vgoldD)"/>
+<path d="M-29.6 -.45 C-30.8 -.9 -32.9 -2.1 -34.6 -2.3 Q-35.2 -2.35 -35.2 -1.8 L-35 -.45 Z" fill="url(#ld-vgold)"/>
+<path d="M-29.6 -.45 C-30.8 -.9 -32.9 -2.1 -34.6 -2.3" fill="none" stroke="#fff7d1" stroke-width=".12"/>
+<rect x="-36.4" y="-.48" width="36.2" height=".96" rx=".2" fill="url(#ld-carbon)"/><rect x="-36.4" y="-.48" width="36.2" height=".96" fill="url(#ld-weave)"/>
+<rect x="-35.9" y="-.52" width="7" height="1.04" rx=".15" fill="url(#ld-wrap)" opacity=".92"/>
+<line x1="-28.4" y1="-.21" x2="-1" y2="-.21" stroke="#fff" stroke-opacity=".55" stroke-width=".1"/>
+<path d="M-30 0 C-31.1 .2 -33 .75 -34.6 .85 Q-35.1 .85 -35.1 .5 L-35 0 Z" fill="#ffd84a" fill-opacity=".78"/>
+<rect x="-36.9" y="-.5" width=".55" height="1" fill="url(#ld-steel)"/>
+<path d="M-36.9 -.46 L-37.9 -.55 Q-38.5 -.55 -38.5 -.2 L-37.7 0 L-38.5 .2 Q-38.5 .55 -37.9 .55 L-36.9 .46 Z" fill="url(#ld-nock)" fill-opacity=".93"/>
+<path d="M-1.9 -.5 L-.8 -.5 L-.15 -.36 L-.15 .36 L-.8 .5 L-1.9 .5 Z" fill="url(#ld-steel)"/></g></g></svg></div>
+    <div class="ld-wm"><h1 class="ld-name"><span>APL</span><span>Analytics</span></h1><p class="ld-tag">The only stats platform for the Archery Premier League</p></div>
+    <div class="ld-end" id="ld-end"><ol class="ld-slots" aria-hidden="true"><li></li><li></li><li></li><li></li></ol><p class="ld-step" id="ld-step">Opening the scorebook</p></div>
+  </div>
+</div>
+<script>
+/* the loader: steps fill while the season loads; main.js calls APL_LOADER.done(stats) or .fail(message) */
+(function () {
+  var root = document.documentElement, el = document.getElementById('ldr'), step = document.getElementById('ld-step');
+  var slots = el.querySelectorAll('.ld-slots li'), calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STEPS = ['Opening the scorebook', 'Reading every match', 'Counting the arrows', 'Ranking the archers'];
+  var t0 = Date.now(), MIN = calm ? 300 : 2300, at = 0, timer, finished = false;
+  root.classList.add('ld-on');
+  function show(i) { at = i; for (var k = 0; k < slots.length; k++) slots[k].className = k < i ? 'on' : k === i ? 'go' : ''; if (STEPS[i]) step.textContent = STEPS[i]; }
+  show(0);
+  // walk through the first three steps while waiting; the last one only finishes when the data is in
+  timer = setInterval(function () { if (at < 2) show(at + 1); }, 700);
+  function count(node, n, ms) { var s = Date.now(); (function f() { var p = Math.min(1, (Date.now() - s) / ms); node.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))).toLocaleString('en-IN'); if (p < 1) requestAnimationFrame(f); })(); }
+  function leave() { root.classList.add('ld-reveal'); el.classList.add('out'); root.classList.remove('ld-on'); setTimeout(function () { el.remove(); root.classList.remove('ld-reveal'); }, 1100); }
+  window.APL_LOADER = {
+    done: function (st) { if (finished) return; finished = true;
+      setTimeout(function () { clearInterval(timer); show(3);
+        setTimeout(function () { show(4);
+          if (st && st.arrows) { step.innerHTML = '<b class="ld-count">0</b> arrows · <b class="ld-count">0</b> matches';
+            var c = step.querySelectorAll('.ld-count'); count(c[0], st.arrows, calm ? 1 : 700); count(c[1], st.matches || 0, calm ? 1 : 700); }
+          setTimeout(leave, calm ? 200 : 1000); }, calm ? 0 : 350); }, Math.max(0, MIN - (Date.now() - t0))); },
+    fail: function (msg, retry) { clearInterval(timer);
+      var end = document.getElementById('ld-end'); end.style.opacity = 1;
+      end.innerHTML = '<div class="ld-err"><p></p><button type="button">Try again</button></div>';
+      end.querySelector('p').textContent = msg;
+      end.querySelector('button').onclick = function () { end.innerHTML = '<ol class="ld-slots" aria-hidden="true"><li></li><li></li><li></li><li></li></ol><p class="ld-step" id="ld-step"></p>';
+        slots = end.querySelectorAll('.ld-slots li'); step = document.getElementById('ld-step'); finished = false; t0 = Date.now() - MIN; show(0);
+        timer = setInterval(function () { if (at < 2) show(at + 1); }, 500); retry && retry(); }; }
+  };
+})();
+</script>
+<div id="root"></div><script type="module" src="/js/main.js"></script></body>
 </html>
