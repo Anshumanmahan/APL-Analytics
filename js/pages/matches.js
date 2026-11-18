@@ -7,6 +7,7 @@ import { Lines } from '../lib/charts.js';
 import { fmtTs } from '../lib/rules.js';
 import { Arch, Table } from './common.js';
 import { context } from '../lib/insights.js';
+import { MatchRotation } from './rotation.js';
 import { loadWeather, wxAt, wxStatus, wxModel, startOf, compass, sky, windWord, ms, VENUE, TIMES_SRC, WX_SRC } from '../lib/weather.js';
 
 /* the arrow points the way the wind blows (it comes FROM the given direction) */
@@ -59,6 +60,8 @@ export function MatchPage({ k }) {
       <div class="tbl"><table><thead><tr><th>Set</th><th class="n">${m.teams.A}</th><th class="n">${m.teams.B}</th><th class="n">Points</th><th class="n">10s ${m.teams.A}</th><th class="n">10s ${m.teams.B}</th></tr></thead>
       <tbody>${m.sets.map(st => { const tens = t => m.arrows.filter(a => a.ph === 'S' && a.set === st.n && a.t === t && a.s === 10).length;
         return html`<tr><td>${st.n}${!st.full ? html` <small class="warn">incomplete</small>` : ''}</td><td class=${cls('n', st.tot.A > st.tot.B && 'w')}>${st.tot.A}</td><td class=${cls('n', st.tot.B > st.tot.A && 'w')}>${st.tot.B}</td><td class="n">${st.pts.A}–${st.pts.B}</td><td class="n">${tens('A')}</td><td class="n">${tens('B')}</td></tr>`; })}</tbody></table></div></section>
+
+    <${MatchRotation} m=${m} />
 
     ${m.sets.map(st => { const l = t => m.arrows.filter(a => a.ph === 'S' && a.set === st.n && a.t === t);
       // set race: running difference after each pair of arrows

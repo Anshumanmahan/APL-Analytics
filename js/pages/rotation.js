@@ -14,10 +14,10 @@ const CAT_INK = { RM: '#fff', RW: '#04223a', CM: '#fff', CW: '#2b2000' };
 const SHORT = { RM: 'Recurve men', RW: 'Recurve women', CM: 'Compound men', CW: 'Compound women' };
 
 /* every recorded set of a team: the category and archer of each of its 8 arrows, in shooting order */
-export function rotation(S, code) {
+export function rotation(S, code, only) {
   const sets = [];
   S.matches.forEach(m => {
-    if (m.src !== 'recorded') return; const k = m.teams.A === code ? 'A' : m.teams.B === code ? 'B' : null; if (!k) return;
+    if (m.src !== 'recorded' || (only && m !== only)) return; const k = m.teams.A === code ? 'A' : m.teams.B === code ? 'B' : null; if (!k) return;
     for (let n = 1; n <= 4; n++) {
       const l = m.arrows.filter(a => a.ph === 'S' && a.set === n && a.t === k).slice(0, 8);
       if (l.length < 8 || l.some(a => !a.a || !S.A(a.a).cat)) continue;
@@ -49,7 +49,7 @@ function slice(r0, r1, i, gap = 0.035) {
   return `M${x0.toFixed(2)} ${y0.toFixed(2)}A${r1} ${r1} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}L${x2.toFixed(2)} ${y2.toFixed(2)}A${r0} ${r0} 0 0 0 ${x3.toFixed(2)} ${y3.toFixed(2)}Z`;
 }
 
-export function Wheel({ R, code, size = 200 }) {
+export function Wheel({ R, code, size = 200, label = 'same order' }) {
   const rings = R.orders.slice(0, 3); const pct = R.n ? Math.round((100 * R.same) / R.n) : 0;
   // outer ring thick; the others thinner, inside it
   const bands = [[19.5, 29], [15.2, 18.6], [11.8, 14.4]];
@@ -61,7 +61,7 @@ export function Wheel({ R, code, size = 200 }) {
     ${[0, 1, 2, 3, 4, 5, 6, 7].map(i => { const [x, y] = polar(30.6, ((i + 0.5) / 8) * 2 * Math.PI); return html`<text class="rw-no" x=${x.toFixed(2)} y=${(y + 0.8).toFixed(2)}>${i + 1}</text>`; })}
     <circle cx="32" cy="32" r="10.6" class="rw-hub" />
     <text class="rw-pct" x="32" y="33.2">${R.n ? pct + '%' : '–'}</text>
-    <text class="rw-pcl" x="32" y="37.4">same order</text>
+    <text class="rw-pcl" x="32" y="37.4">${label}</text>
   </svg>`;
 }
 
@@ -117,4 +117,26 @@ export function Rotations({ S }) {
     </div>
     <div class=${cls('rw-grid', pick && 'one')}>${shown.map(x => html`<${RotationCard} key=${x.t} code=${x.t} S=${S} wide=${!!pick} />`)}</div>
   </div>`;
+}
+
+/* match page: both teams' order in every set, side by side, against each team's usual season order */
+export function MatchRotation({ m, S = app.S }) {
+  const side = ['A', 'B'].map(k => { const code = m.teams[k]; return { k, code, R: rotation(S, code, m), season: rotation(S, code) }; });
+  if (!side.some(x => x.R.n)) return '';
+  const sets = [...new Set(side.flatMap(x => x.R.sets.map(s => s.n)))].sort((a, b) => a - b);
+  const usual = x => (x.season.sig ? x.season.sig.join(' ') : '');
+  return html`<section class="panel mrot"><h2>Rotation, set by set</h2>
+    <p class="muted">The order each team sent its archers to the line across the 8 arrows. A glowing set broke from that team's usual season order.</p>
+    <${CatKey} />
+    <div class="mrot-top">${side.map(x => html`<div class="mrot-team" style=${`--tc:${tc(x.code)}`}>
+      <a href=${'#/team/' + x.code}><${Crest} code=${x.code} size=${34} /></a>
+      ${x.R.n ? html`<${Wheel} R=${x.R} code=${x.code} size=${120} label="this match" />` : ''}
+      <div><b>${S.T(x.code).name}</b><small>${!x.R.n ? 'Not recorded' : x.R.orders.length === 1 ? 'Same order in every set' : `${x.R.orders.length} different orders`}${x.R.n && x.season.sig && x.R.sig.join(' ') !== usual(x) ? ' · not their usual' : ''}</small></div></div>`)}</div>
+    <div class="mrot-sets">${sets.map(n => html`<div class="mrot-set"><span class="mrot-n">Set ${n}</span>
+      ${side.map(x => { const st = x.R.sets.find(s => s.n === n); if (!st) return html`<div class="mrot-row empty-row" style=${`--tc:${tc(x.code)}`}><em>${x.code}</em><span class="muted small">not recorded</span></div>`;
+        const off = usual(x) && st.cats.join(' ') !== usual(x);
+        return html`<div class=${cls('mrot-row', off && 'off')} style=${`--tc:${tc(x.code)}`}><em>${x.code}</em>
+          <ol>${st.cats.map((c, i) => html`<li style=${`--c:${CAT_COL[c]};--ink:${CAT_INK[c]};animation-delay:${(i * 0.04).toFixed(2)}s`} title=${`Arrow ${i + 1}: ${S.A(st.ids[i]).name} (${CATS[c]})`}><b>${c}</b><small>${S.A(st.ids[i]).name.split(' ')[0]}</small></li>`)}</ol>
+          ${off ? html`<i class="mrot-tag">changed</i>` : ''}</div>`; })}</div>`)}</div>
+  </section>`;
 }
