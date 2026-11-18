@@ -54,12 +54,28 @@ export const PHOTO = {
   'ca-casey-kaufhold': WAP + '20955',
   'cc-marcus-d-almeida': WAP + '13787',
   'cc-alejandra-usquiano': WAP + '6788',
+  'py-juyel-sarkar': WAP + '45029',
+  'cc-rajat-chauhan': WAP + '12262',
+  'mm-simranjeet-kaur': WAP + '17287',
+  'py-thirumuru-ganesh-mani-ratnam': WAP + '48824',
+  'kk-ridhi': WAP + '23185',
+  'py-kirti-sharma': WAP + '53250',
+  'rr-sangeeta': WAP + '21148',
+  'py-raj-kaur': WAP + '30248',
 };
 /* World Archery athlete pages, where confirmed */
 export const WA = {
   'cc-marcus-d-almeida': 'https://www.worldarchery.sport/athlete/13787/marcus-dalmeida',
   'ca-casey-kaufhold': 'https://worldarchery.org/athlete/20955',
-  'cc-alejandra-usquiano': 'https://worldarchery.org/athlete/6788'
+  'cc-alejandra-usquiano': 'https://worldarchery.org/athlete/6788',
+  'py-juyel-sarkar': 'https://worldarchery.org/athlete/45029',
+  'cc-rajat-chauhan': 'https://worldarchery.org/athlete/12262',
+  'mm-simranjeet-kaur': 'https://worldarchery.org/athlete/17287',
+  'py-thirumuru-ganesh-mani-ratnam': 'https://worldarchery.org/athlete/48824',
+  'kk-ridhi': 'https://worldarchery.org/athlete/23185',
+  'py-kirti-sharma': 'https://worldarchery.org/athlete/53250',
+  'rr-sangeeta': 'https://worldarchery.org/athlete/21148',
+  'py-raj-kaur': 'https://worldarchery.org/athlete/30248'
 };
 
 const initials = n => String(n || '').split(/[\s'-]+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
