@@ -649,3 +649,25 @@ a.tm:hover { text-decoration: none; } a.tm:hover .tm-n { text-decoration: underl
 .ag-cat::before { content: ''; width: 6px; height: 6px; border-radius: 2px; background: var(--c); }
 .ag-t { display: grid; gap: 2px; align-content: start; }
 .ag-new { font: 500 9px var(--mono); color: var(--goldtx); letter-spacing: .03em; white-space: nowrap; }
+
+/* match page: set winner and the two-sided race chart */
+.setp h2 { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.set-win { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-size: 12px; font-weight: 600; padding: 3px 10px 3px 4px; border-radius: 999px;
+  color: var(--tx); background: color-mix(in srgb, var(--tc) 18%, transparent); border: 1px solid color-mix(in srgb, var(--tc) 55%, transparent); }
+.set-win.tie { padding-left: 10px; color: var(--mut); background: var(--raise); border-color: var(--line); }
+.ag-row { border-radius: 10px; padding: 4px 4px 4px 0; border: 1px solid transparent; }
+.ag-row.won { background: linear-gradient(90deg, color-mix(in srgb, var(--tc) 14%, transparent), transparent 70%); border-color: color-mix(in srgb, var(--tc) 30%, transparent); }
+.ag-tot { font: 600 11px var(--mono); color: var(--mut); }
+.ag-row.won .ag-tot { color: var(--tx); }
+.race2 { margin-top: 10px; max-width: 560px; }
+.race2 svg { display: block; width: 100%; height: auto; overflow: visible; }
+.rc-band { opacity: .05; }
+.rc-area { opacity: .22; }
+.rc-zero { stroke: var(--mut); stroke-opacity: .5; stroke-dasharray: 3 3; }
+.rc-line { fill: none; stroke-width: 2.4; stroke-linejoin: round; }
+.rc-dot { stroke: var(--solid); stroke-width: 1.5; }
+.rc-x { font: 500 10px var(--mono); fill: var(--mut); text-anchor: middle; }
+.rc-y { font: 500 10px var(--mono); fill: var(--mut); text-anchor: end; }
+.rc-lab { font: 700 10.5px var(--mono); letter-spacing: .04em; filter: brightness(1.15); }
+.rc-end { font: 700 11px var(--f); fill: var(--tx); text-anchor: end; }
+.rc-cap { margin: 2px 0 0; font-size: 11px; color: var(--dim); }
