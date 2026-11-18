@@ -16,6 +16,7 @@ export const LOGO = {
 export const LEAGUE_LOGO = BASE + '/__l5e/assets-v1/0adcdd55-d188-40a7-8b5d-875d78af6d64/apl-logo.svg';
 /* player photos from the team squad pages on archerypremierleague.co.in (32 of 48 have one there) */
 const P = BASE + '/api/public/media/players/';
+const WAP = 'https://extranet.worldarchery.sport/ProfilePictures/?Id=';
 export const PHOTO = {
   'ca-atanu-das': P + '4ba4842f-778e-4845-9df7-e12f405889c1.png',
   'ca-yashdeep-bhoge': P + 'e877c9fb-6440-49d0-b269-2cf11686814f.jpeg',
@@ -49,10 +50,16 @@ export const PHOTO = {
   'rr-kushal-dalal': P + 'f66b7316-fa8b-4ed5-ac65-dfb4ad0141b6.jpeg',
   'rr-ella-gibson': P + 'cbdaf8d2-268a-48a7-982e-8f9fcbc08e04.png',
   'rr-swati-dudhwal': P + 'cca5d94d-abf4-4bcc-9cb6-abe5e77decf3.png',
+  // not on the APL squad pages: profile pictures from World Archery
+  'ca-casey-kaufhold': WAP + '20955',
+  'cc-marcus-d-almeida': WAP + '13787',
+  'cc-alejandra-usquiano': WAP + '6788',
 };
 /* World Archery athlete pages, where confirmed */
 export const WA = {
-  'cc-marcus-d-almeida': 'https://www.worldarchery.sport/athlete/13787/marcus-dalmeida'
+  'cc-marcus-d-almeida': 'https://www.worldarchery.sport/athlete/13787/marcus-dalmeida',
+  'ca-casey-kaufhold': 'https://worldarchery.org/athlete/20955',
+  'cc-alejandra-usquiano': 'https://worldarchery.org/athlete/6788'
 };
 
 const initials = n => String(n || '').split(/[\s'-]+/).filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
