@@ -510,3 +510,7 @@ a.tm:hover { text-decoration: none; } a.tm:hover .tm-n { text-decoration: underl
 .pk-s { font-size: 12px; color: var(--mut); padding-left: 10px; white-space: nowrap; }
 .pk-s b { font-family: var(--mono); font-size: 13px; color: var(--tx); font-weight: 600; }
 .ldr .tm, .big .tm { min-width: 0; max-width: 100%; }
+.hteam .tchip { font-size: 11px; padding: 4px 8px 3px; margin: 0; }
+.hteams .ph { flex-wrap: wrap; } .hteams-n { font-size: 12.5px; color: var(--mut); margin-right: auto; }
+.hteam .tchip { color: color-mix(in srgb, var(--tc) 45%, var(--tx)); background: color-mix(in srgb, var(--tc) 26%, transparent); border-color: color-mix(in srgb, var(--tc) 55%, transparent); }
+@media (max-width: 520px) { .hteams-n { order: 3; flex-basis: 100%; } }

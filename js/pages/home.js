@@ -42,9 +42,9 @@ export function Home() {
 
     ${champ ? html`<a class="champ-strip" href=${'#/team/' + champ.t} style=${`--tc:${tc(champ.t)}`}><${Crest} code=${champ.t} size=${46} /><span><small>Season 2 champions</small><b>${S.T(champ.t).name}</b></span><em>🏆</em></a>` : ''}
 
-    <section class="hteams"><div class="ph"><h2>APL Teams</h2><a class="more" href="#/teams">All teams →</a></div>
+    <section class="hteams"><div class="ph"><h2>APL Teams</h2><span class="hteams-n">The short codes are used across the site</span><a class="more" href="#/teams">All teams →</a></div>
       <div class="hteam-grid">${TEAMS.slice().sort((a, b) => S.T(a).name.localeCompare(S.T(b).name)).map(code => html`<a class="hteam" href=${'#/team/' + code} style=${`--tc:${tc(code)}`}>
-        <${Crest} code=${code} size=${72} /><b>${S.T(code).name}</b></a>`)}</div>
+        <${Crest} code=${code} size=${72} /><b>${S.T(code).name}</b><em class="tchip">${code}</em></a>`)}</div>
     </section>
 
     <div class="grid2 home-g">
