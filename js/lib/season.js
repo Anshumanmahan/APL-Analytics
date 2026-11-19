@@ -35,7 +35,7 @@ const OFFICIAL = {
   '4-1': ['CA', 'KK', 'CA', [6, 0], 0, 'wa1'], '4-2': ['CC', 'PY', 'PY', [2, 6], 0, 'tv'], '4-3': ['MM', 'RR', 'MM', [6, 2], 0, 'tv'],
   '5-1': ['CA', 'MM', 'MM', [4, 4], 1, 'wa1'], '5-2': ['CC', 'RR', 'RR', [1, 5], 0, 'wa1'], '5-3': ['PY', 'KK', 'KK', [2, 6], 0, 'wa1'],
   '6-1': ['CA', 'RR', 'RR', [0, 6], 0, 'tv'], '6-2': ['PY', 'MM', 'MM', [2, 6], 0, 'tv'], '6-3': ['CC', 'KK', 'KK', [0, 6], 0, 'tv'],
-  '7-1': ['CA', 'PY', 'PY', [0, 6], 0, 'tv'], '7-2': ['KK', 'RR', 'KK', [4, 4], 1, 'table'], '7-3': ['CC', 'MM', 'MM', null, 0, 'table'],
+  '7-1': ['CA', 'PY', 'PY', [0, 6], 0, 'tv'], '7-2': ['KK', 'RR', 'KK', [4, 4], 1, 'table'], '7-3': ['CC', 'MM', 'MM', [0, 6], 0, 'book'],
   '8-1': ['PY', 'CC', 'CC', [4, 4], 1, 'dd'], '8-2': ['RR', 'MM', 'RR', [6, 2], 0, 'dd'], '8-3': ['KK', 'CA', 'CA', [0, 6], 0, 'dd'],
   '9-1': ['CC', 'RR', 'CC', [5, 3], 0, 'tt'], '9-2': ['KK', 'PY', 'KK', [6, 2], 0, 'mk'], '9-3': ['CA', 'MM', 'MM', [0, 6], 0, 'mk'],
   '10-1': ['KK', 'MM', 'KK', [6, 0], 0, 'wa2'], '10-2': ['CC', 'CA', 'CA', [4, 4], 1, 'wa2'], '10-3': ['RR', 'PY', 'PY', [0, 6], 0, 'wa2'], '10-4': ['PY', 'CA', 'PY', [5, 1], 0, 'wa2'],
@@ -123,7 +123,12 @@ export function buildSeason(rows) {
     const missing = sets.reduce((x, st) => x + Math.max(0, 8 - st.cnt.A) + Math.max(0, 8 - st.cnt.B), 0);
     if (src === 'broadcast' && missing) notes.push(`The scoreboard read missed ${missing} arrow${missing > 1 ? 's' : ''}, so some set totals here may be short.`);
     if (src === 'broadcast' && arrows.some(a => a.bad)) notes.push('One set was read from a recap board, so its clock times are left out.');
-    if (off[5] === 'table') notes.push('This result comes from the official final table: the broadcast read could not tell who won.');
+    // no official set score (e.g. a result taken from the final table): add up the set points of a fully recorded match
+    if (!sp && src === 'recorded' && sets.length >= 3 && sets.every(st => st.full)) {
+      sp = sets.reduce((x, st) => ({ A: x.A + st.pts.A, B: x.B + st.pts.B }), { A: 0, B: 0 });
+      if (off[2] && sp[teams.A === off[2] ? 'A' : 'B'] <= sp[teams.A === off[2] ? 'B' : 'A']) sp = null;
+    }
+    if (off[5] === 'table' && src !== 'recorded') notes.push('This result comes from the official final table: the broadcast read could not tell who won.');
     const so = arrows.filter(a => a.ph === 'SO' || a.ph === 'SD');
     matches.push({
       key, d, s, no: d <= 10 ? 3 * (d - 1) + s : 31 + s, stage: STAGE(d, s), date: dateOf(d), teams, win: off[2], sp, so: !!off[4], resSrc: off[5],
