@@ -686,3 +686,45 @@ a.tm:hover { text-decoration: none; } a.tm:hover .tm-n { text-decoration: underl
 .rc-lab { font: 700 10.5px var(--mono); letter-spacing: .04em; filter: brightness(1.15); }
 .rc-end { font: 700 11px var(--f); fill: var(--tx); text-anchor: end; }
 .rc-cap { margin: 2px 0 0; font-size: 11px; color: var(--dim); }
+
+/* score vs time quadrant (js/pages/quadrant.js) */
+.qd-wrap { display: grid; gap: 12px; }
+.qd-frame { position: relative; padding: 0 0 34px 40px; display: grid; gap: 6px; }
+.qd-ylab { font: 500 10.5px var(--mono); color: var(--mut); letter-spacing: .04em; }
+.qd-xlab { position: absolute; left: 40px; right: 0; bottom: 0; text-align: center; font: 500 10.5px var(--mono); color: var(--mut); letter-spacing: .04em; }
+.qd { position: relative; height: clamp(340px, 58vw, 520px); border: 1px solid var(--line); border-radius: var(--r2); }
+.qd-q { position: absolute; left: 0; top: 0; right: 0; bottom: 0; pointer-events: none; }
+.qd-q.tl { right: auto; bottom: auto; background: radial-gradient(120% 120% at 0 0, color-mix(in srgb, var(--ok) 13%, transparent), transparent 70%); border-top-left-radius: var(--r2); }
+.qd-q.tr { right: 0; bottom: auto; background: radial-gradient(120% 120% at 100% 0, color-mix(in srgb, var(--cyan) 11%, transparent), transparent 70%); }
+.qd-q.bl { bottom: 0; right: auto; background: radial-gradient(120% 120% at 0 100%, color-mix(in srgb, var(--chk) 11%, transparent), transparent 70%); }
+.qd-q.br { right: 0; bottom: 0; background: radial-gradient(120% 120% at 100% 100%, color-mix(in srgb, var(--red) 9%, transparent), transparent 70%); }
+.qd-gy, .qd-gx, .qd-mx, .qd-my { position: absolute; pointer-events: none; font-style: normal; }
+.qd-gy { left: 0; right: 0; height: 0; border-top: 1px dashed var(--line); }
+.qd-gy b { position: absolute; right: calc(100% + 6px); top: -7px; font: 500 10px var(--mono); color: var(--mut); }
+.qd-gx { top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--line); }
+.qd-gx b { position: absolute; top: calc(100% + 4px); left: 0; transform: translateX(-50%); font: 500 10px var(--mono); color: var(--mut); white-space: nowrap; }
+.qd-mx { top: 0; bottom: 0; width: 0; border-left: 1.5px solid color-mix(in srgb, var(--goldtx) 70%, transparent); }
+.qd-my { left: 0; right: 0; height: 0; border-top: 1.5px solid color-mix(in srgb, var(--goldtx) 70%, transparent); }
+.qd-mx b, .qd-my b { position: absolute; font: 600 9.5px var(--mono); color: var(--goldtx); white-space: nowrap; background: var(--solid); padding: 1px 5px; border-radius: 4px; }
+.qd-mx b { bottom: 4px; left: 4px; } .qd-my b { right: 4px; top: -18px; }
+.qd-lab { position: absolute; display: grid; gap: 1px; pointer-events: none; max-width: 44%; z-index: 3; padding: 3px 6px; border-radius: 6px; background: color-mix(in srgb, var(--solid) 70%, transparent); }
+.qd-lab b { font-size: 13px; font-weight: 700; } .qd-lab small { font-size: 11px; color: var(--mut); }
+.qd-lab.tl { left: 10px; top: 8px; } .qd-lab.tl b { color: var(--ok); }
+.qd-lab.tr { right: 10px; top: 8px; text-align: right; } .qd-lab.tr b { color: var(--cyan); }
+.qd-lab.bl { left: 10px; bottom: 8px; } .qd-lab.bl b { color: var(--chk); }
+.qd-lab.br { right: 10px; bottom: 8px; text-align: right; } .qd-lab.br b { color: var(--red); }
+.qd-dot { position: absolute; transform: translate(-50%, -50%); padding: 0; border: 0; background: none; cursor: pointer; border-radius: 50%; z-index: 2; transition: transform .2s, opacity .2s, filter .2s; }
+.qd-dot .avatar { box-shadow: 0 0 0 2px var(--tc), 0 3px 10px rgba(0,0,0,.35); }
+.qd-dot:hover, .qd-dot.on { transform: translate(-50%, -50%) scale(1.35); z-index: 4; }
+.qd-dot.on .avatar { box-shadow: 0 0 0 2px var(--tc), 0 0 0 5px color-mix(in srgb, var(--tc) 35%, transparent), 0 4px 14px rgba(0,0,0,.4); }
+.qd-dot.dim { opacity: .18; filter: grayscale(1); z-index: 1; }
+.qd-tip { position: absolute; z-index: 5; display: grid; gap: 2px; min-width: 160px; padding: 10px 12px; border-radius: 12px; color: var(--tx); text-decoration: none;
+  background: var(--solid); border: 1px solid color-mix(in srgb, var(--tc) 55%, var(--line)); box-shadow: 0 10px 30px rgba(0,0,0,.35); font-size: 12px; transform: translateY(-50%); }
+.qd-tip b { font-size: 14px; } .qd-tip small { color: var(--mut); margin-bottom: 4px; }
+.qd-tip em { font-style: normal; font-family: var(--mono); font-weight: 600; color: var(--goldtx); }
+.qd-tip u { text-decoration: none; color: var(--mut); font-size: 11px; margin-top: 4px; }
+@media (max-width: 560px) {
+  .qd-dot .avatar { width: 24px !important; height: 24px !important; }
+  .qd-lab b { font-size: 11.5px; } .qd-lab small { display: none; }
+  .qd-gx.odd b { display: none; } .qd-xlab { font-size: 9.5px; }
+}

@@ -10,6 +10,7 @@ import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
 import { WindArrow } from './matches.js';
 import { Rotations } from './rotation.js';
+import { Quadrant } from './quadrant.js';
 
 /* average wind over a day's match start times */
 function dayWind(ms) {
@@ -113,6 +114,9 @@ function Time({ S, ctx, rctx, full, bow }) {
   const tt = I.teamTime(S, ctx);
   const l2 = I.lastTwo(ctx);
   return html`
+    <${Panel} title=${'Score vs time: ' + bow.toLowerCase() + ' archers'} sub="Each photo is an archer: how long they take per arrow against what they score. Quick and accurate archers sit top left.">
+      <${Quadrant} ctx=${rctx} bow=${bow} />
+    </${Panel}>
     <div class="grid2">
       <${Panel} title="Time taken vs score" sub="Every recorded arrow with a clean clock reading, by seconds taken.">
         <${Columns} data=${tv.map(r => ({ x: r.label, y: r.avg, n: r.n }))} yMin=${8} yMax=${10} fmt=${f2} xLabel="Seconds taken" tip=${d => html`<b>${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />
