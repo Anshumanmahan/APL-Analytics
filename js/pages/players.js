@@ -8,7 +8,7 @@ import { Columns, Face, RingBar, RingKey } from '../lib/charts.js';
 import { Panel, Table, Seg, CrestPick } from './common.js';
 import { context, TBUCKETS, bucketOf, mean, CRUNCH, CLOSE9, radius, bowOf } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
-import { awards, AwardMark, AwardRibbon } from '../lib/aotd.js';
+import { awards, awardDays, AwardMark, AwardRibbon, Star } from '../lib/aotd.js';
 
 /* Filters without dropdowns: a bow switch, a division switch and a strip of team crests (tap to pick, tap again to drop).
    Recurve and compound stay in separate sections whatever is picked. */
@@ -35,6 +35,7 @@ export function Players() {
         return html`<a class="pcard" href=${'#/player/' + a.id} style=${`--tc:${tc(a.team)}`}><${Avatar} ar=${a} size=${52} /><span class="pc-t"><b class="pc-n" title=${a.name}>${a.name}<${AwardMark} n=${aw[a.id]} /></b>
           <span class="pc-m"><i></i><span class="pc-tm">${S.T(a.team).name || a.team}</span>${a.country ? html`<em>${a.country}</em>` : ''}</span>
           <span class="pc-s">${s ? html`<b>${f2(s.avg)}</b> avg · ${s.n} arrows` : 'No recorded arrows yet'}</span></span></a>`; })}</div>`; })}
+    ${Object.keys(aw).length ? html`<p class="aw-key"><span class="aw-mark"><${Star} />2</span> means Archer of the Day, and the number is how many times. ${awardDays(S)} league days have been awarded so far. Open an archer to see which days.</p>` : ''}
   </div>`;
 }
 
