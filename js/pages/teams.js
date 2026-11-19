@@ -6,6 +6,7 @@ import { Crest, Avatar } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
 import { Arch, Table, Panel } from './common.js';
 import { RotationCard, CatKey } from './rotation.js';
+import { SubsPanel } from './subs.js';
 import { context, halves, shootingOrder, mean, CRUNCH, BOWS, ofBow, bowOf } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 import { awards, teamAwards, awardDays, AwardMark, DayChips, Star } from '../lib/aotd.js';
@@ -87,6 +88,10 @@ export function TeamPage({ code }) {
 
     <${Panel} title="Rotation across the 8 arrows" sub="The order this team sends its four archers to the line in a set. Recorded matches only.">
       <${CatKey} /><${RotationCard} code=${code} wide />
+    </${Panel}>
+
+    <${Panel} title="Substitutions" sub="How often this team changes its playing 4: from one match to the next, and between sets of a match. Each category has two archers in the squad. Recorded matches only.">
+      <${SubsPanel} code=${code} />
     </${Panel}>
 
     <div class="grid2">
