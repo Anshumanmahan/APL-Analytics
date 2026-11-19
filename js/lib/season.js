@@ -68,7 +68,9 @@ function times(arrows) {
 }
 
 function fromRecorded(r) {
-  return (r.arrows || []).slice().sort(byAt).map(a => ({ ph: a.ph, set: a.set, t: a.t, a: a.a || null, s: a.ph === 'S' ? (a.to ? 0 : a.s) : null, x: !!a.x, h: a.h, to: !!a.to, p: a.p || null, cl: a.cl, star: !!a.star, vt: a.vt }));
+  // a set arrow scored M (0) is an arrow the archer ran out of time to shoot: it counts as 0 in the set total, but as a time-out
+  // (not shot) everywhere else, so it doesn't drag arrow averages down
+  return (r.arrows || []).slice().sort(byAt).map(a => ({ ph: a.ph, set: a.set, t: a.t, a: a.a || null, s: a.ph === 'S' ? (a.to ? 0 : a.s) : null, x: !!a.x, h: a.h, to: !!a.to || (a.ph === 'S' && a.s === 0), p: a.p || null, cl: a.cl, star: !!a.star, vt: a.vt }));
 }
 function fromImport(imp) {
   const M = expandImport(imp.match); const out = [];
@@ -76,7 +78,7 @@ function fromImport(imp) {
     // a run of arrows sharing one video time is a recap board: scores are fine, clock readings are not
     const seen = {}; st.arrows.forEach(x => { seen[x.t] = (seen[x.t] || 0) + 1; });
     // a 0 the reader wasn't sure of is noise from a changing board, not a miss
-    st.arrows.filter(x => !(x.s === 0 && x.unsure)).forEach(x => out.push({ ph: 'S', set: i + 1, t: x.team, a: null, s: x.s, x: !!x.x, h: null, to: false, p: null, cl: x.cl, star: !!x.star, vt: x.t, bad: seen[x.t] >= 3 || !!x.clkOdd, unsure: !!x.unsure }));
+    st.arrows.filter(x => !(x.s === 0 && x.unsure)).forEach(x => out.push({ ph: 'S', set: i + 1, t: x.team, a: null, s: x.s, x: !!x.x, h: null, to: x.s === 0, p: null, cl: x.cl, star: !!x.star, vt: x.t, bad: seen[x.t] >= 3 || !!x.clkOdd, unsure: !!x.unsure }));
   });
   const n = { A: 0, B: 0 };
   (M.soArrows || []).forEach(x => { const k = n[x.team]++; out.push({ ph: k < 4 ? 'SO' : 'SD', set: k < 4 ? 0 : k - 3, t: x.team, a: null, s: null, h: !!x.h, vt: x.t }); });

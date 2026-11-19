@@ -61,12 +61,12 @@ function Leaderboard({ S, rctx, bow }) {
   const [cat, setCat] = useState(''); const [teams, setTeams] = useState([]); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('1');
   const f = it => (!stage || (stage === 'League' ? it.m.stage === 'League' : it.m.stage !== 'League')) && (!set || String(it.a.set) === set) && (!half || (half === 'f' ? it.pos <= 4 : it.pos >= 5));
   const rows = archers(S, f).filter(a => I.bowOf(a.ar.cat) === bow && catOk(a.ar.cat, cat) && (!teams.length || teams.includes(a.ar.team)) && a.n >= +min);
-  const bestOf = b => { const l = archers(S, f).filter(a => I.bowOf(a.ar.cat) === b && a.n >= 16).sort((x, y) => y.avg - x.avg); return l[0]; };
-  const bc = bestOf('Compound'), br = bestOf('Recurve');
+  // the best man and best woman of the chosen bow only (at least 16 arrows, or 8 when nobody has 16)
+  const bestOf = c => { const all = archers(S, f).filter(a => a.ar.cat === c); let l = all.filter(a => a.n >= 16); if (!l.length) l = all.filter(a => a.n >= 8); return l.sort((x, y) => y.avg - x.avg)[0]; };
+  const best = [bow[0] + 'W', bow[0] + 'M'].map(c => ({ c, a: bestOf(c) }));
   return html`
     <div class="grid2">
-      <${Panel} title="Best compounder">${bc ? html`<div class="big"><${Arch} id=${bc.id} /><b>${f2(bc.avg)}</b><small class="muted">${bc.n} arrows · AGI ${bc.agi != null ? bc.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>
-      <${Panel} title="Best recurver">${br ? html`<div class="big"><${Arch} id=${br.id} /><b>${f2(br.avg)}</b><small class="muted">${br.n} arrows · AGI ${br.agi != null ? br.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>
+      ${best.map(({ c, a }) => html`<${Panel} title=${'Best ' + { RM: 'recurve man', RW: 'recurve woman', CM: 'compound man', CW: 'compound woman' }[c]}>${a ? html`<div class="big"><${Arch} id=${a.id} /><b>${f2(a.avg)}</b><small class="muted">${a.n} arrows${a.to ? ` · ${a.to} not shot in time` : ''} · AGI ${a.agi != null ? a.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>`)}
     </div>
     <${Panel} title=${bow + ' leaderboard'} sub="Recorded matches only. Pick filters, then sort by any column. Switch bow at the top.">
       <div class="fbar">
@@ -79,7 +79,7 @@ function Leaderboard({ S, rctx, bow }) {
       </div>
       <${Table} sort="avg" rows=${rows} cols=${[
         ['rank', '#', (r, i) => i + 1], ['name', 'Archer', r => html`<${Arch} id=${r.id} />`, { sort: r => r.ar.name }], ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat, sm: 0 }],
-        ['n', 'Arrows', null, { num: 1, sm: 0 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['x', 'X', null, { num: 1, sm: 0 }],
+        ['n', 'Arrows', null, { num: 1, sm: 0 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['x', 'X', null, { num: 1, sm: 0 }], ['to', html`<abbr title="Arrows not shot before the clock ran out (recorded as M). Left out of the average.">Not shot</abbr>`, r => r.to || '–', { num: 1, sm: 0 }],
         ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1, sm: 0 }], ['agi', html`<abbr title="Arrow Grouping Index">AGI</abbr>`, r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }], ['group', 'Group cm', r => (r.group != null ? r.group.toFixed(1) : '–'), { num: 1, sm: 0 }]]} />
     </${Panel}>`;
 }

@@ -55,7 +55,7 @@ export function PlayerPage({ id }) {
   const nines = ctx.filter(o => o.a.s === 9 && o.a.p); const close = nines.filter(o => radius(o.a.p) <= CLOSE9).length;
   const ms = [...new Set(ctx.map(o => o.m))];
   return html`<div class="page">${header}
-    <${Tiles} items=${[[f2(me.avg), 'Arrow average', `${me.n} arrows · ${me.matches} matches`], [pct(me.tenRate), '10s', `${me.x} X`], [me.agi != null ? me.agi.toFixed(1) : '–', 'Arrow Grouping Index (AGI)', 'higher means a tighter group'], [me.at ? f1(me.at) + ' s' : '–', 'Average time'], [me.soN ? `${me.soHits}/${me.soN}` : '–', 'Shoot-off hits']]} />
+    <${Tiles} items=${[[f2(me.avg), 'Arrow average', `${me.n} arrows · ${me.matches} matches${me.to ? ` · ${me.to} not shot in time (left out)` : ''}`], [pct(me.tenRate), '10s', `${me.x} X`], [me.agi != null ? me.agi.toFixed(1) : '–', 'Arrow Grouping Index (AGI)', 'higher means a tighter group'], [me.at ? f1(me.at) + ' s' : '–', 'Average time'], [me.soN ? `${me.soHits}/${me.soN}` : '–', 'Shoot-off hits']]} />
     <div class="grid2">
       <${Panel} title="Where the arrows landed" sub=${`${me.spotN || 0} spots. Dashed: the 90% group.`}>
         <div class="facewrap"><${Face} spots=${me.spots.map(p => ({ p, color: tc(ar.team) }))} ell=${me.g && me.g.ell ? me.g : null} size=${260} /></div>
