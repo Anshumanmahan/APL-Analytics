@@ -8,6 +8,7 @@ import { fmtTs } from '../lib/rules.js';
 import { Arch, Table } from './common.js';
 import { context } from '../lib/insights.js';
 import { CAT_COL, rotation } from './rotation.js';
+import { SetChance } from './winchance.js';
 import { loadWeather, wxAt, wxStatus, wxModel, startOf, compass, sky, windWord, ms, VENUE, TIMES_SRC, WX_SRC } from '../lib/weather.js';
 
 /* the arrow points the way the wind blows (it comes FROM the given direction) */
@@ -98,7 +99,7 @@ export function MatchPage({ k }) {
           return html`<div class=${cls('ag-row', won === t && 'won')} style=${`--tc:${tc(m.teams[t])}`}><span class="ag-t"><${Team} code=${m.teams[t]} /><small class="ag-tot">${st.tot[t]}${won === t ? ' ✓' : ''}</small>${off ? html`<small class="ag-new" title=${'Usual order: ' + usual[t]}>new order</small>` : ''}</span>${l(t).map(a => { const o = piOf.get(a); const c = a.a && S.A(a.a).cat;
           return html`<span class="ag-c" title=${`${a.a ? S.A(a.a).name : 'Archer not recorded'} · arrow ${pos.get(a)} · ${a.dt != null ? a.dt + ' s' : 'time n/a'}${o ? ' · pressure ' + o.pi : ''}`}>
             <span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small>${c ? html`<small class="ag-cat" style=${`--c:${CAT_COL[c]}`}>${c}</small>` : ''}<small class="muted">${a.dt != null ? Math.round(a.dt) + 's' : ''}</small>${o ? html`<i class="pi" style=${`--p:${o.pi}`} title=${'Pressure ' + o.pi}></i>` : ''}</span>`; })}</div>`; })}</div>
-        ${race.length > 1 && html`<${Race} m=${m} race=${race.map(r => r.y)} />`}
+        <div class="set-charts">${race.length > 1 && html`<${Race} m=${m} race=${race.map(r => r.y)} />`}<${SetChance} m=${m} n=${st.n} /></div>
       </section>`; })}
 
     ${m.soArrows.length ? html`<section class="panel"><h2>Shoot-off</h2><div class="arrowgrid">${['A', 'B'].map(t => html`<div class="ag-row"><span class="ag-t"><${Team} code=${m.teams[t]} /></span>${m.soArrows.filter(a => a.t === t).map(a => html`<span class="ag-c"><span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small></span>`)}</div>`)}</div></section>` : ''}
