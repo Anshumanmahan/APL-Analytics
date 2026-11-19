@@ -8,6 +8,7 @@ import { Columns, Face, RingBar, RingKey } from '../lib/charts.js';
 import { Panel, Table, Seg, CrestPick } from './common.js';
 import { context, TBUCKETS, bucketOf, mean, CRUNCH, CLOSE9, radius, bowOf } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
+import { awards, AwardMark, AwardRibbon } from '../lib/aotd.js';
 
 /* Filters without dropdowns: a bow switch, a division switch and a strip of team crests (tap to pick, tap again to drop).
    Recurve and compound stay in separate sections whatever is picked. */
@@ -19,6 +20,7 @@ export function Players() {
   const all = S.roster.teams.flatMap(t => t.archers.map(a => S.A(a.id)));
   const ok = a => (!bow || (a.cat || '')[0] === bow) && (!div || (a.cat || '')[1] === div) && (!teams.length || teams.includes(a.team)) && (!q || a.name.toLowerCase().includes(q.toLowerCase()));
   const list = all.filter(ok);
+  const aw = {}; awards(S).forEach(w => { aw[w.id] = (aw[w.id] || 0) + 1; });
   const any = q || bow || div || teams.length;
   return html`<div class="page"><h1 class="pt">Players</h1>
     <div class="pfilt">
@@ -30,7 +32,7 @@ export function Players() {
     ${list.length ? '' : html`<p class="empty">No archers match these filters.</p>`}
     ${CAT_ORDER.map(c => { const l = list.filter(a => a.cat === c); if (!l.length) return null;
       return html`<h2 class="hsec">${CATS[c]}</h2><div class="pgrid">${l.map(a => { const s = stats[a.id];
-        return html`<a class="pcard" href=${'#/player/' + a.id} style=${`--tc:${tc(a.team)}`}><${Avatar} ar=${a} size=${52} /><span class="pc-t"><b class="pc-n" title=${a.name}>${a.name}</b>
+        return html`<a class="pcard" href=${'#/player/' + a.id} style=${`--tc:${tc(a.team)}`}><${Avatar} ar=${a} size=${52} /><span class="pc-t"><b class="pc-n" title=${a.name}>${a.name}<${AwardMark} n=${aw[a.id]} /></b>
           <span class="pc-m"><i></i><span class="pc-tm">${S.T(a.team).name || a.team}</span>${a.country ? html`<em>${a.country}</em>` : ''}</span>
           <span class="pc-s">${s ? html`<b>${f2(s.avg)}</b> avg · ${s.n} arrows` : 'No recorded arrows yet'}</span></span></a>`; })}</div>`; })}
   </div>`;
@@ -41,7 +43,7 @@ export function PlayerPage({ id }) {
   const me = archers(S).find(a => a.id === id);
   const ctx = context(S).filter(o => o.a.a === id);
   const header = html`<p class="kicker"><a href="#/players">Players</a> · ${CATS[ar.cat] || ''} · ${bowOf(ar.cat)}</p>
-    <section class="phero2" style=${`--tc:${tc(ar.team)}`}><${Avatar} ar=${ar} size=${96} /><div><h1>${ar.name}</h1><p class="lead"><${Team} code=${ar.team} full /> ${ar.country ? ' · ' + ar.country : ''}</p></div></section>`;
+    <section class="phero2" style=${`--tc:${tc(ar.team)}`}><${Avatar} ar=${ar} size=${96} /><div><h1>${ar.name}</h1><p class="lead"><${Team} code=${ar.team} full /> ${ar.country ? ' · ' + ar.country : ''}</p><${AwardRibbon} S=${S} id=${id} /></div></section>`;
   if (!me) return html`<div class="page">${header}<p class="empty">No recorded arrows for ${ar.name} yet. This page fills in once one of their matches is recorded in the scorebook.</p></div>`;
   const posRows = [1, 2, 3, 4, 5, 6, 7, 8].map(p => { const s = summarize(ctx.filter(o => o.pos === p)); return { x: p, y: s.n ? s.avg : null, n: s.n }; });
   const tRows = TBUCKETS.map(([, , l], i) => { const s = summarize(ctx.filter(o => bucketOf(o.a.dt) === i)); return { x: l, y: s.n ? s.avg : null, n: s.n }; });

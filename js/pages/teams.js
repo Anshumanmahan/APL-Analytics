@@ -8,6 +8,7 @@ import { Arch, Table, Panel } from './common.js';
 import { RotationCard, CatKey } from './rotation.js';
 import { context, halves, shootingOrder, mean, CRUNCH, BOWS, ofBow, bowOf } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
+import { awards, teamAwards, awardDays, AwardMark, DayChips, Star } from '../lib/aotd.js';
 
 const mpos = g => g.reduce((x, v, i) => x + v * i, 0) / Math.max(1, g.reduce((x, v) => x + v, 0));
 
@@ -31,7 +32,7 @@ export function Teams() {
             <span><b>${sd > 0 ? '+' : ''}${sd}</b><small>Sets ±</small></span>
             <span><b>${f1(mean(sets.map(x => x.tot)))}</b><small>Avg set</small></span>
           </div>
-          <div class="tb-form"><small>Form</small><${Form} list=${form.slice(-5)} /></div>
+          <div class="tb-form"><small>Form</small><${Form} list=${form.slice(-5)} />${(n => n ? html`<span class="tb-aw" title="Archer of the Day awards"><${Star} />${n} Archer of the Day</span>` : '')(teamAwards(S, o.t).length)}</div>
         </div>
         <span class="tb-go">View team →</span></a>`; })}</div></div>`;
 }
@@ -55,11 +56,14 @@ export function TeamPage({ code }) {
   const all = summarize(ctx); const sets = teamSets(S, code);
   const used = sets.map(x => x.used).filter(v => v != null);
   const squad = archers(S, it => it.code === code);
-  const sq = t.archers.map(a => Object.assign({ ar: S.A(a.id) }, squad.find(x => x.id === a.id) || { n: 0 }));
+  const awN = {}; awards(S).forEach(w => { awN[w.id] = (awN[w.id] || 0) + 1; });
+  const sq = t.archers.map(a => Object.assign({ ar: S.A(a.id), aw: awN[a.id] || 0 }, squad.find(x => x.id === a.id) || { n: 0 }));
   const ord = shootingOrder(S, code);
   // recurve and compound kept apart
   const bw = BOWS.map(([b]) => { const c = ofBow(ctx, b); const cr = c.filter(o => o.clBefore != null && o.clBefore <= CRUNCH); return { b, s: summarize(c), cr, hv: halves(c, () => code, 1)[0], ex: extremes(squad, b) }; });
   const ms = S.matches.filter(m => sideOf(m, code));
+  const aw = teamAwards(S, code); const awBy = {}; aw.forEach(w => { (awBy[w.id] = awBy[w.id] || []).push(w); });
+  const awRank = (() => { const c = {}; awards(S).forEach(w => { c[w.team] = (c[w.team] || 0) + 1; }); const v = TEAMS.map(t => c[t] || 0); return 1 + v.filter(x => x > (c[code] || 0)).length; })();
   return html`<div class="page">
     <p class="kicker"><a href="#/teams">Teams</a> · ${t.state || ''}</p>
     <section class="thero2" style=${`--tc:${tc(code)}`}><${Crest} code=${code} size=${96} /><div><h1>${t.name}</h1><p class="lead">${fme.tier === 0 ? '🏆 Champions' : fme.stage === 'League stage' ? ordn(fs.indexOf(fme) + 1) + ' overall' : fme.stage} · ${rank}${['st', 'nd', 'rd'][rank - 1] || 'th'} in the league · ${me.W} won, ${me.L} lost · ${me.Pts} points</p><${Form} list=${me.form} /></div></section>
@@ -67,9 +71,16 @@ export function TeamPage({ code }) {
     ${bw.map(x => html`<h3 class="bowh">${x.b}</h3><${Tiles} items=${[[f2(x.s.avg), 'Arrow average', `${x.s.n} recorded arrows`], [pct(x.s.tenRate), '10s'], [x.s.at ? f1(x.s.at) + ' s' : '–', 'Average time per arrow', `${x.s.tn} timed`], [x.cr.length ? f2(mean(x.cr.map(o => o.a.s))) : '–', 'Average in a time crunch', `${x.cr.length} arrows with ≤${CRUNCH} s left`]]} />
       ${x.ex ? html`<div class="expair"><${ExCard} r=${x.ex.best} kind="best" code=${code} /><${ExCard} r=${x.ex.weak} kind="weak" code=${code} /></div><p class="muted small exnote">Strongest and weakest ${x.b.toLowerCase()} archer by arrow average, out of ${x.ex.of} with at least ${x.ex.min} recorded arrows.</p>` : ''}`)}
 
+    <${Panel} title="Archer of the Day" sub=${`Picked after each league day, one archer per category (two when it was shared). ${awardDays(S)} days awarded so far.`}>
+      ${aw.length ? html`<div class="aw-team"><div class="aw-tot"><b><${Star} />${aw.length}</b><span>award${aw.length > 1 ? 's' : ''}</span><small>${awRank === 1 ? "Most in the league" : ordn(awRank) + " most in the league"}</small></div>
+        <div class="aw-list">${Object.entries(awBy).sort((a, b) => b[1].length - a[1].length || a[1][0].d - b[1][0].d).map(([id, l]) => { const ar = S.A(id);
+          return html`<a class="aw-row" href=${'#/player/' + id} style=${`--tc:${tc(code)}`}><${Avatar} ar=${ar} size=${40} /><span class="aw-nm"><b>${ar.name}</b><small>${ar.cat} · ${l.length}×</small></span><${DayChips} list=${l} /></a>`; })}</div></div>`
+        : html`<p class="empty">No ${t.name} archer has been Archer of the Day yet.</p>`}
+    </${Panel}>
+
     <${Panel} title="Squad" sub="Recorded matches only. Average time is the seconds each archer took per arrow (average time by each teammate).">
       <${Table} sort="n" rows=${sq} cols=${[
-        ['name', 'Archer', r => html`<span class="sqn"><${Avatar} ar=${r.ar} size=${28} /><a href=${'#/player/' + r.ar.id}><span class="nm-f">${r.ar.name}</span><span class="nm-s">${r.ar.name.split(' ')[0]}</span></a></span>`, { sort: r => r.ar.name }],
+        ['name', 'Archer', r => html`<span class="sqn"><${Avatar} ar=${r.ar} size=${28} /><a href=${'#/player/' + r.ar.id}><span class="nm-f">${r.ar.name}</span><span class="nm-s">${r.ar.name.split(' ')[0]}</span></a><${AwardMark} n=${r.aw} /></span>`, { sort: r => r.ar.name }],
         ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat }], ['matches', 'Matches', r => r.matches || 0, { num: 1, sm: 0 }], ['n', 'Arrows', r => r.n, { num: 1 }],
         ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1 }], ['agi', html`<abbr title="Arrow Grouping Index">AGI</abbr>`, r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }]]} />
     </${Panel}>
