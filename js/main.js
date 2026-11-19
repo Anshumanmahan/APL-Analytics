@@ -9,6 +9,7 @@ import { Players, PlayerPage } from './pages/players.js';
 import { Matches, MatchPage } from './pages/matches.js';
 import { Analytics } from './pages/analytics.js';
 import { Ideas } from './pages/ideas.js';
+import { DreamTeam } from './pages/dream.js';
 import { Ticker } from './pages/ticker.js';
 import { About, Contact } from './pages/about.js';
 
@@ -28,6 +29,7 @@ function route() {
   if (p === 'analytics') return { tab: 'analytics', el: html`<${Analytics} sec=${h[1] || 'leaderboard'} bow=${h[2] || 'R'} key=${'a' + (h[1] || '') + (h[2] || '')} />` };
   if (p === 'about' || p === 'creator') return { tab: 'about', el: html`<${About} />` };
   if (p === 'contact') return { tab: 'contact', el: html`<${Contact} />` };
+  if (p === 'dream' || p === 'dream-team') return { tab: 'dream', el: html`<${DreamTeam} />` };
   if (p === 'ideas') return { tab: 'ideas', el: html`<${Ideas} />` };
   return { tab: 'home', el: html`<${Home} />` };
 }
@@ -123,7 +125,7 @@ function ThemeBtn() {
   </button>`;
 }
 
-const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['ideas', 'Ideas', '#/ideas']];
+const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['dream', 'Dream team', '#/dream'], ['ideas', 'Ideas', '#/ideas']];
 function App() {
   if (state.status === 'gate') return html`<${Gate} />`;
   if (!app.S) return null; // blank for the moment it takes to check for data; the loader covers the rest
