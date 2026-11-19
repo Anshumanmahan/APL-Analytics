@@ -59,6 +59,6 @@ export function Home() {
       </div>
     </div>
 
-    ${playoffs.length ? html`<section class="panel po-panel"><h2>Playoffs</h2><p class="muted">The top 4 after the league. First and second get two chances to reach the Final.</p><${Bracket} S=${S} /></section>` : ''}
+    ${playoffs.length ? html`<section class="panel po-panel"><h2>Playoffs</h2><p class="muted">The top 4 after the league. First and second get two chances to reach The Final.</p><${Bracket} S=${S} /></section>` : ''}
   </div>`;
 }

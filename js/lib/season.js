@@ -11,7 +11,7 @@ export const TEAMS = ['CA', 'CC', 'KK', 'MM', 'PY', 'RR'];
 export const COLOR = Object.assign({}, UI_COLOR, { KK: '#8a5ce6' });
 export const NDAYS = 11;
 export const slotsOf = d => (d === 10 ? 4 : 3);
-export const STAGE = (d, s) => (d < 10 ? 'League' : d === 10 ? (s === 4 ? 'Eliminator 1' : 'League') : ['Shortcut Decider', 'Eliminator 2', 'Final'][s - 1]);
+export const STAGE = (d, s) => (d < 10 ? 'League' : d === 10 ? (s === 4 ? 'Eliminator 1' : 'League') : ['Shortcut Decider', 'Eliminator 2', 'The Final'][s - 1]);
 export const dateOf = d => new Date(2026, 9, 7 + d);
 export const dayName = d => dateOf(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 export const CLOCK = 120;
@@ -259,7 +259,7 @@ export function finalStandings(S) {
   const po = S.matches.filter(m => m.stage !== 'League');
   const inPO = new Set(po.flatMap(m => [m.teams.A, m.teams.B]));
   const done = m => m.win === m.teams.A || m.win === m.teams.B;
-  const fin = po.find(m => m.stage === 'Final'), e2 = po.find(m => m.stage === 'Eliminator 2'), e1 = po.find(m => m.stage === 'Eliminator 1');
+  const fin = po.find(m => m.stage === 'The Final'), e2 = po.find(m => m.stage === 'Eliminator 2'), e1 = po.find(m => m.stage === 'Eliminator 1');
   const tier = {}, note = {};
   lg.forEach(o => { if (inPO.has(o.t)) { tier[o.t] = 1.5; note[o.t] = 'In the playoffs'; } else { tier[o.t] = 4; note[o.t] = 'League stage'; } });
   const lost = (m, tr, n) => { if (m && done(m)) { const l = opp(m, m.win); tier[l] = tr; note[l] = n; } };
