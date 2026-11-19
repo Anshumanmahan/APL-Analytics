@@ -6,7 +6,7 @@ import { app, cls, f1, f2, tc } from '../lib/ui.js';
 import { Avatar } from '../lib/media.js';
 import { CATS, CAT_ORDER } from '../lib/rules.js';
 import { CLOCK } from '../lib/season.js';
-import { dreamTeam, ranking, RULES, MIN, K, LATE, BUFFER, ORDERS } from '../lib/dream.js';
+import { dreamTeam, ranking, RULES, MIN, K, LATE, BUFFER } from '../lib/dream.js';
 import { CAT_COL } from './rotation.js';
 import { Panel, Seg } from './common.js';
 
@@ -53,7 +53,8 @@ function whySquad(D) {
   const out = [];
   CAT_ORDER.forEach(c => {
     const p = D.line[c], r = D.reserves[c]; const pool = D.pool[c];
-    out.push(html`<li><${CatTag} c=${c} /> <b>${p.ar.name}</b> starts: ${pool[0] === p ? `the top-rated ${ONE[c]} in the league` : `the best ${ONE[c]} the squad rules allow`} at <b>${f2(p.score)}</b> an arrow (${f2(p.raw)} raw over ${p.n} arrows${p.foreign ? `, and one of the two foreign slots` : ''}).</li>`);
+    const sw = D.swaps.find(x => x.cat === c); const why = pool[0] === p ? `the top-rated ${ONE[c]} in the league` : r.score > p.score && sw && sw.v ? `picked ahead of ${r.ar.name}, who rates a little higher, because ${first(p.ar)}'s quicker pace (${f1(p.pace)} s against ${f1(r.pace)} s an arrow) keeps more of the set clear of the last 30 s, and the four expect ${f2(D.set.total - sw.v.total)} more a set; rated` : `the best ${ONE[c]} the squad rules allow`;
+    out.push(html`<li><${CatTag} c=${c} /> <b>${p.ar.name}</b> starts: ${why} at <b>${f2(p.score)}</b> an arrow (${f2(p.raw)} raw over ${p.n} arrows${p.foreign ? `, and one of the two foreign slots` : ''}).</li>`);
     const above = pool.filter(a => a !== p && a !== r && a.score > r.score);
     out.push(html`<li class="dt-sub"><b>${r.ar.name}</b> is the reserve at <b>${f2(r.score)}</b> (${f2(r.raw)} over ${r.n} arrows, ${f1(r.pace)} s an arrow)${above.length ? html`. Rated higher but left out: ${above.map((a, i) => html`${i ? ', ' : ''}${a.ar.name} (${f2(a.score)}${a.foreign ? ', foreign, and both foreign slots are better used elsewhere' : ''})`)}` : ', the next best in the category'}.</li>`);
   });
@@ -84,8 +85,9 @@ function whyOrder(D) {
   const four = CAT_ORDER.map(c => D.line[c]); const fastest = four.slice().sort((a, b) => a.pace - b.pace)[0];
   const R = D.R;
   return html`<ul class="dt-why">
-    <li>${set.kind === 'loop' ? html`A four-arrow loop shot twice: ${set.cats.slice(0, 4).map((c, i) => html`${i ? ' → ' : ''}<${CatTag} c=${c} />`)}, then the same again, so each archer has three arrows of rest between shots.` : html`Two pairs that alternate: ${set.cats.map((c, i) => html`${i ? ' → ' : ''}<${CatTag} c=${c} />`)}.`}</li>
-    <li>The plan ends with <b>${f1(set.slots[7].after)} s</b> on the clock: ${f1(set.natural)} s of shooting for ${CLOCK} s, which uses the clock almost exactly without anyone being rushed.</li>
+    <li>${set.kind === 'loop' ? html`A four-arrow loop shot twice: ${set.cats.slice(0, 4).map((c, i) => html`${i ? ' → ' : ''}<${CatTag} c=${c} />`)}, then the same again, so each archer has three arrows of rest between shots.` : html`The order ${set.cats.map((c, i) => html`${i ? ' → ' : ''}<${CatTag} c=${c} />`)}.`}</li>
+    <li>Only orders APL teams have actually shot are considered (${D.R.orders.length} orders shot in at least 3 recorded sets each), so the plan never asks for something the rules don't allow. No archer shoots two arrows in a row.</li>
+    <li>The plan ends with <b>${f1(set.slots[7].after)} s</b> on the clock: ${f1(set.natural)} s of shooting for ${CLOCK} s, so the four use almost all of their time without anyone being rushed, and keep a few seconds in hand.</li>
     <li><b>${last.ar.name}</b> shoots the last arrow${last === fastest ? `: the fastest of the four (${f1(last.pace)} s an arrow)` : ` (${f1(last.pace)} s an arrow)`}${last.lateN ? `, and already proven with the clock low: ${last.lateN} arrows with ${LATE} s or less left, ${f2(last.lateRaw)} average against ${f2(last.raw)} overall` : ''}.</li>
     ${lateSlots.length ? html`<li>Only ${lateSlots.map((s, i) => html`${i ? ' and ' : ''}arrow ${s.i} (${first(s.a.ar)})`)} ${lateSlots.length > 1 ? 'are' : 'is'} shot in the last ${LATE} s, where the league drops ${f2(-R.latePrior)} an arrow on average.</li>` : ''}
     ${D.real && D.realSet ? html`<li>The league's most-used order (${D.real.cats.join(' ')}, ${D.real.n} of ${D.real.of} recorded sets) would expect ${f2(D.realSet.total)} with these four; this order expects <b>${f2(set.total)}</b> (${signed(set.total - D.realSet.total)}).</li>` : ''}
@@ -154,7 +156,7 @@ export function DreamTeam() {
     <${Panel} title="How it's worked out">
       <ul class="dt-why small">
         <li>Recorded matches only (the TV scoreboard read doesn't say who shot). Recurve and compound, men and women, are rated only against their own category.</li>
-        <li>Every squad that keeps the rules is tried (the top 6 in each category, two each, exactly ${RULES.foreign} foreign). For each, every playing 4 with a foreign archer is played out over the ${ORDERS.length} shooting orders the teams use. The squad with the best expected set wins, with a small extra credit for strong reserves, since ${RULES.subs} substitutions are allowed.</li>
+        <li>Every squad that keeps the rules is tried (the top 6 in each category, two each, exactly ${RULES.foreign} foreign). For each, every playing 4 with a foreign archer is played out over every shooting order APL teams have actually used (${D.R.orders.length} orders, each shot in at least 3 recorded sets; no archer ever shoots twice in a row). The squad with the best expected set wins, with a small extra credit for strong reserves, since ${RULES.subs} substitutions are allowed.</li>
         <li>An archer needs ${MIN} arrows to be picked. Time-outs count as 0. A plan keeps ${BUFFER} s in hand; any extra time the four need is taken off the last arrows, which lose points at the measured hurry cost.</li>
       </ul>
     </${Panel}>
