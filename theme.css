@@ -581,3 +581,19 @@ a.tm:hover { text-decoration: none; } a.tm:hover .tm-n { text-decoration: underl
   .fbar { padding: 12px; gap: 12px; } .fbar .fg { flex: 1 1 100%; } .fbar .seg { display: flex; } .fbar .seg button { flex: 1; }
   .steps { width: 100%; }
   .crests-s { display: flex; overflow-x: auto; scrollbar-width: none; padding: 8px 2px 6px; } .crests-s .crest { flex: 0 0 auto; } }
+
+/* team page: best and weakest archer of each bow */
+.expair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0 0 4px; }
+.excard { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 14px; border-radius: var(--r2); background: var(--panel); border: 1px solid var(--line); color: inherit; text-decoration: none; border-left: 3px solid var(--goldtx); }
+.excard.weak { border-left-color: var(--mut); }
+.excard:hover { border-color: color-mix(in srgb, var(--tc) 55%, var(--line)); }
+.ex-b { display: grid; gap: 2px; min-width: 0; }
+.ex-b > small:first-child { font-size: 10.5px; text-transform: uppercase; letter-spacing: .14em; color: var(--goldtx); }
+.excard.weak .ex-b > small:first-child { color: var(--mut); }
+.ex-b .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.ex-v { font-size: 26px; font-weight: 600; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.excard.best .ex-v { color: var(--goldtx); }
+.exnote { margin: 0 0 14px; }
+@media (max-width: 640px) { .expair { grid-template-columns: 1fr; } }
+/* analytics: best archer per category by time band */
+.cattime td { vertical-align: top; }

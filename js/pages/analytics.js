@@ -104,7 +104,7 @@ function TeamHalves({ S, ctx }) {
 }
 
 /* ---------- time ---------- */
-function Time({ S, ctx, rctx, bow }) {
+function Time({ S, ctx, rctx, full, bow }) {
   const tv = I.timeVsScore(ctx);
   const ideal = I.idealTime(rctx);
   const eff = I.efficiency(rctx.filter(o => o.a.a), o => o.a.a, 16);
@@ -133,12 +133,27 @@ function Time({ S, ctx, rctx, bow }) {
         <${Table} sort="bavg" rows=${ideal.map(r => Object.assign(r, { bavg: r.best.avg }))} limit=${10} cols=${[['id', 'Archer', r => html`<${Arch} id=${r.id} />`], ['w', 'Best window', r => r.best.label, { sort: r => r.best.i }], ['bavg', 'Avg there', r => f2(r.best.avg), { num: 1 }], ['avg', 'Overall', r => f2(r.avg), { num: 1 }]]} />
       </${Panel}>
     </div>
+    <${CatTime} S=${S} full=${full} bow=${bow} />
     <${Panel} title="Best player in each time window">
       <div class="tbl"><table><thead><tr><th>Seconds taken</th><th>1st</th><th>2nd</th><th>3rd</th></tr></thead><tbody>${win.map(w => html`<tr><td>${w.label}</td>${[0, 1, 2].map(i => html`<td>${w.best[i] ? html`<${Pick} id=${w.best[i].k} v=${f2(w.best[i].avg)} n=${w.best[i].n} />` : '–'}</td>`)}</tr>`)}</tbody></table></div>
     </${Panel}>
     <${Panel} title="Time crunch vs shot made" sub=${`Archers with ${I.CRUNCH} s or less left when they shot, against their other arrows.`}>
       <${Table} sort="n" rows=${I.crunch(rctx.filter(o => o.a.a), o => o.a.a, 2)} limit=${12} cols=${[['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['n', 'Crunch arrows', null, { num: 1 }], ['avg', 'Crunch avg', r => f2(r.avg), { num: 1 }], ['r', 'Other arrows', r => f2(r.rest.avg), { num: 1, sort: r => r.rest.avg }]]} />
     </${Panel}>`;
+}
+
+/* best archer in each of the four categories, in 2-second bands of time taken */
+function CatTime({ S, full, bow }) {
+  const [cat, setCat] = useState('');
+  const rows = I.bestByCatTime(S, full);
+  // the bow picked at the top goes first; each category is ranked only within itself
+  const order = bow === 'Compound' ? ['CM', 'CW', 'RM', 'RW'] : ['RM', 'RW', 'CM', 'CW'];
+  const cell = (r, c, i) => { const p = r.cats[c].best[i]; return p ? html`<${Pick} id=${p.k} v=${f2(p.avg)} n=${p.n} />` : html`<span class="muted">–</span>`; };
+  return html`<${Panel} title="Best archer in each category, by time taken" sub="Seconds an archer took for the arrow, in 2-second bands. Each category is ranked only against itself (at least 3 arrows in the band). Tap a category for its top three.">
+    <div class="fbar"><${FGroup} label="Category"><${Seg} small label="Category" value=${cat} onPick=${setCat} opts=${[['', 'All four'], ...order.map(c => [c, CATS[c]])]} /></${FGroup}></div>
+    ${rows.length ? html`<div class="tbl cattime"><table><thead><tr><th>Seconds taken</th>${cat ? ['1st', '2nd', '3rd'].map(l => html`<th>${l}</th>`) : order.map(c => html`<th>${CATS[c]}</th>`)}</tr></thead><tbody>
+      ${rows.map(r => html`<tr><td>${r.label}</td>${cat ? [0, 1, 2].map(i => html`<td>${cell(r, cat, i)}</td>`) : order.map(c => html`<td>${cell(r, c, 0)}</td>`)}</tr>`)}</tbody></table></div>` : html`<p class="empty">No timed arrows yet.</p>`}
+  </${Panel}>`;
 }
 
 /* ---------- pressure ---------- */
