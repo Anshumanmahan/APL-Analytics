@@ -59,7 +59,7 @@ export function Analytics({ sec, bow: b0 }) {
 
 /* ---------- leaderboard with filters ---------- */
 function Leaderboard({ S, rctx, bow }) {
-  const [cat, setCat] = useState(''); const [teams, setTeams] = useState([]); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('16');
+  const [cat, setCat] = useState(''); const [teams, setTeams] = useState([]); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('1');
   const f = it => (!stage || (stage === 'League' ? it.m.stage === 'League' : it.m.stage !== 'League')) && (!set || String(it.a.set) === set) && (!half || (half === 'f' ? it.pos <= 4 : it.pos >= 5));
   const rows = archers(S, f).filter(a => I.bowOf(a.ar.cat) === bow && catOk(a.ar.cat, cat) && (!teams.length || teams.includes(a.ar.team)) && a.n >= +min);
   const bestOf = b => { const l = archers(S, f).filter(a => I.bowOf(a.ar.cat) === b && a.n >= 16).sort((x, y) => y.avg - x.avg); return l[0]; };
