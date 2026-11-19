@@ -30,7 +30,6 @@ export function SubsPanel({ code, S = app.S }) {
     <div class="rw-head sb-head">
       <div><b>${R.between}</b><span>changes between matches</span><small>${R.pairs ? `${f1(R.between / R.pairs)} a match · ${most(rB)}` : 'Needs two recorded matches'}</small></div>
       <div><b>${R.inMatch}</b><span>substitutions during a match</span><small>in ${R.withSub} of ${R.games.length} matches · ${most(rIn)}</small></div>
-      <div><b>${R.same}/${R.pairs}</b><span>matches kept the same playing 4</span><small>as the match before</small></div>
     </div>
 
     <div class="sb-cats" aria-label="Changes by category">
