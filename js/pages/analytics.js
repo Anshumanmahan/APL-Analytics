@@ -12,6 +12,7 @@ import { WindArrow } from './matches.js';
 import { Rotations } from './rotation.js';
 import { SetScoreChance } from './setscore.js';
 import { Quadrant } from './quadrant.js';
+import { AnHead } from './anhead.js';
 
 /* average wind over a day's match start times */
 function dayWind(ms) {
@@ -51,9 +52,7 @@ export function Analytics({ sec, bow: b0 }) {
   // recurve and compound are kept apart everywhere: arrow-level numbers only use arrows of the chosen bow
   const ctx = I.ofBow(full, bow); const rctx = ctx;
   const Sec = { leaderboard: Leaderboard, positions: Positions, time: Time, pressure: Pressure, comebacks: Comebacks, strategy: Strategy, events: Events }[sec] || Leaderboard;
-  return html`<div class="page"><h1 class="pt">Analytics</h1>
-    <div class="bowbar"><span class="muted small">Bow</span><div class="seg">${I.BOWS.map(([k, l]) => html`<a class=${cls(bow === k && 'on')} href=${'#/analytics/' + sec + '/' + k[0]}>${l}</a>`)}</div><span class="muted small">Recurve and compound are never mixed: compound scores run higher.</span></div>
-    <nav class="subnav">${SECTIONS.map(([k, l]) => html`<a class=${cls(sec === k && 'on')} href=${'#/analytics/' + k + '/' + bk}>${l}</a>`)}</nav>
+  return html`<div class=${cls('page an', bk)}><${AnHead} sec=${sec} bow=${bow} full=${full} />
     <${Sec} S=${S} ctx=${ctx} rctx=${rctx} full=${full} bow=${bow} key=${sec + bk} /></div>`;
 }
 
