@@ -73,7 +73,7 @@ function Leaderboard({ S, rctx, bow }) {
         <${FGroup} label="Division"><${Seg} small label="Division" value=${cat} onPick=${setCat} opts=${[['', 'All'], [bow[0] + 'M', 'Men'], [bow[0] + 'W', 'Women']]} /></${FGroup}>
         <${FGroup} label="Stage"><${Seg} small label="Stage" value=${stage} onPick=${setStage} opts=${[['', 'All'], ['League', 'League'], ['PO', 'Playoffs']]} /></${FGroup}>
         <${FGroup} label="Set"><${Seg} small label="Set" value=${set} onPick=${setSet} opts=${[['', 'All'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']]} /></${FGroup}>
-        <${FGroup} label="Arrows of the set"><${Seg} small label="Arrows of the set" value=${half} onPick=${setHalf} opts=${[['', '1–8'], ['f', '1–4'], ['l', '5–8']]} /></${FGroup}>
+        <${FGroup} label="Arrows of the set"><${Seg} small label="Arrows of the set" value=${half} onPick=${setHalf} opts=${[['', 'All 8'], ['f', 'First 4'], ['l', 'Last 4']]} /></${FGroup}>
         <${FGroup} label="At least this many arrows"><${Steps} label="Minimum arrows" values=${['1', '8', '16', '32']} value=${min} onPick=${setMin} unit=" arrows" /></${FGroup}>
         <div class="fg fg-wide"><span class="fg-l">Teams</span><${CrestPick} compact value=${teams} onChange=${setTeams} /></div>
       </div>
@@ -94,7 +94,7 @@ function Positions({ S, rctx, bow }) {
     </${Panel}>
     <${Panel} title="First 4 vs last 4 arrows" sub="Who finishes a set stronger than they start it.">
       <${Table} sort="delta" rows=${I.halves(rctx.filter(o => o.a.a), o => o.a.a, 4)} limit=${15} cols=${[
-        ['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['f', 'Arrows 1–4', r => f2(r.first.avg), { num: 1, sort: r => r.first.avg }], ['l', 'Arrows 5–8', r => f2(r.last.avg), { num: 1, sort: r => r.last.avg }],
+        ['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['f', 'First 4', r => f2(r.first.avg), { num: 1, sort: r => r.first.avg }], ['l', 'Last 4', r => f2(r.last.avg), { num: 1, sort: r => r.last.avg }],
         ['delta', 'Change', r => html`<b class=${r.delta >= 0 ? 'pos' : 'neg'}>${r.delta >= 0 ? '+' : ''}${f2(r.delta)}</b>`, { num: 1 }], ['n', 'Arrows', null, { num: 1 }]]} />
       <h3 class="sub">By team</h3>
       <${TeamHalves} S=${S} ctx=${rctx} />

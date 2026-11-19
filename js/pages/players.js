@@ -64,7 +64,7 @@ export function PlayerPage({ id }) {
       </${Panel}>
       <${Panel} title="Best position (arrow 1–8)" sub="Average score by which arrow of the set it was.">
         <${Columns} data=${posRows} yMin=${7} yMax=${10} fmt=${f2} xLabel="Arrow of the set" color=${tc(ar.team)} tip=${d => html`<b>Arrow ${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />
-        <div class="kv"><span>Arrows 1–4</span><b>${f2(f4.avg)}</b><span>Arrows 5–8</span><b>${f2(l4.avg)}</b></div>
+        <div class="kv"><span>First 4</span><b>${f2(f4.avg)}</b><span>Last 4</span><b>${f2(l4.avg)}</b></div>
       </${Panel}>
       <${Panel} title="Time taken vs score" sub=${best ? `Ideal time: ${best.x}, averaging ${f2(best.y)}.` : 'Seconds taken per arrow against the score.'}>
         <${Columns} data=${tRows} yMin=${7} yMax=${10} fmt=${f2} xLabel="Seconds taken" color=${tc(ar.team)} tip=${d => html`<b>${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />

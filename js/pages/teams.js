@@ -101,7 +101,7 @@ export function TeamPage({ code }) {
             return html`<tr><td><${Arch} id=${id} team=${false} /></td>${[1, 2, 3, 4, 5, 6, 7, 8].map(p => html`<td class="n hc" style=${`--h:${g[p] / Math.max(1, mx)};--tc:${tc(code)}`}>${g[p] || ''}</td>`)}</tr>`; })}</tbody></table></div>` : html`<p class="empty">No recorded matches for this team yet.</p>`}
       </${Panel}>
       <${Panel} title="First 4 vs last 4 arrows" sub="Average score of the first half of each set against the second half.">
-        ${bw.map(({ b, hv }) => html`<h3 class="sub">${b}</h3>${hv ? html`<div class="kv"><span>Arrows 1–4</span><b>${f2(hv.first.avg)}</b><span>Arrows 5–8</span><b>${f2(hv.last.avg)}</b><span>Difference</span><b class=${hv.delta >= 0 ? 'pos' : 'neg'}>${hv.delta >= 0 ? '+' : ''}${f2(hv.delta)}</b></div>` : html`<p class="empty">Not enough data yet.</p>`}`)}
+        ${bw.map(({ b, hv }) => html`<h3 class="sub">${b}</h3>${hv ? html`<div class="kv"><span>First 4</span><b>${f2(hv.first.avg)}</b><span>Last 4</span><b>${f2(hv.last.avg)}</b><span>Difference</span><b class=${hv.delta >= 0 ? 'pos' : 'neg'}>${hv.delta >= 0 ? '+' : ''}${f2(hv.delta)}</b></div>` : html`<p class="empty">Not enough data yet.</p>`}`)}
       </${Panel}>
     </div>
 
