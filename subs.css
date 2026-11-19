@@ -70,3 +70,29 @@
   .rw-head.sb-head small { font-size: 10px; line-height: 1.3; }
 }
 .rw-head.sb-head { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* Where the arrows landed (js/pages/landing.js) */
+.lf-ctl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 4px 0 14px; }
+.lf-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.lf { margin: 0; display: grid; gap: 10px; align-content: start; padding: 12px; border: 1px solid var(--line); border-radius: var(--r2); background: var(--raise); }
+.lf figcaption { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.lf > svg { width: 100%; max-width: 420px; height: auto; justify-self: center; border-radius: 50%; overflow: hidden; }
+.lf figcaption .logo, .lf figcaption svg { width: 26px; height: 26px; flex: none; }
+.lf-dot { animation: lfIn .35s ease both; }
+@keyframes lfIn { from { opacity: 0; transform: scale(.4); transform-box: fill-box; transform-origin: center; } }
+.lf-grp { fill: none; stroke: #fff; stroke-width: 1.5px; vector-effect: non-scaling-stroke; stroke-dasharray: 5 4; opacity: .9; filter: drop-shadow(0 0 .006px rgba(0,0,0,.8)); }
+.lf-c path { stroke: #0b0d12; stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.lf-who { display: flex; flex-wrap: wrap; gap: 6px; }
+.lf-who button { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 12px; cursor: pointer; padding: 4px 10px 4px 5px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--mut); }
+.lf-who button:first-child { padding-left: 10px; }
+.lf-who button i { font-style: normal; display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--tc); color: #fff; font-size: 9.5px; font-weight: 700; }
+.lf-who button small { font-family: var(--mono); font-size: 10px; color: var(--dim); }
+.lf-who button.on { color: var(--tx); border-color: color-mix(in srgb, var(--tc) 70%, var(--line)); background: color-mix(in srgb, var(--tc) 16%, transparent); }
+.lf-k { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.lf-k div { display: grid; gap: 2px; }
+.lf-k dt { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--mut); }
+.lf-k dd { margin: 0; font-family: var(--mono); font-size: 18px; font-weight: 600; }
+.lf-k dd small { font-size: 12px; color: var(--mut); }
+.lf-k .lf-dr { font-family: inherit; font-size: 13px; font-weight: 500; }
+.lf-off { margin: 0; font-size: 11.5px; color: var(--mut); }
+@media (max-width: 640px) { .lf-pair { grid-template-columns: 1fr; } }
