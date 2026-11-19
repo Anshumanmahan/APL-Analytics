@@ -7,6 +7,7 @@ import { Lines } from '../lib/charts.js';
 import { fmtTs } from '../lib/rules.js';
 import { Arch, Table } from './common.js';
 import { context } from '../lib/insights.js';
+import { CAT_COL, rotation } from './rotation.js';
 import { loadWeather, wxAt, wxStatus, wxModel, startOf, compass, sky, windWord, ms, VENUE, TIMES_SRC, WX_SRC } from '../lib/weather.js';
 
 /* the arrow points the way the wind blows (it comes FROM the given direction) */
@@ -42,11 +43,38 @@ export function Matches() {
   </div>`;
 }
 
+/* the race inside a set: running gap after each pair of arrows. Above the line is team A ahead (its colour and crest),
+   below is team B ahead; the area takes the colour of whoever leads at that point. */
+function Race({ m, race }) {
+  const S = app.S; const W = 440, H = 150, L = 26, R = 10, T = 22, B = 22;
+  const mx = Math.max(2, ...race.map(Math.abs)); const n = race.length;
+  const x = i => L + ((W - L - R) * (i + 1)) / n, y = v => T + ((H - T - B) / 2) * (1 - v / mx), y0 = y(0);
+  const pts = [[L, y0], ...race.map((v, i) => [x(i), y(v)])];
+  const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join('');
+  const area = line + `L${pts[pts.length - 1][0].toFixed(1)} ${y0}Z`;
+  const cA = tc(m.teams.A), cB = tc(m.teams.B), id = 'rc' + m.key.replace(/\W/g, '') + race.join('');
+  const end = race[n - 1];
+  return html`<div class="race2"><svg viewBox=${`0 0 ${W} ${H}`} role="img" aria-label=${`Running gap: ${end > 0 ? m.teams.A + ' ahead by ' + end : end < 0 ? m.teams.B + ' ahead by ' + -end : 'level'} after ${n} pairs`}>
+    <defs><clipPath id=${id + 'a'}><rect x="0" y="0" width=${W} height=${y0} /></clipPath><clipPath id=${id + 'b'}><rect x="0" y=${y0} width=${W} height=${H - y0} /></clipPath></defs>
+    <rect x=${L} y=${T} width=${W - L - R} height=${y0 - T} class="rc-band" style=${`fill:${cA}`} /><rect x=${L} y=${y0} width=${W - L - R} height=${H - B - y0} class="rc-band" style=${`fill:${cB}`} />
+    <path d=${area} clip-path=${`url(#${id}a)`} style=${`fill:${cA}`} class="rc-area" /><path d=${area} clip-path=${`url(#${id}b)`} style=${`fill:${cB}`} class="rc-area" />
+    <line x1=${L} x2=${W - R} y1=${y0} y2=${y0} class="rc-zero" />
+    <path d=${line} class="rc-line" clip-path=${`url(#${id}a)`} style=${`stroke:${cA}`} /><path d=${line} class="rc-line" clip-path=${`url(#${id}b)`} style=${`stroke:${cB}`} />
+    ${race.map((v, i) => html`<circle cx=${x(i)} cy=${y(v)} r="3.2" class="rc-dot" style=${`fill:${v > 0 ? cA : v < 0 ? cB : 'var(--mut)'}`}><title>${`After pair ${i + 1}: ${v > 0 ? m.teams.A + ' +' + v : v < 0 ? m.teams.B + ' +' + -v : 'level'}`}</title></circle>`)}
+    ${race.map((_, i) => html`<text x=${x(i)} y=${H - 6} class="rc-x">${i + 1}</text>`)}
+    <text x=${L - 6} y=${y0 + 3.5} class="rc-y">0</text>
+    <text x=${L + 6} y=${T + 12} class="rc-lab" style=${`fill:${cA}`}>▲ ${m.teams.A} ahead</text>
+    <text x=${L + 6} y=${H - B - 6} class="rc-lab" style=${`fill:${cB}`}>▼ ${m.teams.B} ahead</text>
+    <text x=${W - R} y=${T - 8} class="rc-end">${end === 0 ? 'Level' : `${end > 0 ? m.teams.A : m.teams.B} by ${Math.abs(end)}`}</text>
+  </svg><p class="rc-cap">Running gap after each pair of arrows</p></div>`;
+}
+
 export function MatchPage({ k }) {
   const S = app.S; const m = S.matches.find(x => x.key === k); loadWeather();
   if (!m) return html`<div class="page"><p class="empty">No such match. <a href="#/matches">All matches</a></p></div>`;
   const ctx = context(S).filter(o => o.m === m); const piOf = new Map(ctx.map(o => [o.a, o]));
   const pos = positions(m); const sp = span(m);
+  const usual = {}; ['A', 'B'].forEach(t => { const r = m.src === 'recorded' ? rotation(S, m.teams[t]) : null; usual[t] = r && r.sig ? r.sig.join(' ') : ''; });
   const side = t => html`<a class="mside" href=${'#/team/' + m.teams[t]} style=${`--tc:${tc(m.teams[t])}`}><${Crest} code=${m.teams[t]} size=${56} /><b>${S.T(m.teams[t]).name}</b></a>`;
   return html`<div class="page">
     <p class="kicker"><a href="#/matches">Matches</a> · ${matchTitle(m)}${startOf(m) ? ' · ' + startOf(m) + ' IST' : ''} <${Src} m=${m} /></p>
@@ -64,11 +92,13 @@ export function MatchPage({ k }) {
       // set race: running difference after each pair of arrows
       const race = []; let ra = 0, rb = 0; const A = l('A'), B = l('B');
       for (let i = 0; i < Math.max(A.length, B.length); i++) { ra += (A[i] && A[i].s) || 0; rb += (B[i] && B[i].s) || 0; race.push({ y: ra - rb }); }
-      return html`<section class="panel"><h2>Set ${st.n} <small class="muted">${st.tot.A}–${st.tot.B}</small></h2>
-        <div class="arrowgrid">${['A', 'B'].map(t => html`<div class="ag-row"><span class="ag-t"><${Team} code=${m.teams[t]} /></span>${l(t).map(a => { const o = piOf.get(a);
+      const won = st.tot.A > st.tot.B ? 'A' : st.tot.B > st.tot.A ? 'B' : null;
+      return html`<section class="panel setp"><h2>Set ${st.n} <small class="muted">${st.tot.A}–${st.tot.B}</small>${won ? html`<span class="set-win" style=${`--tc:${tc(m.teams[won])}`}><${Crest} code=${m.teams[won]} size=${18} />${S.T(m.teams[won]).short || m.teams[won]} won the set</span>` : html`<span class="set-win tie">Set tied · 1 point each</span>`}</h2>
+        <div class="arrowgrid">${['A', 'B'].map(t => { const cats = l(t).map(a => (a.a ? S.A(a.a).cat : '')); const off = cats.length >= 8 && cats.every(Boolean) && usual[t] && cats.slice(0, 8).join(' ') !== usual[t];
+          return html`<div class=${cls('ag-row', won === t && 'won')} style=${`--tc:${tc(m.teams[t])}`}><span class="ag-t"><${Team} code=${m.teams[t]} /><small class="ag-tot">${st.tot[t]}${won === t ? ' ✓' : ''}</small>${off ? html`<small class="ag-new" title=${'Usual order: ' + usual[t]}>new order</small>` : ''}</span>${l(t).map(a => { const o = piOf.get(a); const c = a.a && S.A(a.a).cat;
           return html`<span class="ag-c" title=${`${a.a ? S.A(a.a).name : 'Archer not recorded'} · arrow ${pos.get(a)} · ${a.dt != null ? a.dt + ' s' : 'time n/a'}${o ? ' · pressure ' + o.pi : ''}`}>
-            <span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small><small class="muted">${a.dt != null ? Math.round(a.dt) + 's' : ''}</small>${o ? html`<i class="pi" style=${`--p:${o.pi}`} title=${'Pressure ' + o.pi}></i>` : ''}</span>`; })}</div>`)}</div>
-        ${race.length > 1 && html`<div class="race"><${Lines} xs=${race.map((_, i) => i + 1)} series=${[{ key: 'd', label: m.teams.A + ' lead', color: tc(m.teams.A), pts: race }]} height=${150} xLabel="Arrow pair" xFmt=${v => v} fmt=${v => (v > 0 ? '+' : '') + v} /></div>`}
+            <span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small>${c ? html`<small class="ag-cat" style=${`--c:${CAT_COL[c]}`}>${c}</small>` : ''}<small class="muted">${a.dt != null ? Math.round(a.dt) + 's' : ''}</small>${o ? html`<i class="pi" style=${`--p:${o.pi}`} title=${'Pressure ' + o.pi}></i>` : ''}</span>`; })}</div>`; })}</div>
+        ${race.length > 1 && html`<${Race} m=${m} race=${race.map(r => r.y)} />`}
       </section>`; })}
 
     ${m.soArrows.length ? html`<section class="panel"><h2>Shoot-off</h2><div class="arrowgrid">${['A', 'B'].map(t => html`<div class="ag-row"><span class="ag-t"><${Team} code=${m.teams[t]} /></span>${m.soArrows.filter(a => a.t === t).map(a => html`<span class="ag-c"><span class="schip" style=${chipStyle(a)}>${label(a)}</span><small>${a.a ? S.A(a.a).name.split(' ')[0] : '·'}</small></span>`)}</div>`)}</div></section>` : ''}

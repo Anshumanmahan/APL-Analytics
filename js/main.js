@@ -1,6 +1,6 @@
-/* APL Analytics: routes, the data gate and the page shell. */
+/* APL Analytics: routes, loading the season and the page shell. */
 import { html, render, useState } from './../vendor/preact-htm.js';
-import { buildSeason } from './lib/season.js';
+import { buildSeason, pool, summarize } from './lib/season.js';
 import { load, loadOpen, hasPass, forget } from './lib/store.js';
 import { app, cls } from './lib/ui.js';
 import { Home } from './pages/home.js';
@@ -34,14 +34,29 @@ function route() {
 window.addEventListener('hashchange', () => { rerender(); window.scrollTo(0, 0); });
 
 function ready(rows) { app.S = buildSeason(rows); state.status = 'ready'; state.loadedAt = new Date(); state.msg = ''; }
+const L = () => window.APL_LOADER || { start() { }, hide() { }, done() { } };
+/* the loader (index.html) plays once the passcode is in, or straight away when no passcode is needed */
+function finish(rows, first) {
+  ready(rows); state.refreshing = false; rerender();
+  if (first) { let arrows = 0; try { arrows = summarize(pool(app.S)).n; } catch (e) { } L().done({ arrows, matches: app.S.matches.length }); }
+}
 async function open(p) {
-  state.status = app.S ? 'ready' : 'loading'; state.refreshing = true; rerender();
-  // the site's own read-only proxy first (no passcode needed once it is set up)
-  if (!p) { const rows = await loadOpen(); if (rows) { state.open = true; ready(rows); state.refreshing = false; return rerender(); } }
+  const first = !app.S;
+  state.refreshing = true; if (!first) rerender();
+  // the site's own read-only proxy first (no passcode needed once APL_KEY is set on Vercel)
+  if (!p) {
+    // start the loader if the check takes more than a blink, so a visitor never stares at a blank page
+    const t = first && setTimeout(() => L().start(), 250);
+    const rows = await loadOpen(); clearTimeout(t);
+    if (rows) { if (first) L().start(true); return finish(rows, first); }
+    if (first && !hasPass()) L().hide();
+  }
   if (!p && !hasPass()) { state.status = app.S ? 'ready' : 'gate'; state.refreshing = false; return rerender(); }
+  if (first) L().start();
   const r = await load(p);
-  if (r.status === 'ok') ready(r.rows);
-  else if (r.status === 'wrong') { forget(); state.status = 'gate'; state.msg = p ? 'That passcode didn’t work. Try again.' : ''; }
+  if (r.status === 'ok') return finish(r.rows, first);
+  if (first) L().hide();
+  if (r.status === 'wrong') { forget(); state.status = 'gate'; state.msg = p ? 'That passcode didn’t work. Try again.' : ''; }
   else { state.status = app.S ? 'ready' : 'gate'; state.msg = 'The season data can’t be reached right now. Check your connection and try again.'; }
   state.refreshing = false; rerender();
 }
@@ -111,7 +126,7 @@ function ThemeBtn() {
 const TABS = [['home', 'Home', '#/'], ['teams', 'Teams', '#/teams'], ['players', 'Players', '#/players'], ['matches', 'Matches', '#/matches'], ['analytics', 'Analytics', '#/analytics'], ['ideas', 'Ideas', '#/ideas']];
 function App() {
   if (state.status === 'gate') return html`<${Gate} />`;
-  if (!app.S) return html`<div class="loading"><span class="spin"></span>Loading the season…</div>`;
+  if (!app.S) return null; // blank for the moment it takes to check for data; the loader covers the rest
   const r = route(); const S = app.S; const rec = S.matches.filter(m => m.src === 'recorded').length;
   return html`<div class="shell">
     <header class="top"><a class="brand" href="#/" aria-label="APL Analytics home"><img src="/logo.svg" alt="" width="32" height="32" /><span class="wm"><b>APL</b><small>ANALYTICS</small></span></a>
