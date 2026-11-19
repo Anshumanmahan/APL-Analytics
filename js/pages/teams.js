@@ -35,7 +35,7 @@ export function Teams() {
         <span class="tb-go">View team →</span></a>`; })}</div></div>`;
 }
 
-/* the team's best and weakest archer of one bow by arrow average. Needs 16 arrows, or 8 when fewer qualify. */
+/* the team's strongest and weakest archer of one bow by arrow average. Needs 16 arrows, or 8 when fewer qualify. */
 function extremes(squad, b) {
   const l = squad.filter(a => bowOf(a.ar.cat) === b);
   let q = l.filter(a => a.n >= 16); if (q.length < 2) q = l.filter(a => a.n >= 8);
@@ -44,7 +44,7 @@ function extremes(squad, b) {
   return { best: q[0], weak: q[q.length - 1], min: q.every(a => a.n >= 16) ? 16 : 8, of: q.length };
 }
 const ExCard = ({ r, kind, code }) => html`<a class=${'excard ' + kind} href=${'#/player/' + r.id} style=${`--tc:${tc(code)}`}>
-  <${Avatar} ar=${r.ar} size=${52} /><span class="ex-b"><small>${kind === 'best' ? 'Best' : 'Weakest'}</small><b class="nm">${r.ar.name}</b><small class="muted">${r.ar.cat} · ${r.n} arrows · ${pct(r.tenRate)} 10s</small></span><b class="ex-v">${f2(r.avg)}</b></a>`;
+  <${Avatar} ar=${r.ar} size=${52} /><span class="ex-b"><small>${kind === 'best' ? 'Strongest' : 'Weakest'}</small><b class="nm">${r.ar.name}</b><small class="muted">${r.ar.cat} · ${r.n} arrows · ${pct(r.tenRate)} 10s</small></span><b class="ex-v">${f2(r.avg)}</b></a>`;
 
 export function TeamPage({ code }) {
   const S = app.S; const t = S.T(code);
@@ -64,7 +64,7 @@ export function TeamPage({ code }) {
     <section class="thero2" style=${`--tc:${tc(code)}`}><${Crest} code=${code} size=${96} /><div><h1>${t.name}</h1><p class="lead">${fme.tier === 0 ? '🏆 Champions' : fme.stage === 'League stage' ? ordn(fs.indexOf(fme) + 1) + ' overall' : fme.stage} · ${rank}${['st', 'nd', 'rd'][rank - 1] || 'th'} in the league · ${me.W} won, ${me.L} lost · ${me.Pts} points</p><${Form} list=${me.form} /></div></section>
     <${Tiles} items=${[[f1(mean(sets.map(x => x.tot))), 'Average set', `${sets.length} sets, both bows`]]} />
     ${bw.map(x => html`<h3 class="bowh">${x.b}</h3><${Tiles} items=${[[f2(x.s.avg), 'Arrow average', `${x.s.n} recorded arrows`], [pct(x.s.tenRate), '10s'], [x.s.at ? f1(x.s.at) + ' s' : '–', 'Average time per arrow', `${x.s.tn} timed`], [x.cr.length ? f2(mean(x.cr.map(o => o.a.s))) : '–', 'Average in a time crunch', `${x.cr.length} arrows with ≤${CRUNCH} s left`]]} />
-      ${x.ex ? html`<div class="expair"><${ExCard} r=${x.ex.best} kind="best" code=${code} /><${ExCard} r=${x.ex.weak} kind="weak" code=${code} /></div><p class="muted small exnote">Best and weakest ${x.b.toLowerCase()} archer by arrow average, out of ${x.ex.of} with at least ${x.ex.min} recorded arrows.</p>` : ''}`)}
+      ${x.ex ? html`<div class="expair"><${ExCard} r=${x.ex.best} kind="best" code=${code} /><${ExCard} r=${x.ex.weak} kind="weak" code=${code} /></div><p class="muted small exnote">Strongest and weakest ${x.b.toLowerCase()} archer by arrow average, out of ${x.ex.of} with at least ${x.ex.min} recorded arrows.</p>` : ''}`)}
 
     <${Panel} title="Squad" sub="Recorded matches only. Average time is the seconds each archer took per arrow (average time by each teammate).">
       <${Table} sort="n" rows=${sq} cols=${[

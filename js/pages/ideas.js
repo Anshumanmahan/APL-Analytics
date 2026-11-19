@@ -31,7 +31,7 @@ export const IDEAS = [
   ['Last 2 arrows: time needed for the best result', '#/analytics/time', R],
   ['Ideal time to shoot for each archer', '#/analytics/time', D],
   ['Best archer in all 4 categories by time (2 s bands)', '#/analytics/time', D, 'Recurve men, recurve women, compound men and compound women, each ranked only within itself.'],
-  ['Team page: best and weakest archer', '#/teams', D, 'For each bow on every team page, by arrow average.'],
+  ['Team page: strongest and weakest archer', '#/teams', D, 'For each bow on every team page, by arrow average.'],
   ['Running news ticker with cool analytics', '#/', D, 'Under the header; pauses on hover; every item links to its source.'],
   ['Light and dark theme with an archery-style switch', '#/', D, 'Follows the device setting until you pick one.'],
   ['Works on phones, tablets and laptops', '#/', D],
