@@ -1,4 +1,4 @@
-/* Home: a points table of team rows and a playoff bracket (Qualifier 1 and Eliminator 1, then Eliminator 2, then the Final). */
+/* Home: a points table of team rows and a playoff bracket (Shortcut Decider and Eliminator 1, then Eliminator 2, then the Final). */
 import { html } from '../../vendor/preact-htm.js';
 import { dayName } from '../lib/season.js';
 import { cls, tc } from '../lib/ui.js';
@@ -49,9 +49,9 @@ function Tie({ S, m, label, route, big, k }) {
 export function Bracket({ S }) {
   const po = S.matches.filter(m => m.stage !== 'League');
   const g = s => po.find(m => m.stage === s);
-  const q1 = g('Qualifier 1'), e1 = g('Eliminator 1'), e2 = g('Eliminator 2'), fn = g('Final');
+  const q1 = g('Shortcut Decider'), e1 = g('Eliminator 1'), e2 = g('Eliminator 2'), fn = g('Final');
   const champ = done(fn) ? fn.win : null;
-  // the lines between the rounds: gold for winners, dashed for Qualifier 1's loser getting a second chance
+  // the lines between the rounds: gold for winners, dashed for Shortcut Decider's loser getting a second chance
   const L1 = html`<svg class="br-ln" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
     <path d="M0 25H40" class="wn" /><path d="M0 25H14Q20 25 20 31V69Q20 75 26 75H40" class="ls" /><path d="M0 75H40" class="wn" /></svg>`;
   const L2 = html`<svg class="br-ln" viewBox="0 0 40 100" preserveAspectRatio="none" aria-hidden="true">
@@ -59,14 +59,14 @@ export function Bracket({ S }) {
   return html`<div class="br">
     <div class="br-col c1">
       <div class="br-step"><span>Round 1</span></div>
-      <${Tie} S=${S} m=${q1} k="q1" label="Qualifier 1" route="1st v 2nd. Winner goes straight to the Final, loser gets a second chance." />
+      <${Tie} S=${S} m=${q1} k="q1" label="Shortcut Decider" route="1st v 2nd. Winner goes straight to the Final, loser gets a second chance." />
       <${Tie} S=${S} m=${e1} k="e1" label="Eliminator 1" route="3rd v 4th. Loser is out." />
     </div>
     <div class="br-gap">${L1}</div>
     <div class="br-col c2">
       <div class="br-step"><span>Round 2</span></div>
-      <div class="br-pass"><span>${q1 && done(q1) ? html`<b style=${`color:${tc(q1.win)}`}>${q1.win}</b> through to the Final` : 'Qualifier 1 winner waits for the Final'}</span></div>
-      <${Tie} S=${S} m=${e2} label="Eliminator 2" route="Qualifier 1 loser v Eliminator 1 winner." />
+      <div class="br-pass"><span>${q1 && done(q1) ? html`<b style=${`color:${tc(q1.win)}`}>${q1.win}</b> through to the Final` : 'Shortcut Decider winner waits for the Final'}</span></div>
+      <${Tie} S=${S} m=${e2} label="Eliminator 2" route="Shortcut Decider loser v Eliminator 1 winner." />
     </div>
     <div class="br-gap">${L2}</div>
     <div class="br-col c3">
