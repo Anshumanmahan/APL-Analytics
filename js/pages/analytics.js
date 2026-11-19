@@ -10,6 +10,7 @@ import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
 import { WindArrow } from './matches.js';
 import { Rotations } from './rotation.js';
+import { SetScoreChance } from './setscore.js';
 import { Quadrant } from './quadrant.js';
 
 /* average wind over a day's match start times */
@@ -191,6 +192,7 @@ function Pressure({ S, ctx, rctx }) {
 function Comebacks({ S }) {
   const cb = I.comebacks(S); const so = I.shootOffs(S);
   return html`
+    <${Panel} title="What set score wins a set?" sub="Each row is a set score. The bar shows how likely a set with that score is to be won."><${SetScoreChance} S=${S} /></${Panel}>
     <${Panel} title="Sets won from behind" sub="Set-level, so both bows together by format. Sets a team won after trailing at the halfway point (4 arrows each) or after 6 arrows, and matches won after being behind on set points.">
       <${Table} sort="won4" rows=${cb} cols=${[['t', 'Team', r => html`<${Team} code=${r.t} full />`], ['won4', 'Won from behind at 4', r => `${r.won4} of ${r.behind4}`, { num: 1 }], ['won6', 'Won from behind at 6', r => `${r.won6} of ${r.behind6}`, { num: 1 }], ['matchWon', 'Matches won from behind', r => `${r.matchWon} of ${r.matchBehind}`, { num: 1 }]]} />
     </${Panel}>
