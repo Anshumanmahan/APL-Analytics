@@ -11,6 +11,7 @@ import { CAT_COL } from './rotation.js';
 import { Panel, Seg } from './common.js';
 
 const first = ar => ar.name.split(' ')[0];
+const last = ar => { const p = ar.name.split(' '); return p[p.length - 1]; };
 const ONE = { RM: 'recurve man', RW: 'recurve woman', CM: 'compound man', CW: 'compound woman' };
 const CAT_INK = { RM: '#fff', RW: '#04223a', CM: '#fff', CW: '#2b2000' };
 const CatTag = ({ c }) => html`<span class="dt-cat" style=${`background:${CAT_COL[c]};color:${CAT_INK[c]}`}>${c}</span>`;
@@ -30,7 +31,7 @@ function Card({ a, role }) {
 function ClockLane({ set }) {
   return html`<div class="dt-lane" role="img" aria-label=${`Set plan: ${set.slots.map(s => `arrow ${s.i} ${first(s.a.ar)} ${f1(s.used)} s`).join(', ')}; ${f1(set.left)} s spare`}>
     ${set.slots.map(s => html`<div class="dt-blk" style=${`width:${(100 * s.used / CLOCK).toFixed(2)}%;background:${CAT_COL[s.cat]};color:${CAT_INK[s.cat]}`} title=${`Arrow ${s.i}: ${s.a.ar.name}, ${f1(s.used)} s, clock ${f1(s.before)} → ${f1(s.after)}`}>
-      <b>${s.i}</b><small>${first(s.a.ar)}</small></div>`)}
+      <b>${s.i}</b><small>${last(s.a.ar)}</small></div>`)}
     ${set.left > 0.2 && html`<div class="dt-spare" style=${`width:${(100 * set.left / CLOCK).toFixed(2)}%`} title=${`${f1(set.left)} s spare`}></div>`}
     <i class="dt-late" style=${`left:${(100 * (CLOCK - LATE) / CLOCK).toFixed(2)}%`}><span>last ${LATE} s</span></i>
   </div>
@@ -86,7 +87,7 @@ function whyOrder(D) {
   const R = D.R;
   return html`<ul class="dt-why">
     <li>${set.kind === 'loop' ? html`A four-arrow loop shot twice: ${set.cats.slice(0, 4).map((c, i) => html`${i ? ' → ' : ''}<${CatTag} c=${c} />`)}, then the same again, so each archer has three arrows of rest between shots.` : html`The order ${set.cats.map((c, i) => html`${i ? ' → ' : ''}<${CatTag} c=${c} />`)}.`}</li>
-    <li>Only orders APL teams have actually shot are considered (${D.R.orders.length} orders shot in at least 3 recorded sets each), so the plan never asks for something the rules don't allow. No archer shoots two arrows in a row.</li>
+    <li>No archer ever shoots two arrows in a row: every order tried (${D.R.orders.length} of them: each four-arrow loop shot twice, and each pair-then-pair order) is checked for it, and the set plan above always alternates archers.</li>
     <li>The plan ends with <b>${f1(set.slots[7].after)} s</b> on the clock: ${f1(set.natural)} s of shooting for ${CLOCK} s, so the four use almost all of their time without anyone being rushed, and keep a few seconds in hand.</li>
     <li><b>${last.ar.name}</b> shoots the last arrow${last === fastest ? `: the fastest of the four (${f1(last.pace)} s an arrow)` : ` (${f1(last.pace)} s an arrow)`}${last.lateN ? `, and already proven with the clock low: ${last.lateN} arrows with ${LATE} s or less left, ${f2(last.lateRaw)} average against ${f2(last.raw)} overall` : ''}.</li>
     ${lateSlots.length ? html`<li>Only ${lateSlots.map((s, i) => html`${i ? ' and ' : ''}arrow ${s.i} (${first(s.a.ar)})`)} ${lateSlots.length > 1 ? 'are' : 'is'} shot in the last ${LATE} s, where the league drops ${f2(-R.latePrior)} an arrow on average.</li>` : ''}
@@ -156,7 +157,7 @@ export function DreamTeam() {
     <${Panel} title="How it's worked out">
       <ul class="dt-why small">
         <li>Recorded matches only (the TV scoreboard read doesn't say who shot). Recurve and compound, men and women, are rated only against their own category.</li>
-        <li>Every squad that keeps the rules is tried (the top 6 in each category, two each, exactly ${RULES.foreign} foreign). For each, every playing 4 with a foreign archer is played out over every shooting order APL teams have actually used (${D.R.orders.length} orders, each shot in at least 3 recorded sets; no archer ever shoots twice in a row). The squad with the best expected set wins, with a small extra credit for strong reserves, since ${RULES.subs} substitutions are allowed.</li>
+        <li>Every squad that keeps the rules is tried (the top 6 in each category, two each, exactly ${RULES.foreign} foreign). For each, every playing 4 with a foreign archer is played out over all ${D.R.orders.length} shooting orders in which no archer shoots twice in a row (each four-arrow loop shot twice, and each pair-then-pair order). The squad with the best expected set wins, with a small extra credit for strong reserves, since ${RULES.subs} substitutions are allowed.</li>
         <li>An archer needs ${MIN} arrows to be picked. Time-outs count as 0. A plan keeps ${BUFFER} s in hand; any extra time the four need is taken off the last arrows, which lose points at the measured hurry cost.</li>
       </ul>
     </${Panel}>

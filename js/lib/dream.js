@@ -31,8 +31,7 @@ const KL = 8;                  // prior arrows for the late-clock effect
 export const MIN = 10;         // arrows an archer needs to be picked
 export const LATE = 30;        // "late clock": this many seconds or fewer left before the arrow
 export const BUFFER = 2;       // seconds a plan keeps in hand at the end of the set
-const MAX_RUSH = 4;
-export const MIN_ORDER = 3;     // an order counts as one APL teams use once it has been shot in this many recorded sets            // seconds one arrow can be hurried by
+const MAX_RUSH = 4;            // seconds one arrow can be hurried by
 const RESERVE_W = 0.25;        // weight of the reserves' strength when choosing the squad
 const foreign = ar => !!(ar && ar.country);
 const bowOf = cat => (cat && cat[0] === 'C' ? 'C' : 'R');
@@ -104,6 +103,7 @@ export const ORDERS = (() => {
 
 /* play one set out on the clock: who shoots when, the clock before each arrow, how much each arrow is hurried */
 export function playSet(line, cats, R) {
+  if (!legal(cats)) throw new Error('order has one archer shooting twice in a row: ' + cats.join(' '));
   const who = c => line[c];
   const nat = cats.map((c, i) => Math.max(4, who(c).pace + (R.slot[i + 1] || 0)));
   const T = nat.reduce((x, v) => x + v, 0);
@@ -129,11 +129,11 @@ export function usedOrders(S) {
   S.matches.forEach(m => { if (m.src !== 'recorded') return; ['A', 'B'].forEach(t => { for (let n = 1; n <= 4; n++) {
     const l = m.arrows.filter(a => a.ph === 'S' && a.set === n && a.t === t);
     if (l.length !== 8 || l.some(a => !a.a || !S.A(a.a).cat)) continue; const k = l.map(a => S.A(a.a).cat).join(' '); cnt[k] = (cnt[k] || 0) + 1; } }); });
-  return Object.entries(cnt).map(([k, n]) => ({ cats: k.split(' '), n, kind: kindOf(k.split(' ')) })).filter(o => legal(o.cats) && o.n >= MIN_ORDER).sort((a, b) => b.n - a.n);
+  return Object.entries(cnt).map(([k, n]) => ({ cats: k.split(' '), n, kind: kindOf(k.split(' ')) })).filter(o => legal(o.cats)).sort((a, b) => b.n - a.n);
 }
 export function bestOrder(line, R) {
   let best = null;
-  (R.orders && R.orders.length ? R.orders : ORDERS).forEach(o => {
+  ORDERS.forEach(o => {
     const r = playSet(line, o.cats, R); r.kind = o.kind;
     r.risk = r.slots.slice(6).reduce((x, s) => x + (s.a.sd || 3), 0);
     if (!best || r.total > best.total + 0.005 || (Math.abs(r.total - best.total) <= 0.005 && r.risk < best.risk)) best = r;
@@ -143,7 +143,7 @@ export function bestOrder(line, R) {
 
 /* ---------- the dream team ---------- */
 export function dreamTeam(S) {
-  const R = rate(S); R.orders = usedOrders(S);
+  const R = rate(S); R.orders = ORDERS; R.used = usedOrders(S);
   const pool = {}; CAT_ORDER.forEach(c => {
     const l = R.archers.filter(a => a.cat === c).sort((x, y) => y.score - x.score);
     const ok = l.filter(a => a.n >= MIN); pool[c] = (ok.length >= 2 ? ok : l.filter(a => a.n >= 4)).slice(0, 6);
@@ -175,7 +175,7 @@ export function dreamTeam(S) {
 
   // comparisons for the reasons: the most-used real order, the best line on score alone, every swap
   const real = commonOrder(S);
-  const realSet = real ? playSet(best.line, real.cats, R) : null;
+  const realSet = real && legal(real.cats) ? playSet(best.line, real.cats, R) : null;
   const scoreOnly = {}; CAT_ORDER.forEach(c => { scoreOnly[c] = pool[c][0]; });
   const nfS = CAT_ORDER.filter(c => scoreOnly[c].foreign).length;
   const paper = nfS >= 1 && nfS <= 2 ? lineVal(scoreOnly) : null;
