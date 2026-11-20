@@ -37,7 +37,7 @@ export function Matches() {
     <h1 class="pt">Matches</h1>
     <p class="lead small">Every match of the season by day. Each match shows its official start time (IST) and the wind and temperature at that moment at People's Plaza, Hyderabad. Broadcast timings let you watch from the first arrow.</p>
     ${Array.from({ length: NDAYS }, (_, i) => i + 1).map(d => { const ms = S.matches.filter(m => m.d === d);
-      return html`<section class="panel"><h2>Day ${d} <small class="muted">${dayName(d)}</small></h2>
+      return html`<section class="panel"><h2>Day ${d}</h2>
         <div class="rlist">${ms.map(m => { const sp = span(m);
           return html`<div class="mrow2"><small class="muted">${m.stage === 'League' ? 'Match ' + m.s : m.stage}${startOf(m) ? html` · <b class="mt">${startOf(m)}</b>` : ''}</small><${Result} m=${m} /><${Src} m=${m} /><${WxChip} m=${m} />
             <span class="muted small">${sp ? html`<a href=${yt(m, sp.from - 20)} target="_blank" rel="noopener">${fmtTs(sp.from)}–${fmtTs(sp.to)} ↗</a> · ${Math.round((sp.to - sp.from) / 60)} min` : 'no timings'}</span></div>`; })}</div></section>`; })}

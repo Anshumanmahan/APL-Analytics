@@ -4,9 +4,8 @@ import { TEAMS, standings, finalStandings, archers, pool, summarize } from '../l
 import { app, f2, tc } from '../lib/ui.js';
 import { Crest } from '../lib/media.js';
 import { AnimatedLogo } from '../lib/logo.js';
-import { Arch } from './common.js';
 import { TAGLINE } from './about.js';
-import { PointsTable, Bracket } from './homebits.js';
+import { PointsTable, Bracket, Leaders } from './homebits.js';
 import { context, bowOf, ofBow, BOWS } from '../lib/insights.js';
 
 
@@ -48,15 +47,10 @@ export function Home() {
       <section class="panel"><h2>Points table</h2><p class="muted">League stage. 2 points a win; ties split on head-to-head, then set-point difference.</p>
         <${PointsTable} S=${S} st=${st} fs=${fs} />
       </section>
-      <div>
-        <section class="panel"><h2>Leaders so far</h2>
-          ${byBow.map(x => html`<h3 class="bowh">${x.b}</h3><div class="leaders">
-            <div><h3 class="sub">Arrow average</h3>${x.topAvg.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${f2(a.avg)}</b></div>`)}</div>
-            <div><h3 class="sub">Arrow Grouping Index (AGI)</h3>${x.topAgi.map((a, i) => html`<div class="ldr"><span>${i + 1}</span><${Arch} id=${a.id} /><b>${a.agi.toFixed(1)}</b></div>`)}</div>
-          </div>`)}
-          <a class="lnk" href="#/analytics">All analytics →</a>
-        </section>
-      </div>
+      <section class="panel ld-panel"><h2>Leaders so far</h2><p class="muted">Archers with at least 16 recorded arrows. Recurve and compound are ranked apart.</p>
+        <${Leaders} S=${S} byBow=${byBow} />
+        <a class="lnk" href="#/analytics">All analytics →</a>
+      </section>
     </div>
 
     ${playoffs.length ? html`<section class="panel po-panel"><h2>Playoffs</h2><p class="muted">The top 4 after the league. First and second get two chances to reach The Final.</p><${Bracket} S=${S} /></section>` : ''}

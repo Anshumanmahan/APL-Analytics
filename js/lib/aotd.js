@@ -23,7 +23,7 @@ export { Star };
 export const AwardMark = ({ n, title }) => n ? html`<span class="aw-mark" title=${title || `Archer of the Day ${n}×`}><${Star} />${n}</span>` : '';
 
 /* day chips: "Day 3 · Thu 6 Nov", marked when the award was shared */
-export const DayChips = ({ list }) => html`<span class="aw-days">${list.map(w => html`<span class="aw-day" title=${`Archer of the Day, day ${w.d}${w.shared ? ' (shared)' : ''}`}><b>Day ${w.d}</b><small>${dayName(w.d)}${w.shared ? ' · shared' : ''}</small></span>`)}</span>`;
+export const DayChips = ({ list }) => html`<span class="aw-days">${list.map(w => html`<span class="aw-day" title=${`Archer of the Day, day ${w.d}${w.shared ? ' (shared)' : ''}`}><b>Day ${w.d}</b>${w.shared ? html`<small>shared</small>` : ''}</span>`)}</span>`;
 
 /* the player page ribbon, under the name */
 export function AwardRibbon({ S, id }) {
