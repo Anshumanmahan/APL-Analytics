@@ -9,6 +9,11 @@ import * as I from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
 import { WindArrow } from './matches.js';
+import { SquadDepth } from './depth.js';
+import { Rotations } from './rotation.js';
+import { SetScoreChance } from './setscore.js';
+import { Quadrant } from './quadrant.js';
+import { AnHead } from './anhead.js';
 
 /* average wind over a day's match start times */
 function dayWind(ms) {
@@ -48,36 +53,34 @@ export function Analytics({ sec, bow: b0 }) {
   // recurve and compound are kept apart everywhere: arrow-level numbers only use arrows of the chosen bow
   const ctx = I.ofBow(full, bow); const rctx = ctx;
   const Sec = { leaderboard: Leaderboard, positions: Positions, time: Time, pressure: Pressure, comebacks: Comebacks, strategy: Strategy, events: Events }[sec] || Leaderboard;
-  return html`<div class="page"><h1 class="pt">Analytics</h1>
-    <div class="bowbar"><span class="muted small">Bow</span><div class="seg">${I.BOWS.map(([k, l]) => html`<a class=${cls(bow === k && 'on')} href=${'#/analytics/' + sec + '/' + k[0]}>${l}</a>`)}</div><span class="muted small">Recurve and compound are never mixed: compound scores run higher.</span></div>
-    <nav class="subnav">${SECTIONS.map(([k, l]) => html`<a class=${cls(sec === k && 'on')} href=${'#/analytics/' + k + '/' + bk}>${l}</a>`)}</nav>
+  return html`<div class=${cls('page an', bk)}><${AnHead} sec=${sec} bow=${bow} full=${full} />
     <${Sec} S=${S} ctx=${ctx} rctx=${rctx} full=${full} bow=${bow} key=${sec + bk} /></div>`;
 }
 
 /* ---------- leaderboard with filters ---------- */
 function Leaderboard({ S, rctx, bow }) {
-  const [cat, setCat] = useState(''); const [teams, setTeams] = useState([]); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('16');
+  const [cat, setCat] = useState(''); const [teams, setTeams] = useState([]); const [stage, setStage] = useState(''); const [set, setSet] = useState(''); const [half, setHalf] = useState(''); const [min, setMin] = useState('1');
   const f = it => (!stage || (stage === 'League' ? it.m.stage === 'League' : it.m.stage !== 'League')) && (!set || String(it.a.set) === set) && (!half || (half === 'f' ? it.pos <= 4 : it.pos >= 5));
   const rows = archers(S, f).filter(a => I.bowOf(a.ar.cat) === bow && catOk(a.ar.cat, cat) && (!teams.length || teams.includes(a.ar.team)) && a.n >= +min);
-  const bestOf = b => { const l = archers(S, f).filter(a => I.bowOf(a.ar.cat) === b && a.n >= 16).sort((x, y) => y.avg - x.avg); return l[0]; };
-  const bc = bestOf('Compound'), br = bestOf('Recurve');
+  // the best man and best woman of the chosen bow only (at least 16 arrows, or 8 when nobody has 16)
+  const bestOf = c => { const all = archers(S, f).filter(a => a.ar.cat === c); let l = all.filter(a => a.n >= 16); if (!l.length) l = all.filter(a => a.n >= 8); return l.sort((x, y) => y.avg - x.avg)[0]; };
+  const best = [bow[0] + 'W', bow[0] + 'M'].map(c => ({ c, a: bestOf(c) }));
   return html`
     <div class="grid2">
-      <${Panel} title="Best compounder">${bc ? html`<div class="big"><${Arch} id=${bc.id} /><b>${f2(bc.avg)}</b><small class="muted">${bc.n} arrows · AGI ${bc.agi != null ? bc.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>
-      <${Panel} title="Best recurver">${br ? html`<div class="big"><${Arch} id=${br.id} /><b>${f2(br.avg)}</b><small class="muted">${br.n} arrows · AGI ${br.agi != null ? br.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>
+      ${best.map(({ c, a }) => html`<${Panel} title=${'Best ' + { RM: 'recurve man', RW: 'recurve woman', CM: 'compound man', CW: 'compound woman' }[c]}>${a ? html`<div class="big"><${Arch} id=${a.id} /><b>${f2(a.avg)}</b><small class="muted">${a.n} arrows${a.to ? ` · ${a.to} not shot in time` : ''} · AGI ${a.agi != null ? a.agi.toFixed(1) : '–'}</small></div>` : html`<p class="empty">Not enough data yet.</p>`}</${Panel}>`)}
     </div>
     <${Panel} title=${bow + ' leaderboard'} sub="Recorded matches only. Pick filters, then sort by any column. Switch bow at the top.">
       <div class="fbar">
         <${FGroup} label="Division"><${Seg} small label="Division" value=${cat} onPick=${setCat} opts=${[['', 'All'], [bow[0] + 'M', 'Men'], [bow[0] + 'W', 'Women']]} /></${FGroup}>
         <${FGroup} label="Stage"><${Seg} small label="Stage" value=${stage} onPick=${setStage} opts=${[['', 'All'], ['League', 'League'], ['PO', 'Playoffs']]} /></${FGroup}>
         <${FGroup} label="Set"><${Seg} small label="Set" value=${set} onPick=${setSet} opts=${[['', 'All'], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4']]} /></${FGroup}>
-        <${FGroup} label="Arrows of the set"><${Seg} small label="Arrows of the set" value=${half} onPick=${setHalf} opts=${[['', '1–8'], ['f', '1–4'], ['l', '5–8']]} /></${FGroup}>
+        <${FGroup} label="Arrows of the set"><${Seg} small label="Arrows of the set" value=${half} onPick=${setHalf} opts=${[['', 'All 8'], ['f', 'First 4'], ['l', 'Last 4']]} /></${FGroup}>
         <${FGroup} label="At least this many arrows"><${Steps} label="Minimum arrows" values=${['1', '8', '16', '32']} value=${min} onPick=${setMin} unit=" arrows" /></${FGroup}>
         <div class="fg fg-wide"><span class="fg-l">Teams</span><${CrestPick} compact value=${teams} onChange=${setTeams} /></div>
       </div>
       <${Table} sort="avg" rows=${rows} cols=${[
         ['rank', '#', (r, i) => i + 1], ['name', 'Archer', r => html`<${Arch} id=${r.id} />`, { sort: r => r.ar.name }], ['cat', 'Cat.', r => r.ar.cat, { sort: r => r.ar.cat, sm: 0 }],
-        ['n', 'Arrows', null, { num: 1, sm: 0 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['x', 'X', null, { num: 1, sm: 0 }],
+        ['n', 'Arrows', null, { num: 1, sm: 0 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }], ['tenRate', '10s', r => pct(r.tenRate), { num: 1, sm: 0 }], ['x', 'X', null, { num: 1, sm: 0 }], ['to', html`<abbr title="Arrows not shot before the clock ran out (recorded as M). Left out of the average.">Not shot</abbr>`, r => r.to || '–', { num: 1, sm: 0 }],
         ['at', 'Avg time', r => (r.at ? f1(r.at) + ' s' : '–'), { num: 1, sm: 0 }], ['agi', html`<abbr title="Arrow Grouping Index">AGI</abbr>`, r => (r.agi != null ? r.agi.toFixed(1) : '–'), { num: 1 }], ['group', 'Group cm', r => (r.group != null ? r.group.toFixed(1) : '–'), { num: 1, sm: 0 }]]} />
     </${Panel}>`;
 }
@@ -92,7 +95,7 @@ function Positions({ S, rctx, bow }) {
     </${Panel}>
     <${Panel} title="First 4 vs last 4 arrows" sub="Who finishes a set stronger than they start it.">
       <${Table} sort="delta" rows=${I.halves(rctx.filter(o => o.a.a), o => o.a.a, 4)} limit=${15} cols=${[
-        ['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['f', 'Arrows 1–4', r => f2(r.first.avg), { num: 1, sort: r => r.first.avg }], ['l', 'Arrows 5–8', r => f2(r.last.avg), { num: 1, sort: r => r.last.avg }],
+        ['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['f', 'First 4', r => f2(r.first.avg), { num: 1, sort: r => r.first.avg }], ['l', 'Last 4', r => f2(r.last.avg), { num: 1, sort: r => r.last.avg }],
         ['delta', 'Change', r => html`<b class=${r.delta >= 0 ? 'pos' : 'neg'}>${r.delta >= 0 ? '+' : ''}${f2(r.delta)}</b>`, { num: 1 }], ['n', 'Arrows', null, { num: 1 }]]} />
       <h3 class="sub">By team</h3>
       <${TeamHalves} S=${S} ctx=${rctx} />
@@ -104,7 +107,7 @@ function TeamHalves({ S, ctx }) {
 }
 
 /* ---------- time ---------- */
-function Time({ S, ctx, rctx, bow }) {
+function Time({ S, ctx, rctx, full, bow }) {
   const tv = I.timeVsScore(ctx);
   const ideal = I.idealTime(rctx);
   const eff = I.efficiency(rctx.filter(o => o.a.a), o => o.a.a, 16);
@@ -112,6 +115,9 @@ function Time({ S, ctx, rctx, bow }) {
   const tt = I.teamTime(S, ctx);
   const l2 = I.lastTwo(ctx);
   return html`
+    <${Panel} title=${'Score vs time: ' + bow.toLowerCase() + ' archers'} sub="Each photo is an archer: how long they take per arrow against what they score. Quick and accurate archers sit top left.">
+      <${Quadrant} ctx=${rctx} bow=${bow} />
+    </${Panel}>
     <div class="grid2">
       <${Panel} title="Time taken vs score" sub="Every recorded arrow with a clean clock reading, by seconds taken.">
         <${Columns} data=${tv.map(r => ({ x: r.label, y: r.avg, n: r.n }))} yMin=${8} yMax=${10} fmt=${f2} xLabel="Seconds taken" tip=${d => html`<b>${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />
@@ -133,12 +139,27 @@ function Time({ S, ctx, rctx, bow }) {
         <${Table} sort="bavg" rows=${ideal.map(r => Object.assign(r, { bavg: r.best.avg }))} limit=${10} cols=${[['id', 'Archer', r => html`<${Arch} id=${r.id} />`], ['w', 'Best window', r => r.best.label, { sort: r => r.best.i }], ['bavg', 'Avg there', r => f2(r.best.avg), { num: 1 }], ['avg', 'Overall', r => f2(r.avg), { num: 1 }]]} />
       </${Panel}>
     </div>
+    <${CatTime} S=${S} full=${full} bow=${bow} />
     <${Panel} title="Best player in each time window">
       <div class="tbl"><table><thead><tr><th>Seconds taken</th><th>1st</th><th>2nd</th><th>3rd</th></tr></thead><tbody>${win.map(w => html`<tr><td>${w.label}</td>${[0, 1, 2].map(i => html`<td>${w.best[i] ? html`<${Pick} id=${w.best[i].k} v=${f2(w.best[i].avg)} n=${w.best[i].n} />` : '–'}</td>`)}</tr>`)}</tbody></table></div>
     </${Panel}>
     <${Panel} title="Time crunch vs shot made" sub=${`Archers with ${I.CRUNCH} s or less left when they shot, against their other arrows.`}>
       <${Table} sort="n" rows=${I.crunch(rctx.filter(o => o.a.a), o => o.a.a, 2)} limit=${12} cols=${[['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['n', 'Crunch arrows', null, { num: 1 }], ['avg', 'Crunch avg', r => f2(r.avg), { num: 1 }], ['r', 'Other arrows', r => f2(r.rest.avg), { num: 1, sort: r => r.rest.avg }]]} />
     </${Panel}>`;
+}
+
+/* best archer in each of the four categories, in 2-second bands of time taken */
+function CatTime({ S, full, bow }) {
+  const [cat, setCat] = useState('');
+  const rows = I.bestByCatTime(S, full);
+  // the bow picked at the top goes first; each category is ranked only within itself
+  const order = bow === 'Compound' ? ['CM', 'CW', 'RM', 'RW'] : ['RM', 'RW', 'CM', 'CW'];
+  const cell = (r, c, i) => { const p = r.cats[c].best[i]; return p ? html`<${Pick} id=${p.k} v=${f2(p.avg)} n=${p.n} />` : html`<span class="muted">–</span>`; };
+  return html`<${Panel} title="Best archer in each category, by time taken" sub="Seconds an archer took for the arrow, in 2-second bands. Each category is ranked only against itself (at least 3 arrows in the band). Tap a category for its top three.">
+    <div class="fbar"><${FGroup} label="Category"><${Seg} small label="Category" value=${cat} onPick=${setCat} opts=${[['', 'All four'], ...order.map(c => [c, CATS[c]])]} /></${FGroup}></div>
+    ${rows.length ? html`<div class="tbl cattime"><table><thead><tr><th>Seconds taken</th>${cat ? ['1st', '2nd', '3rd'].map(l => html`<th>${l}</th>`) : order.map(c => html`<th>${CATS[c]}</th>`)}</tr></thead><tbody>
+      ${rows.map(r => html`<tr><td>${r.label}</td>${cat ? [0, 1, 2].map(i => html`<td>${cell(r, cat, i)}</td>`) : order.map(c => html`<td>${cell(r, c, 0)}</td>`)}</tr>`)}</tbody></table></div>` : html`<p class="empty">No timed arrows yet.</p>`}
+  </${Panel}>`;
 }
 
 /* ---------- pressure ---------- */
@@ -171,6 +192,7 @@ function Pressure({ S, ctx, rctx }) {
 function Comebacks({ S }) {
   const cb = I.comebacks(S); const so = I.shootOffs(S);
   return html`
+    <${Panel} title="What set score wins a set?" sub="Each row is a set score. The bar shows how likely a set with that score is to be won."><${SetScoreChance} S=${S} /></${Panel}>
     <${Panel} title="Sets won from behind" sub="Set-level, so both bows together by format. Sets a team won after trailing at the halfway point (4 arrows each) or after 6 arrows, and matches won after being behind on set points.">
       <${Table} sort="won4" rows=${cb} cols=${[['t', 'Team', r => html`<${Team} code=${r.t} full />`], ['won4', 'Won from behind at 4', r => `${r.won4} of ${r.behind4}`, { num: 1 }], ['won6', 'Won from behind at 6', r => `${r.won6} of ${r.behind6}`, { num: 1 }], ['matchWon', 'Matches won from behind', r => `${r.matchWon} of ${r.matchBehind}`, { num: 1 }]]} />
     </${Panel}>
@@ -188,14 +210,17 @@ function Comebacks({ S }) {
 function Strategy({ S, ctx, rctx, full, bow }) {
   const pr = I.predictability(S, full); const subs = I.substitutes(S, rctx);
   return html`
+    <${Panel} title="How teams rotate their archers" sub="Every set, each team's four archers (recurve man, recurve woman, compound man, compound woman) shoot two arrows each. This is the order they choose across the 8 arrows. Recorded matches only.">
+      <${Rotations} S=${S} />
+    </${Panel}>
+    <${Panel} title=${'Squad depth: ' + bow.toLowerCase()} sub="How close each team's archers are inside a category, so a coach can rotate the bench without losing points. Every dot is an archer at their arrow average; compare lanes across teams. Switch bow at the top.">
+      <${SquadDepth} bow=${bow} />
+    </${Panel}>
     <${Panel} title="How predictable is each team?" sub="Set totals always combine both bows (every set has two recurve and two compound archers). Spread of set totals (lower is steadier), and how close a set total lands to what the four archers' season averages predict.">
       <${Table} sort="sd" dir=${1} rows=${pr} cols=${[['t', 'Team', r => html`<${Team} code=${r.t} full />`], ['n', 'Sets', null, { num: 1 }], ['avg', 'Avg set', r => f1(r.avg), { num: 1 }], ['sd', 'Spread (±)', r => f1(r.sd), { num: 1 }], ['mae', 'Prediction miss', r => (r.mae != null ? '±' + f1(r.mae) : '–'), { num: 1 }], ['en', 'Sets predicted', null, { num: 1 }]]} />
     </${Panel}>
     <${Panel} title=${'Best ' + bow.toLowerCase() + ' substitute'} sub="Archers who were not in the first-set line-up but came in later in the match.">
       <${Table} sort="avg" rows=${subs} cols=${[['k', 'Archer', r => html`<${Arch} id=${r.k} />`], ['apps', 'Times subbed in', null, { num: 1 }], ['n', 'Arrows', null, { num: 1 }], ['avg', 'Average', r => f2(r.avg), { num: 1 }]]} empty="No substitutions in the recorded matches yet." />
-    </${Panel}>
-    <${Panel} title="Who shot when" sub="Each team's shooting order is on its team page.">
-      <div class="explore">${TEAMS.map(t => html`<a href=${'#/team/' + t} style=${`--tc:${tc(t)}`}><b>${S.T(t).name}</b><span>Shooting order and set strategy</span></a>`)}</div>
     </${Panel}>`;
 }
 

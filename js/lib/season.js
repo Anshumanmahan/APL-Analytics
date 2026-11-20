@@ -11,7 +11,7 @@ export const TEAMS = ['CA', 'CC', 'KK', 'MM', 'PY', 'RR'];
 export const COLOR = Object.assign({}, UI_COLOR, { KK: '#8a5ce6' });
 export const NDAYS = 11;
 export const slotsOf = d => (d === 10 ? 4 : 3);
-export const STAGE = (d, s) => (d < 10 ? 'League' : d === 10 ? (s === 4 ? 'Eliminator 1' : 'League') : ['Qualifier 1', 'Eliminator 2', 'Final'][s - 1]);
+export const STAGE = (d, s) => (d < 10 ? 'League' : d === 10 ? (s === 4 ? 'Eliminator 1' : 'League') : ['Shortcut Decider', 'Eliminator 2', 'The Final'][s - 1]);
 export const dateOf = d => new Date(2026, 9, 7 + d);
 export const dayName = d => dateOf(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 export const CLOCK = 120;
@@ -35,7 +35,7 @@ const OFFICIAL = {
   '4-1': ['CA', 'KK', 'CA', [6, 0], 0, 'wa1'], '4-2': ['CC', 'PY', 'PY', [2, 6], 0, 'tv'], '4-3': ['MM', 'RR', 'MM', [6, 2], 0, 'tv'],
   '5-1': ['CA', 'MM', 'MM', [4, 4], 1, 'wa1'], '5-2': ['CC', 'RR', 'RR', [1, 5], 0, 'wa1'], '5-3': ['PY', 'KK', 'KK', [2, 6], 0, 'wa1'],
   '6-1': ['CA', 'RR', 'RR', [0, 6], 0, 'tv'], '6-2': ['PY', 'MM', 'MM', [2, 6], 0, 'tv'], '6-3': ['CC', 'KK', 'KK', [0, 6], 0, 'tv'],
-  '7-1': ['CA', 'PY', 'PY', [0, 6], 0, 'tv'], '7-2': ['KK', 'RR', 'KK', [4, 4], 1, 'table'], '7-3': ['CC', 'MM', 'MM', null, 0, 'table'],
+  '7-1': ['CA', 'PY', 'PY', [0, 6], 0, 'tv'], '7-2': ['KK', 'RR', 'KK', [4, 4], 1, 'table'], '7-3': ['CC', 'MM', 'MM', [0, 6], 0, 'book'],
   '8-1': ['PY', 'CC', 'CC', [4, 4], 1, 'dd'], '8-2': ['RR', 'MM', 'RR', [6, 2], 0, 'dd'], '8-3': ['KK', 'CA', 'CA', [0, 6], 0, 'dd'],
   '9-1': ['CC', 'RR', 'CC', [5, 3], 0, 'tt'], '9-2': ['KK', 'PY', 'KK', [6, 2], 0, 'mk'], '9-3': ['CA', 'MM', 'MM', [0, 6], 0, 'mk'],
   '10-1': ['KK', 'MM', 'KK', [6, 0], 0, 'wa2'], '10-2': ['CC', 'CA', 'CA', [4, 4], 1, 'wa2'], '10-3': ['RR', 'PY', 'PY', [0, 6], 0, 'wa2'], '10-4': ['PY', 'CA', 'PY', [5, 1], 0, 'wa2'],
@@ -68,7 +68,9 @@ function times(arrows) {
 }
 
 function fromRecorded(r) {
-  return (r.arrows || []).slice().sort(byAt).map(a => ({ ph: a.ph, set: a.set, t: a.t, a: a.a || null, s: a.ph === 'S' ? (a.to ? 0 : a.s) : null, x: !!a.x, h: a.h, to: !!a.to, p: a.p || null, cl: a.cl, star: !!a.star, vt: a.vt }));
+  // a set arrow scored M (0) is an arrow the archer ran out of time to shoot: it counts as 0 in the set total, but as a time-out
+  // (not shot) everywhere else, so it doesn't drag arrow averages down
+  return (r.arrows || []).slice().sort(byAt).map(a => ({ ph: a.ph, set: a.set, t: a.t, a: a.a || null, s: a.ph === 'S' ? (a.to ? 0 : a.s) : null, x: !!a.x, h: a.h, to: !!a.to || (a.ph === 'S' && a.s === 0), p: a.p || null, cl: a.cl, star: !!a.star, vt: a.vt }));
 }
 function fromImport(imp) {
   const M = expandImport(imp.match); const out = [];
@@ -76,7 +78,7 @@ function fromImport(imp) {
     // a run of arrows sharing one video time is a recap board: scores are fine, clock readings are not
     const seen = {}; st.arrows.forEach(x => { seen[x.t] = (seen[x.t] || 0) + 1; });
     // a 0 the reader wasn't sure of is noise from a changing board, not a miss
-    st.arrows.filter(x => !(x.s === 0 && x.unsure)).forEach(x => out.push({ ph: 'S', set: i + 1, t: x.team, a: null, s: x.s, x: !!x.x, h: null, to: false, p: null, cl: x.cl, star: !!x.star, vt: x.t, bad: seen[x.t] >= 3 || !!x.clkOdd, unsure: !!x.unsure }));
+    st.arrows.filter(x => !(x.s === 0 && x.unsure)).forEach(x => out.push({ ph: 'S', set: i + 1, t: x.team, a: null, s: x.s, x: !!x.x, h: null, to: x.s === 0, p: null, cl: x.cl, star: !!x.star, vt: x.t, bad: seen[x.t] >= 3 || !!x.clkOdd, unsure: !!x.unsure }));
   });
   const n = { A: 0, B: 0 };
   (M.soArrows || []).forEach(x => { const k = n[x.team]++; out.push({ ph: k < 4 ? 'SO' : 'SD', set: k < 4 ? 0 : k - 3, t: x.team, a: null, s: null, h: !!x.h, vt: x.t }); });
@@ -123,7 +125,12 @@ export function buildSeason(rows) {
     const missing = sets.reduce((x, st) => x + Math.max(0, 8 - st.cnt.A) + Math.max(0, 8 - st.cnt.B), 0);
     if (src === 'broadcast' && missing) notes.push(`The scoreboard read missed ${missing} arrow${missing > 1 ? 's' : ''}, so some set totals here may be short.`);
     if (src === 'broadcast' && arrows.some(a => a.bad)) notes.push('One set was read from a recap board, so its clock times are left out.');
-    if (off[5] === 'table') notes.push('This result comes from the official final table: the broadcast read could not tell who won.');
+    // no official set score (e.g. a result taken from the final table): add up the set points of a fully recorded match
+    if (!sp && src === 'recorded' && sets.length >= 3 && sets.every(st => st.full)) {
+      sp = sets.reduce((x, st) => ({ A: x.A + st.pts.A, B: x.B + st.pts.B }), { A: 0, B: 0 });
+      if (off[2] && sp[teams.A === off[2] ? 'A' : 'B'] <= sp[teams.A === off[2] ? 'B' : 'A']) sp = null;
+    }
+    if (off[5] === 'table' && src !== 'recorded') notes.push('This result comes from the official final table: the broadcast read could not tell who won.');
     const so = arrows.filter(a => a.ph === 'SO' || a.ph === 'SD');
     matches.push({
       key, d, s, no: d <= 10 ? 3 * (d - 1) + s : 31 + s, stage: STAGE(d, s), date: dateOf(d), teams, win: off[2], sp, so: !!off[4], resSrc: off[5],
@@ -252,7 +259,7 @@ export function finalStandings(S) {
   const po = S.matches.filter(m => m.stage !== 'League');
   const inPO = new Set(po.flatMap(m => [m.teams.A, m.teams.B]));
   const done = m => m.win === m.teams.A || m.win === m.teams.B;
-  const fin = po.find(m => m.stage === 'Final'), e2 = po.find(m => m.stage === 'Eliminator 2'), e1 = po.find(m => m.stage === 'Eliminator 1');
+  const fin = po.find(m => m.stage === 'The Final'), e2 = po.find(m => m.stage === 'Eliminator 2'), e1 = po.find(m => m.stage === 'Eliminator 1');
   const tier = {}, note = {};
   lg.forEach(o => { if (inPO.has(o.t)) { tier[o.t] = 1.5; note[o.t] = 'In the playoffs'; } else { tier[o.t] = 4; note[o.t] = 'League stage'; } });
   const lost = (m, tr, n) => { if (m && done(m)) { const l = opp(m, m.win); tier[l] = tr; note[l] = n; } };
