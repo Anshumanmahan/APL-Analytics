@@ -57,14 +57,14 @@ function whySquad(D) {
     const sw = D.swaps.find(x => x.cat === c); const why = pool[0] === p ? `the top-rated ${ONE[c]} in the league` : r.score > p.score && sw && sw.v ? `picked ahead of ${r.ar.name}, who rates a little higher, because ${first(p.ar)}'s quicker pace (${f1(p.pace)} s against ${f1(r.pace)} s an arrow) keeps more of the set clear of the last 30 s, and the four expect ${f2(D.set.total - sw.v.total)} more a set; rated` : `the best ${ONE[c]} the squad rules allow`;
     out.push(html`<li><${CatTag} c=${c} /> <b>${p.ar.name}</b> starts: ${why} at <b>${f2(p.score)}</b> an arrow (${f2(p.raw)} raw over ${p.n} arrows${p.foreign ? `, and one of the two foreign slots` : ''}).</li>`);
     const above = pool.filter(a => a !== p && a !== r && a.score > r.score);
-    out.push(html`<li class="dt-sub"><b>${r.ar.name}</b> is the reserve at <b>${f2(r.score)}</b> (${f2(r.raw)} over ${r.n} arrows, ${f1(r.pace)} s an arrow)${above.length ? html`. Rated higher but left out: ${above.map((a, i) => html`${i ? ', ' : ''}${a.ar.name} (${f2(a.score)}${a.foreign ? ', foreign, and both foreign slots are better used elsewhere' : ''})`)}` : ', the next best in the category'}.</li>`);
+    out.push(html`<li class="dt-sub"><b>${r.ar.name}</b> is the reserve at <b>${f2(r.score)}</b> (${f2(r.raw)} over ${r.n} arrows, ${f1(r.pace)} s an arrow)${above.length ? html`. Rated higher but left out: ${above.map((a, i) => html`${i ? ', ' : ''}${a.ar.name} (${f2(a.score)}${a.foreign ? ', foreign, and the foreign slot for that gender is better used elsewhere' : ''})`)}` : ', the next best in the category'}.</li>`);
   });
   return out;
 }
 function whyForeign(D) {
   const g = D.gain.filter(x => x.d != null).sort((a, b) => b.d - a.d);
   const used = CAT_ORDER.filter(c => D.line[c].foreign || D.reserves[c].foreign);
-  return html`<p>Only two foreign archers fit in the squad, so they go where they add the most over the best Indian in the same category:
+  return html`<p>The squad holds exactly one foreign man and one foreign woman, so each goes where they add the most over the best Indian in the same category:
     ${g.map((x, i) => html`${i ? ', ' : ''}<${CatTag} c=${x.cat} /> ${x.f.ar.name} ${signed(x.d)} over ${x.i.ar.name}`)}.
     The squad uses them in ${used.map((c, i) => html`${i ? ' and ' : ''}<${CatTag} c=${c} />`)}${used.length && g[0] && !used.includes(g[0].cat) ? ' (the bigger gain on paper loses to the full squad value once reserves and the clock count)' : ''}.</p>`;
 }
@@ -130,7 +130,7 @@ export function DreamTeam() {
   return html`<div class="page dt">
     <h1 class="pt">Dream team</h1>
     <p class="lead">The best APL squad the data can build: 8 archers under the league's squad rules, the playing 4, and who shoots each of the 8 arrows so the team uses its ${CLOCK} s clock fully. Purely from the ${rec} matches recorded arrow by arrow; it updates as more are recorded.</p>
-    <div class="dt-rules">${[`Squad of ${RULES.squad}`, `${RULES.perCat} per category`, `${RULES.foreign} foreign · ${RULES.indian} Indian`, `Playing 4 with ≥ ${RULES.foreignInPlay} foreign`, `${RULES.arrows} arrows each a set`, `${CLOCK} s per team per set`, `${RULES.subs} substitutions`].map(t => html`<span>${t}</span>`)}</div>
+    <div class="dt-rules">${[`Squad of ${RULES.squad}`, `${RULES.perCat} per category`, `1 foreign man + 1 foreign woman · ${RULES.indian} Indian`, `Playing 4 with ≥ ${RULES.foreignInPlay} foreign`, `${RULES.arrows} arrows each a set`, `${CLOCK} s per team per set`, `${RULES.subs} substitutions`].map(t => html`<span>${t}</span>`)}</div>
 
     <${Panel} title="The squad" sub="Top row is the playing 4, bottom row the reserves. Tap an archer for their profile.">
       <div class="dt-grid">${CAT_ORDER.map(c => html`<div class="dt-col" style=${`--cc:${CAT_COL[c]}`}>
@@ -157,7 +157,7 @@ export function DreamTeam() {
     <${Panel} title="How it's worked out">
       <ul class="dt-why small">
         <li>Recorded matches only (the TV scoreboard read doesn't say who shot). Recurve and compound, men and women, are rated only against their own category.</li>
-        <li>Every squad that keeps the rules is tried (the top 6 in each category, two each, exactly ${RULES.foreign} foreign). For each, every playing 4 with a foreign archer is played out over all ${D.R.orders.length} shooting orders in which no archer shoots twice in a row (each four-arrow loop shot twice, and each pair-then-pair order). The squad with the best expected set wins, with a small extra credit for strong reserves, since ${RULES.subs} substitutions are allowed.</li>
+        <li>Every squad that keeps the rules is tried (the top 6 in each category, two each, exactly one foreign man and one foreign woman). For each, every playing 4 with a foreign archer is played out over all ${D.R.orders.length} shooting orders in which no archer shoots twice in a row (each four-arrow loop shot twice, and each pair-then-pair order). The squad with the best expected set wins, with a small extra credit for strong reserves, since ${RULES.subs} substitutions are allowed.</li>
         <li>An archer needs ${MIN} arrows to be picked. Time-outs count as 0. A plan keeps ${BUFFER} s in hand; any extra time the four need is taken off the last arrows, which lose points at the measured hurry cost.</li>
       </ul>
     </${Panel}>

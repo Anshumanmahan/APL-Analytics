@@ -9,6 +9,7 @@ import * as I from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
 import { loadWeather, wxAt, compass, wxStatus } from '../lib/weather.js';
 import { WindArrow } from './matches.js';
+import { SquadDepth } from './depth.js';
 import { Rotations } from './rotation.js';
 import { SetScoreChance } from './setscore.js';
 import { Quadrant } from './quadrant.js';
@@ -211,6 +212,9 @@ function Strategy({ S, ctx, rctx, full, bow }) {
   return html`
     <${Panel} title="How teams rotate their archers" sub="Every set, each team's four archers (recurve man, recurve woman, compound man, compound woman) shoot two arrows each. This is the order they choose across the 8 arrows. Recorded matches only.">
       <${Rotations} S=${S} />
+    </${Panel}>
+    <${Panel} title=${'Squad depth: ' + bow.toLowerCase()} sub="How close each team's archers are inside a category, so a coach can rotate the bench without losing points. Every dot is an archer at their arrow average; compare lanes across teams. Switch bow at the top.">
+      <${SquadDepth} bow=${bow} />
     </${Panel}>
     <${Panel} title="How predictable is each team?" sub="Set totals always combine both bows (every set has two recurve and two compound archers). Spread of set totals (lower is steadier), and how close a set total lands to what the four archers' season averages predict.">
       <${Table} sort="sd" dir=${1} rows=${pr} cols=${[['t', 'Team', r => html`<${Team} code=${r.t} full />`], ['n', 'Sets', null, { num: 1 }], ['avg', 'Avg set', r => f1(r.avg), { num: 1 }], ['sd', 'Spread (±)', r => f1(r.sd), { num: 1 }], ['mae', 'Prediction miss', r => (r.mae != null ? '±' + f1(r.mae) : '–'), { num: 1 }], ['en', 'Sets predicted', null, { num: 1 }]]} />

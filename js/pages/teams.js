@@ -3,9 +3,9 @@ import { html } from '../../vendor/preact-htm.js';
 import { TEAMS, standings, finalStandings, teamSets, archers, sideOf, opp } from '../lib/season.js';
 import { app, cls, f1, f2, pct, tc, Result, Tiles, matchTitle } from '../lib/ui.js';
 import { Crest, Avatar } from '../lib/media.js';
-import { Form } from '../lib/charts.js';
+import { Form, Columns } from '../lib/charts.js';
 import { Arch, Table, Panel } from './common.js';
-import { RotationCard, CatKey } from './rotation.js';
+import { RotationCard, CatKey, CAT_COL } from './rotation.js';
 import { SubsPanel } from './subs.js';
 import { context, halves, shootingOrder, mean, CRUNCH, BOWS, ofBow, bowOf } from '../lib/insights.js';
 import { summarize } from '../lib/season.js';
@@ -48,6 +48,36 @@ function extremes(squad, b) {
 }
 const ExCard = ({ r, kind, code }) => html`<a class=${'excard ' + kind} href=${'#/player/' + r.id} style=${`--tc:${tc(code)}`}>
   <${Avatar} ar=${r.ar} size=${52} /><span class="ex-b"><small>${kind === 'best' ? 'Strongest' : 'Weakest'}</small><b class="nm">${r.ar.name}</b><small class="muted">${r.ar.cat} · ${r.n} arrows · ${pct(r.tenRate)} 10s</small></span><b class="ex-v">${f2(r.avg)}</b></a>`;
+
+/* time strategy at each place 1–8 of the set: how long this team spends on each arrow against the league,
+   the clock left when it is shot, who usually shoots it, and the score there (recurve and compound apart) */
+function placeTime(S, code) {
+  const all = context(S); const mine = all.filter(o => o.code === code);
+  return [1, 2, 3, 4, 5, 6, 7, 8].map(p => {
+    const l = mine.filter(o => o.pos === p), lg = all.filter(o => o.pos === p);
+    const dt = l.filter(o => o.a.dt != null).map(o => o.a.dt), ldt = lg.filter(o => o.a.dt != null).map(o => o.a.dt);
+    const cl = l.filter(o => o.clBefore != null).map(o => o.clBefore);
+    const cats = {}; l.forEach(o => { const c = o.a.a && S.A(o.a.a).cat; if (c) cats[c] = (cats[c] || 0) + 1; });
+    const top = Object.entries(cats).sort((a, b) => b[1] - a[1])[0];
+    return { p, n: l.length, at: mean(dt), lat: mean(ldt), cl: mean(cl), cat: top ? top[0] : null, catShare: top ? top[1] / l.length : 0,
+      r: summarize(ofBow(l, 'Recurve')), c: summarize(ofBow(l, 'Compound')) };
+  });
+}
+function PlaceTime({ S, code }) {
+  const rows = placeTime(S, code);
+  if (!rows.some(r => r.at != null)) return html`<p class="empty">No timed arrows for this team yet.</p>`;
+  const tot = rows.reduce((x, r) => x + (r.at || 0), 0);
+  const sgn = v => (v >= 0 ? '+' : '−') + Math.abs(v).toFixed(1);
+  return html`
+    <${Columns} data=${rows.map(r => ({ x: r.p, y: r.at, n: r.n }))} yMin=${0} fmt=${f1} xLabel="Place in the set" color=${tc(code)} tip=${d => { const r = rows[d.x - 1]; return html`<b>Arrow ${d.x}</b><span>${f1(d.y)} s here · league ${f1(r.lat)} s</span>`; }} />
+    <div class="tbl"><table><thead><tr><th>Place</th><th class="n">Time</th><th class="n">vs league</th><th class="n hs">Clock left</th><th>Usually</th><th class="n">Recurve avg</th><th class="n">Compound avg</th></tr></thead><tbody>
+      ${rows.map(r => html`<tr><td>${r.p}</td><td class="n">${r.at != null ? f1(r.at) + ' s' : '–'}</td>
+        <td class="n">${r.at != null && r.lat != null ? html`<b class=${r.at <= r.lat ? 'pos' : 'neg'}>${sgn(r.at - r.lat)} s</b>` : '–'}</td>
+        <td class="n hs">${r.cl != null ? Math.round(r.cl) + ' s' : '–'}</td>
+        <td>${r.cat ? html`<span class="ptcat" style=${`--cc:${CAT_COL[r.cat]}`}>${r.cat}</span> <small class="muted">${Math.round(100 * r.catShare)}%</small>` : '–'}</td>
+        <td class="n">${r.r.n ? html`${f2(r.r.avg)} <small class="muted">${r.r.n}</small>` : '–'}</td><td class="n">${r.c.n ? html`${f2(r.c.avg)} <small class="muted">${r.c.n}</small>` : '–'}</td></tr>`)}</tbody></table></div>
+    <p class="muted small">A full set of eight takes this team about <b>${Math.round(tot)} s</b> of the 120 s clock on average. Green is quicker than the league at that place, red slower.</p>`;
+}
 
 export function TeamPage({ code }) {
   const S = app.S; const t = S.T(code);
@@ -94,6 +124,9 @@ export function TeamPage({ code }) {
       <${SubsPanel} code=${code} />
     </${Panel}>
 
+    <${Panel} title="Time strategy at each place 1–8" sub="Seconds this team takes for each arrow of the set, against the league average at the same place, with the clock left before it and who usually shoots it. Scores stay split by bow.">
+      <${PlaceTime} S=${S} code=${code} />
+    </${Panel}>
     <div class="grid2">
       <${Panel} title="Who shot when" sub="How often each archer shot each arrow of the set (1st to 8th), across recorded matches. Darker is more often.">
         ${Object.keys(ord.grid).length ? html`<div class="tbl"><table class="heat"><thead><tr><th>Archer</th>${[1, 2, 3, 4, 5, 6, 7, 8].map(p => html`<th class="n">${p}</th>`)}</tr></thead><tbody>

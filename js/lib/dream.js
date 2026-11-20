@@ -3,7 +3,7 @@
 
    APL rules used (Season 2):
    - a squad of 8: 2 recurve men, 2 recurve women, 2 compound men, 2 compound women;
-   - 2 foreign archers and 6 Indian archers in the squad;
+   - 2 foreign archers (1 man and 1 woman) and 6 Indian archers in the squad;
    - a playing 4 (one per category) with at least 1 foreign archer, each shooting 2 arrows a set;
    - each team has 120 seconds on its clock for its 8 arrows; 2 substitutions a match.
 
@@ -24,7 +24,7 @@
 import { CLOCK, positions, scored } from './season.js';
 import { CAT_ORDER, CATS } from './rules.js';
 
-export const RULES = { squad: 8, perCat: 2, foreign: 2, indian: 6, play: 4, foreignInPlay: 1, arrows: 2, clock: CLOCK, subs: 2 };
+export const RULES = { squad: 8, perCat: 2, foreign: 2, foreignMen: 1, foreignWomen: 1, indian: 6, play: 4, foreignInPlay: 1, arrows: 2, clock: CLOCK, subs: 2 };
 export const K = 12;          // prior arrows for the score
 const KT = 8;                  // prior arrows for the pace
 const KL = 8;                  // prior arrows for the late-clock effect
@@ -160,6 +160,9 @@ export function dreamTeam(S) {
   P[0].forEach(p0 => P[1].forEach(p1 => P[2].forEach(p2 => P[3].forEach(p3 => {
     const ps = [p0, p1, p2, p3]; const nf = ps.reduce((x, p) => x + p.filter(a => a.foreign).length, 0);
     if (nf !== RULES.foreign) return;
+    // one foreign man and one foreign woman (categories ending in M or W)
+    const fm = ps.reduce((x, p) => x + p.filter(a => a.foreign && a.cat[1] === 'M').length, 0);
+    if (fm !== RULES.foreignMen || nf - fm !== RULES.foreignWomen) return;
     let top = null;
     for (let m = 0; m < 16; m++) {
       const l = {}; CAT_ORDER.forEach((c, i) => { l[c] = ps[i][(m >> i) & 1]; });

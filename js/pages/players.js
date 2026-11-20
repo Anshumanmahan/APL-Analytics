@@ -39,6 +39,20 @@ export function Players() {
   </div>`;
 }
 
+/* each match: points scored against the 10-a-arrow maximum */
+function Dropped({ S, id, ms }) {
+  const rows = ms.map(m => { const l = m.arrows.filter(a => a.ph === 'S' && a.a === id && (a.to || a.s != null));
+    const got = l.reduce((x, a) => x + (a.to ? 0 : a.s), 0), poss = 10 * l.length; return { m, n: l.length, got, poss, drop: poss - got, to: l.filter(a => a.to).length }; }).filter(r => r.n);
+  if (!rows.length) return html`<p class="empty">No recorded set arrows yet.</p>`;
+  const T = rows.reduce((x, r) => ({ got: x.got + r.got, poss: x.poss + r.poss }), { got: 0, poss: 0 });
+  const best = rows.slice().sort((a, b) => a.drop / a.poss - b.drop / b.poss)[0];
+  return html`<div class="drops">${rows.map(r => html`<a class="drop" href=${'#/match/' + r.m.key}>
+      <span class="dr-t muted small">${matchTitle(r.m)}</span>
+      <span class="dr-bar" style=${`--k:${(100 * r.got / r.poss).toFixed(1)}%;--tc:${tc(S.A(id).team)}`}><i></i></span>
+      <span class="dr-v"><b>−${r.drop}</b><small class="muted"> of ${r.poss}${r.to ? ` · ${r.to} not shot` : ''}</small></span></a>`)}</div>
+    <p class="small">Season: <b>${T.got}</b> of a possible <b>${T.poss}</b>, so <b>${T.poss - T.got}</b> points dropped (${(10 * T.got / T.poss).toFixed(2)} an arrow). Cleanest match: ${matchTitle(best.m)}, dropping ${best.drop} of ${best.poss}.</p>`;
+}
+
 export function PlayerPage({ id }) {
   const S = app.S; const ar = S.A(id);
   const me = archers(S).find(a => a.id === id);
@@ -74,6 +88,9 @@ export function PlayerPage({ id }) {
           <span>Time crunch (≤${CRUNCH} s left)</span><b>${f2(cr.avg)} <small class="muted">${cr.n}</small></b><span>Average pressure faced</span><b>${f1(mean(ctx.map(o => o.pi)))}</b></div>
       </${Panel}>
     </div>
+    <${Panel} title="Points dropped in each match" sub="Out of a possible 10 for every arrow the archer had to shoot in the sets. An arrow not shot in time counts as all 10 dropped here.">
+      <${Dropped} S=${S} id=${id} ms=${ms} />
+    </${Panel}>
     <${Panel} title="Matches">
       ${ms.map(m => { const l = ctx.filter(o => o.m === m); return html`<div class="plog"><a class="muted small" href=${'#/match/' + m.key}>${matchTitle(m)}</a><span>${l.map(o => html`<span class="schip" style=${chipStyle(o.a)} title=${`Set ${o.a.set}, arrow ${o.pos}${o.a.dt != null ? ', ' + o.a.dt + ' s' : ''}`}>${label(o.a)}</span>`)}</span><b>${f2(mean(l.map(o => o.a.s)))}</b></div>`; })}
     </${Panel}>
