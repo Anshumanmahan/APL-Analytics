@@ -1,0 +1,49 @@
+/* PREVIEW ONLY: font options for the site, switched with the chips at the bottom (fontpick).
+   Each option sets --f (body), --fh (headings) and --mono (micro-labels). Remove the
+   options that aren't picked, and the picker, before going live. */
+:root { --fh: var(--f); }
+h1, h2, h3, .brand .wm b, .tile b, .pt { font-family: var(--fh); }
+
+/* 1 Sporty: Barlow Condensed headings, Inter body */
+:root[data-font="barlow"] { --f: 'Inter', system-ui, sans-serif; --fh: 'Barlow Condensed', 'Inter', sans-serif; }
+/* 2 Premium: Space Grotesk headings, IBM Plex Sans body, IBM Plex Mono labels */
+:root[data-font="plex"] { --f: 'IBM Plex Sans', system-ui, sans-serif; --fh: 'Space Grotesk', sans-serif; --mono: 'IBM Plex Mono', ui-monospace, monospace; }
+/* 3 Broadcast: Oswald headings, Manrope body */
+:root[data-font="oswald"] { --f: 'Manrope', system-ui, sans-serif; --fh: 'Oswald', 'Manrope', sans-serif; }
+/* 4 Minimal: Outfit everywhere */
+:root[data-font="outfit"] { --f: 'Outfit', system-ui, sans-serif; --fh: 'Outfit', sans-serif; }
+
+/* scores and averages line up in columns */
+:root[data-font] body { font-variant-numeric: tabular-nums; }
+
+/* condensed heading faces need open spacing and suit capitals on the big titles */
+:root[data-font="barlow"] :is(h1, h2, h3, .pt), :root[data-font="oswald"] :is(h1, h2, h3, .pt) { letter-spacing: .01em; }
+:root[data-font="barlow"] :is(.hhero h1, .h2-text h1, .ph h1, .thero h1, .thero2 h1, .phero h1, .phero2 h1, .hero h1, .gate h1),
+:root[data-font="oswald"] :is(.hhero h1, .h2-text h1, .ph h1, .thero h1, .thero2 h1, .phero h1, .phero2 h1, .hero h1, .gate h1) { text-transform: uppercase; letter-spacing: .01em; }
+:root[data-font="barlow"] :is(h1, h2, h3, .pt) { font-weight: 700; }
+:root[data-font="barlow"] .panel h2 { font-size: 18px; font-weight: 600; }
+:root[data-font="oswald"] :is(h1, .pt) { font-weight: 600; }
+:root[data-font="oswald"] .panel h2 { font-size: 16.5px; font-weight: 500; }
+:root[data-font="barlow"] .tile b { font-size: 34px; letter-spacing: 0; }
+:root[data-font="oswald"] .tile b { letter-spacing: 0; font-weight: 500; }
+:root[data-font="barlow"] .brand .wm b, :root[data-font="oswald"] .brand .wm b { letter-spacing: .1em; font-size: 19px; }
+:root[data-font="outfit"] :is(h1, h2, h3, .pt) { letter-spacing: -.02em; }
+:root[data-font="outfit"] :is(.hhero h1, .h2-text h1) { letter-spacing: -.035em; }
+
+/* the picker */
+.fontpick { position: fixed; left: 50%; bottom: max(12px, env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 9000;
+  display: flex; align-items: center; gap: 4px; padding: 5px; max-width: calc(100vw - 24px); overflow-x: auto; scrollbar-width: none;
+  border-radius: 999px; border: 1px solid var(--line); background: color-mix(in srgb, var(--solid) 88%, transparent);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 10px 30px rgba(0, 0, 0, .35); font-family: 'JetBrains Mono', monospace; }
+.fontpick::-webkit-scrollbar { display: none; }
+.fontpick > span { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--goldtx); padding: 0 8px 0 10px; white-space: nowrap; }
+.fontpick button { all: unset; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 12px; border-radius: 999px;
+  color: var(--mut); white-space: nowrap; transition: background .15s, color .15s; }
+.fontpick button b { font-size: 15px; line-height: 1.1; font-weight: 700; color: var(--tx); }
+.fontpick button small { font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
+.fontpick button:hover { background: var(--raise); }
+.fontpick button[aria-pressed="true"] { background: var(--gold); color: #3a2c00; }
+.fontpick button[aria-pressed="true"] b { color: #1a1300; }
+.fontpick button:focus-visible { outline: 1px solid var(--gold); }
+body { padding-bottom: 76px; }
+@media (max-width: 560px) { .fontpick > span, .fontpick button small { display: none; } .fontpick { gap: 2px; padding: 4px; } .fontpick button { padding: 8px 7px; } .fontpick button b { font-size: 12.5px; } }
