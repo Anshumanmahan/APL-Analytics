@@ -231,8 +231,8 @@ function Events({ S, ctx }) {
   return html`
     <${Panel} title="Day by day" sub="Arrow average per match day, how much of each day is recorded, and the average wind at match start times (modelled for the venue).">
       <${Columns} data=${days.map(d => ({ x: 'D' + d.d, y: d.n ? d.avg : null, n: d.n }))} yMin=${8} yMax=${10} fmt=${f2} xLabel="Match day" tip=${d => html`<b>${d.x}</b><span>${f2(d.y)} from ${d.n}</span>`} />
-      <div class="tbl"><table><thead><tr><th>Day</th><th>Date</th><th class="n">Matches</th><th class="n">Recorded</th><th class="n">Arrows</th><th class="n">Avg</th><th class="n">Avg time</th><th>Wind</th></tr></thead><tbody>
-      ${days.map(d => html`<tr><td>${d.d}</td><td>${dayName(d.d)}</td><td class="n">${d.matches.length}</td><td class="n">${d.rec}</td><td class="n">${d.n}</td><td class="n">${f2(d.avg)}</td><td class="n">${d.at ? f1(d.at) + ' s' : '–'}</td><td>${dayWind(d.matches)}</td></tr>`)}</tbody></table></div>
+      <div class="tbl"><table><thead><tr><th>Day</th><th class="n">Matches</th><th class="n">Recorded</th><th class="n">Arrows</th><th class="n">Avg</th><th class="n">Avg time</th><th>Wind</th></tr></thead><tbody>
+      ${days.map(d => html`<tr><td>Day ${d.d}</td><td class="n">${d.matches.length}</td><td class="n">${d.rec}</td><td class="n">${d.n}</td><td class="n">${f2(d.avg)}</td><td class="n">${d.at ? f1(d.at) + ' s' : '–'}</td><td>${dayWind(d.matches)}</td></tr>`)}</tbody></table></div>
     </${Panel}>
     <${WindScores} ctx=${ctx} S=${S} />
     <${Panel} title="League vs playoffs">

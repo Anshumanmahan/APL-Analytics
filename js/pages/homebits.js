@@ -1,8 +1,8 @@
 /* Home: a points table of team rows and a playoff bracket (Shortcut Decider and Eliminator 1, then Eliminator 2, then The Final). */
 import { html } from '../../vendor/preact-htm.js';
 import { dayName } from '../lib/season.js';
-import { cls, tc } from '../lib/ui.js';
-import { Crest } from '../lib/media.js';
+import { cls, tc, f2 } from '../lib/ui.js';
+import { Crest, Avatar } from '../lib/media.js';
 import { Form } from '../lib/charts.js';
 
 const opp = (m, t) => (m.teams.A === t ? m.teams.B : m.teams.A);
@@ -77,4 +77,22 @@ export function Bracket({ S }) {
       </div>
     </div>
   </div>`;
+}
+
+/* ---------- leaders: per bow, the top 3 by arrow average and by grouping (AGI); the leader gets a big card ---------- */
+function LeadList({ S, title, list, val, unit }) {
+  if (!list.length) return html`<div class="ld-col"><h4>${title}</h4><p class="muted small">Not enough arrows yet.</p></div>`;
+  const [top, ...rest] = list; const a0 = S.A(top.id);
+  return html`<div class="ld-col"><h4>${title}</h4>
+    <a class="ld-top" href=${'#/player/' + top.id} style=${`--tc:${tc(a0.team)}`}><${Avatar} ar=${a0} size=${46} />
+      <span class="ld-nm"><b>${a0.name}</b><small>${S.T(a0.team).name}</small></span><span class="ld-v"><em>${val(top)}</em><small>${unit}</small></span><i class="ld-rk">1</i></a>
+    ${rest.map((x, i) => { const a = S.A(x.id); return html`<a class="ld-row" href=${'#/player/' + x.id} style=${`--tc:${tc(a.team)}`}>
+      <span class="ld-n">${i + 2}</span><${Avatar} ar=${a} size=${28} /><span class="ld-nm"><b>${a.name}</b><small>${a.team}</small></span><span class="ld-v"><em>${val(x)}</em></span></a>`; })}
+  </div>`;
+}
+export function Leaders({ S, byBow }) {
+  return html`<div class="ld">${byBow.map(x => html`<div class="ld-bow"><h3 class="bowh">${x.b}</h3><div class="ld-grid">
+    <${LeadList} S=${S} title="Arrow average" list=${x.topAvg} val=${a => f2(a.avg)} unit="avg" />
+    <${LeadList} S=${S} title="Grouping (AGI)" list=${x.topAgi} val=${a => a.agi.toFixed(1)} unit="AGI" />
+  </div></div>`)}</div>`;
 }

@@ -38,7 +38,7 @@ export function Result({ m, small }) {
     <span class=${cls('rt r', m.win === b && 'w')}><${Team} code=${b} link=${false} /></span>
   </a>`;
 }
-export const matchTitle = m => `${m.stage === 'League' ? 'Day ' + m.d + ' · match ' + m.s : m.stage} · ${dayName(m.d)}`;
+export const matchTitle = m => (m.stage === 'League' ? `Day ${m.d} · match ${m.s}` : `${m.stage} · ${dayName(m.d)}`);
 
 export function Tiles({ items }) {
   return html`<div class="tiles">${items.map(([v, l, sub]) => html`<div class="tile"><b>${v}</b><span>${l}</span>${sub && html`<small>${sub}</small>`}</div>`)}</div>`;

@@ -13,7 +13,7 @@ export const NDAYS = 11;
 export const slotsOf = d => (d === 10 ? 4 : 3);
 export const STAGE = (d, s) => (d < 10 ? 'League' : d === 10 ? (s === 4 ? 'Eliminator 1' : 'League') : ['Shortcut Decider', 'Eliminator 2', 'The Final'][s - 1]);
 export const dateOf = d => new Date(2026, 9, 7 + d);
-export const dayName = d => dateOf(d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+export const dayName = d => 'Day ' + d; // the user wants day numbers only, no calendar dates
 export const CLOCK = 120;
 
 export const SOURCES = {
