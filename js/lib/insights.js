@@ -88,6 +88,18 @@ export function bestInWindow(ctx, min = 4) {
     return { label, best: groupBy(l, o => o.a.a, min).sort((x, y) => y.avg - x.avg).slice(0, 3), n: l.length };
   });
 }
+/* best archer of each category (RM, RW, CM, CW) in 2-second bands of time taken.
+   Each category is ranked only against itself, so recurve and compound never meet. */
+export const BANDS2 = [[0, 10, 'under 10 s'], ...[10, 12, 14, 16, 18, 20].map(a => [a, a + 2, `${a}–${a + 2} s`]), [22, 999, '22 s +']];
+export function bestByCatTime(S, ctx, min = 3) {
+  const l = ctx.filter(o => o.a.a && o.a.dt != null);
+  return BANDS2.map(([a, b, label]) => {
+    const inb = l.filter(o => o.a.dt >= a && o.a.dt < b);
+    const cats = {};
+    ['RM', 'RW', 'CM', 'CW'].forEach(c => { const lc = inb.filter(o => S.A(o.a.a).cat === c); cats[c] = { n: lc.length, best: groupBy(lc, o => o.a.a, min).sort((x, y) => y.avg - x.avg || y.n - x.n).slice(0, 3) }; });
+    return { label, a, b, n: inb.length, cats };
+  }).filter(r => r.n);
+}
 /* time crunch: shot with 15 s or less left on the clock */
 export const CRUNCH = 15;
 export function crunch(ctx, key, min = 3) {
